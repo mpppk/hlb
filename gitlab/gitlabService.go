@@ -3,29 +3,22 @@ package gitlab
 import (
 	"context"
 	"github.com/xanzy/go-gitlab"
-	"errors"
 	"github.com/mpppk/hlb/project"
 	"fmt"
+	"github.com/mpppk/hlb/etc"
 )
 
 type Service struct {
 	Client *gitlab.Client
+	hostName string
 	ListOptions *gitlab.ListOptions
 }
 
-func NewService(token string, baseUrlStrs ...string) (project.Service, error) {
-	if len(baseUrlStrs) > 1 {
-		return nil, errors.New("too many base urls")
-	}
-
-	client := gitlab.NewClient(nil, token)
-
-	if len(baseUrlStrs) == 1 {
-		client.SetBaseURL(baseUrlStrs[0])
-	}
-
+func NewService(host *etc.Host) (project.Service, error) {
+	client := gitlab.NewClient(nil, host.OAuthToken)
+	client.SetBaseURL(host.Protocol + "://" + host.Name+ "/api/v3")
 	listOpt := &gitlab.ListOptions{PerPage: 100}
-	return project.Service(&Service{Client: client, ListOptions: listOpt}), nil
+	return project.Service(&Service{Client: client, hostName: host.Name, ListOptions: listOpt}), nil
 }
 
 func (s *Service) GetIssues(ctx context.Context, owner, repo string) (issues []project.Issue, err error) {
@@ -61,5 +54,13 @@ func (s *Service) GetRepository(ctx context.Context, owner, repo string) (projec
 }
 
 func (s *Service) GetRepositoryURL(owner, repo string) (string, error) {
-	return fmt.Sprintf("https://gitlab.com/%s/%s" , owner, repo), nil
+	return fmt.Sprintf("https://%s/%s/%s", s.hostName, owner, repo), nil
+}
+
+func (s *Service) GetIssuesURL(owner, repo string) (string, error) {
+	repoUrl, err := s.GetRepositoryURL(owner, repo)
+	if err != nil {
+		return "", err
+	}
+	return repoUrl + "/issues", nil
 }

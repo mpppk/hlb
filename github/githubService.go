@@ -4,37 +4,31 @@ import (
 	"context"
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
-	"errors"
 	"net/url"
 	"github.com/mpppk/hlb/project"
 	"fmt"
+	"github.com/mpppk/hlb/etc"
 )
 
 type Service struct {
 	Client *github.Client
+	hostName string
 	ListOptions *github.ListOptions
 }
 
-func NewService(ctx context.Context, token string, baseUrlStrs ...string) (*Service, error) {
-	if len(baseUrlStrs) > 1 {
-		return nil, errors.New("too many base urls")
-	}
-
-	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
+func NewService(ctx context.Context, host *etc.Host) (*Service, error) {
+	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: host.OAuthToken})
 	tc := oauth2.NewClient(ctx, ts)
 	client := github.NewClient(tc)
 
-	if len(baseUrlStrs) == 1 {
-		baseUrl, err := url.Parse(baseUrlStrs[0])
-		if err != nil {
-			return nil, err
-		}
-
-		client.BaseURL = baseUrl
+	baseUrl, err := url.Parse(host.Protocol + "://api." + host.Name)
+	if err != nil {
+		return nil, err
 	}
 
+	client.BaseURL = baseUrl
 	listOpt := &github.ListOptions{PerPage: 100}
-	return &Service{Client: client, ListOptions: listOpt}, nil
+	return &Service{Client: client, hostName: host.Name, ListOptions: listOpt}, nil
 }
 
 func (s *Service) GetPullRequests(ctx context.Context, owner, repo string) (pullRequests []project.PullRequest, err error) {
@@ -93,5 +87,13 @@ func (s *Service) GetRepository(ctx context.Context, owner, repo string) (projec
 }
 
 func (s *Service) GetRepositoryURL(owner, repo string) (string, error) {
-	return fmt.Sprintf("https://github.com/%s/%s" , owner, repo), nil
+	return fmt.Sprintf("https://%s/%s/%s", s.hostName, owner, repo), nil
+}
+
+func (s *Service) GetIssuesURL(owner, repo string) (string, error) {
+	repoUrl, err := s.GetRepositoryURL(owner, repo)
+	if err != nil {
+		return "", err
+	}
+	return repoUrl + "/issues", nil
 }

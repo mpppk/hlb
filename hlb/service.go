@@ -13,7 +13,7 @@ func GetService(ctx context.Context, host *etc.Host) (project.Service, error){
 
 	switch host.Type {
 	case etc.HOST_TYPE_GITHUB.String():
-		service, err := github.NewService(ctx, host.OAuthToken, host.Protocol + "://api." + host.Name)
+		service, err := github.NewService(ctx, host)
 		if err != nil {
 			return nil, err
 		}
@@ -21,7 +21,7 @@ func GetService(ctx context.Context, host *etc.Host) (project.Service, error){
 	}
 	switch host.Type {
 	case etc.HOST_TYPE_GITLAB.String():
-		service, err := gitlab.NewService(host.OAuthToken, host.Protocol + "://" + host.Name+ "/api/v3")
+		service, err := gitlab.NewService(host)
 		if err != nil {
 			return nil, err
 		}
