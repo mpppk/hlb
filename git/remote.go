@@ -19,7 +19,7 @@ func NewRemote(remote *git.Remote) *Remote {
 
 	var assigned *regexp.Regexp
 	if strings.HasPrefix(url, "http") {
-		assigned = regexp.MustCompile(`https?://.+@(.+)/(.+)/(.+).git`)
+		assigned = regexp.MustCompile(`https?://[.+@]?(.+)/(.+)/(.+)$`)
 	}else if strings.HasPrefix(url, "git") {
 		assigned = regexp.MustCompile(`git@(.+):(.+)/(.+).git`)
 	}else {
@@ -34,7 +34,7 @@ func NewRemote(remote *git.Remote) *Remote {
 
 	newRemote.ServiceHostName = result[1]
 	newRemote.Owner = result[2]
-	newRemote.RepoName = result[3]
+	newRemote.RepoName = strings.Replace(result[3], ".git", "", -1)
 	return newRemote
 }
 

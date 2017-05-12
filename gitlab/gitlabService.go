@@ -64,3 +64,11 @@ func (s *Service) GetIssuesURL(owner, repo string) (string, error) {
 	}
 	return repoUrl + "/issues", nil
 }
+
+func (s *Service) GetIssueURL(owner, repo string, id int) (string, error) {
+	url, err := s.GetIssuesURL(owner, repo)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s/%d", url, id), nil
+}

@@ -8,6 +8,8 @@ import (
 	"github.com/mpppk/hlb/git"
 	"context"
 	"github.com/skratchdot/open-golang/open"
+	"fmt"
+	"strconv"
 )
 
 // browseissuesCmd represents the browseissues command
@@ -16,6 +18,10 @@ var browseissuesCmd = &cobra.Command{
 	Short: "browse issues",
 	Long: `browse issues`,
 	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) > 1 {
+			fmt.Println("Too many issue IDs")
+		}
+
 		ctx := context.Background()
 
 		var config etc.Config
@@ -27,15 +33,26 @@ var browseissuesCmd = &cobra.Command{
 
 		host, ok := config.FindHost(remote.ServiceHostName)
 		if !ok {
-			panic("host not found" + remote.ServiceHostName)
+			panic("host not found: " + remote.ServiceHostName)
 		}
 
 		pj, err := hlb.GetService(ctx, host)
 		etc.PanicIfErrorExist(err)
 
-		url, err := pj.GetIssuesURL(remote.Owner, remote.RepoName)
-		etc.PanicIfErrorExist(err)
-		open.Run(url)
+		if len(args) == 0 {
+			url, err := pj.GetIssuesURL(remote.Owner, remote.RepoName)
+			etc.PanicIfErrorExist(err)
+			open.Run(url)
+			return
+		}else {
+			id, err := strconv.Atoi(args[0])
+			etc.PanicIfErrorExist(err)
+
+			url, err := pj.GetIssueURL(remote.Owner, remote.RepoName, id)
+			etc.PanicIfErrorExist(err)
+			open.Run(url)
+			return
+		}
 	},
 }
 
