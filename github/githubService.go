@@ -7,6 +7,7 @@ import (
 	"errors"
 	"net/url"
 	"github.com/mpppk/hlb/project"
+	"fmt"
 )
 
 type Service struct {
@@ -89,4 +90,8 @@ func (s *Service) GetRepository(ctx context.Context, owner, repo string) (projec
 	}
 
 	return &Repository{Repository: githubRepo}, err
+}
+
+func (s *Service) GetRepositoryURL(owner, repo string) (string, error) {
+	return fmt.Sprintf("https://github.com/%s/%s" , owner, repo), nil
 }

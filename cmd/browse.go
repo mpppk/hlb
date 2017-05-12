@@ -33,9 +33,9 @@ var browseCmd = &cobra.Command{
 		pj, err := hlb.GetService(ctx, host)
 		etc.PanicIfErrorExist(err)
 
-		repo, err := pj.GetRepository(ctx, remote.Owner, remote.RepoName)
+		url, err := pj.GetRepositoryURL(remote.Owner, remote.RepoName)
 		etc.PanicIfErrorExist(err)
-		open.Run(repo.GetHTMLURL())
+		open.Run(url)
 	},
 }
 
