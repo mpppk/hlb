@@ -72,3 +72,18 @@ func (s *Service) GetIssueURL(owner, repo string, id int) (string, error) {
 	}
 	return fmt.Sprintf("%s/%d", url, id), nil
 }
+func (s *Service) GetPullRequestsURL(owner, repo string) (string, error) {
+	repoUrl, err := s.GetRepositoryURL(owner, repo)
+	if err != nil {
+		return "", err
+	}
+	return repoUrl + "/merge_requests", nil
+}
+
+func (s *Service) GetPullRequestURL(owner, repo string, id int) (string, error) {
+	url, err := s.GetPullRequestsURL(owner, repo)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s/%d", url, id), nil
+}

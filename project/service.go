@@ -11,8 +11,8 @@ type Service interface{
 	GetRepositoryURL(owner, repo string) (string, error)
 	GetIssuesURL(owner, repo string) (string, error)
 	GetIssueURL(owner, repo string, no int) (string, error)
-	//GetPullRequestsURL(owner, repo string) (string, error)
-	//GetPullRequestURL(owner, repo string, no int) (string, error)
+	GetPullRequestsURL(owner, repo string) (string, error)
+	GetPullRequestURL(owner, repo string, no int) (string, error)
 }
 
 
