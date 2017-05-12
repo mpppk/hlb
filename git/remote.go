@@ -3,6 +3,7 @@ package git
 import (
 	"gopkg.in/src-d/go-git.v4"
 	"regexp"
+	"strings"
 )
 
 type Remote struct {
@@ -16,15 +17,24 @@ func NewRemote(remote *git.Remote) *Remote {
 	remoteConfig := remote.Config()
 	url := remoteConfig.URL
 
-	assigned := regexp.MustCompile(`git@(.+):(.+)/(.+).git`)
+	var assigned *regexp.Regexp
+	if strings.HasPrefix(url, "http") {
+		assigned = regexp.MustCompile(`https?://.+@(.+)/(.+)/(.+).git`)
+	}else if strings.HasPrefix(url, "git") {
+		assigned = regexp.MustCompile(`git@(.+):(.+)/(.+).git`)
+	}else {
+		panic("unknown remote: " + url)
+	}
 
 	newRemote := &Remote{}
-	if assigned != nil {
-		result := assigned.FindStringSubmatch(url)
-		newRemote.ServiceHostName = result[1]
-		newRemote.Owner = result[2]
-		newRemote.RepoName = result[3]
+	result := assigned.FindStringSubmatch(url)
+	if result == nil {
+		panic("unknown url pattern: " + url)
 	}
+
+	newRemote.ServiceHostName = result[1]
+	newRemote.Owner = result[2]
+	newRemote.RepoName = result[3]
 	return newRemote
 }
 
