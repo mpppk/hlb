@@ -4,11 +4,8 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/mpppk/hlb/hlb"
-	"context"
 	"github.com/mpppk/hlb/etc"
-	"github.com/mpppk/hlb/git"
 	"strconv"
 )
 
@@ -20,8 +17,9 @@ var listissuesCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		base, err := hlb.NewCmdBase()
 		etc.PanicIfErrorExist(err)
+		sw := hlb.ServiceWrapper{Base: base}
 
-		issues, err := base.Service.GetIssues(base.Context, base.Remote.Owner, base.Remote.RepoName)
+		issues, err := sw.GetIssues()
 		etc.PanicIfErrorExist(err)
 
 		for _, issue := range issues {

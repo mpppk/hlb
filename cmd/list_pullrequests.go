@@ -4,12 +4,9 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/mpppk/hlb/hlb"
 	"strconv"
 	"github.com/mpppk/hlb/etc"
-	"github.com/mpppk/hlb/git"
-	"context"
 )
 
 // listpullrequestsCmd represents the listpullrequests command
@@ -19,9 +16,10 @@ var listpullrequestsCmd = &cobra.Command{
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		base, err := hlb.NewCmdBase()
+		sw := hlb.ServiceWrapper{Base: base}
 		etc.PanicIfErrorExist(err)
 
-		pulls, err := base.Service.GetPullRequests(base.Context, base.Remote.Owner, base.Remote.RepoName)
+		pulls, err := sw.GetPullRequests()
 		etc.PanicIfErrorExist(err)
 
 		for _, pull := range pulls {

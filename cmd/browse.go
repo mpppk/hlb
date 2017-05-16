@@ -15,7 +15,8 @@ var browseCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		base, err := hlb.NewCmdBase()
 		etc.PanicIfErrorExist(err)
-		url, err := base.Service.GetRepositoryURL(base.Remote.Owner, base.Remote.RepoName)
+		sw := hlb.ServiceWrapper{Base: base}
+		url, err := sw.GetRepositoryURL()
 		etc.PanicIfErrorExist(err)
 		open.Run(url)
 	},

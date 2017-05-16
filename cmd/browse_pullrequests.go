@@ -4,13 +4,10 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/mpppk/hlb/hlb"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/mpppk/hlb/etc"
 	"strconv"
-	"github.com/mpppk/hlb/git"
-	"context"
 )
 
 // browsepullrequestsCmd represents the browsepullrequests command
@@ -25,9 +22,10 @@ var browsepullrequestsCmd = &cobra.Command{
 
 		base, err := hlb.NewCmdBase()
 		etc.PanicIfErrorExist(err)
+		sw := hlb.ServiceWrapper{Base: base}
 
 		if len(args) == 0 {
-			url, err := base.Service.GetPullRequestsURL(base.Remote.Owner, base.Remote.RepoName)
+			url, err := sw.GetPullRequestsURL()
 			etc.PanicIfErrorExist(err)
 			open.Run(url)
 			return
@@ -35,7 +33,7 @@ var browsepullrequestsCmd = &cobra.Command{
 			id, err := strconv.Atoi(args[0])
 			etc.PanicIfErrorExist(err)
 
-			url, err := base.Service.GetPullRequestURL(base.Remote.Owner, base.Remote.RepoName, id)
+			url, err := sw.GetPullRequestURL(id)
 			etc.PanicIfErrorExist(err)
 			open.Run(url)
 			return
