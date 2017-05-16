@@ -23,25 +23,11 @@ var browsepullrequestsCmd = &cobra.Command{
 			fmt.Println("Too many issue IDs")
 		}
 
-		ctx := context.Background()
-
-		var config etc.Config
-		err := viper.Unmarshal(&config)
-		etc.PanicIfErrorExist(err)
-
-		remote, err := git.GetDefaultRemote(".")
-		etc.PanicIfErrorExist(err)
-
-		host, ok := config.FindHost(remote.ServiceHostName)
-		if !ok {
-			panic("host not found: " + remote.ServiceHostName)
-		}
-
-		pj, err := hlb.GetService(ctx, host)
+		base, err := hlb.NewCmdBase()
 		etc.PanicIfErrorExist(err)
 
 		if len(args) == 0 {
-			url, err := pj.GetPullRequestsURL(remote.Owner, remote.RepoName)
+			url, err := base.Service.GetPullRequestsURL(base.Remote.Owner, base.Remote.RepoName)
 			etc.PanicIfErrorExist(err)
 			open.Run(url)
 			return
@@ -49,7 +35,7 @@ var browsepullrequestsCmd = &cobra.Command{
 			id, err := strconv.Atoi(args[0])
 			etc.PanicIfErrorExist(err)
 
-			url, err := pj.GetPullRequestURL(remote.Owner, remote.RepoName, id)
+			url, err := base.Service.GetPullRequestURL(base.Remote.Owner, base.Remote.RepoName, id)
 			etc.PanicIfErrorExist(err)
 			open.Run(url)
 			return

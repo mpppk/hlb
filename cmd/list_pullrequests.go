@@ -18,24 +18,10 @@ var listpullrequestsCmd = &cobra.Command{
 	Short: "list pull-requests",
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		ctx := context.Background()
-
-		var config etc.Config
-		err := viper.Unmarshal(&config)
+		base, err := hlb.NewCmdBase()
 		etc.PanicIfErrorExist(err)
 
-		remote, err := git.GetDefaultRemote(".")
-		etc.PanicIfErrorExist(err)
-
-		host, ok := config.FindHost(remote.ServiceHostName)
-		if !ok {
-			panic("host not found: " + remote.ServiceHostName)
-		}
-
-		pj, err := hlb.GetService(ctx, host)
-		etc.PanicIfErrorExist(err)
-
-		pulls, err := pj.GetPullRequests(ctx, remote.Owner, remote.RepoName)
+		pulls, err := base.Service.GetPullRequests(base.Context, base.Remote.Owner, base.Remote.RepoName)
 		etc.PanicIfErrorExist(err)
 
 		for _, pull := range pulls {

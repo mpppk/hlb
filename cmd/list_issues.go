@@ -18,24 +18,10 @@ var listissuesCmd = &cobra.Command{
 	Short: "list issuses",
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		ctx := context.Background()
-
-		var config etc.Config
-		err := viper.Unmarshal(&config)
+		base, err := hlb.NewCmdBase()
 		etc.PanicIfErrorExist(err)
 
-		remote, err := git.GetDefaultRemote(".")
-		etc.PanicIfErrorExist(err)
-
-		host, ok := config.FindHost(remote.ServiceHostName)
-		if !ok {
-			panic("host not found: " + remote.ServiceHostName)
-		}
-
-		pj, err := hlb.GetService(ctx, host)
-		etc.PanicIfErrorExist(err)
-
-		issues, err := pj.GetIssues(ctx, remote.Owner, remote.RepoName)
+		issues, err := base.Service.GetIssues(base.Context, base.Remote.Owner, base.Remote.RepoName)
 		etc.PanicIfErrorExist(err)
 
 		for _, issue := range issues {

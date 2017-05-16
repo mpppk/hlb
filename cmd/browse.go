@@ -2,9 +2,6 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/mpppk/hlb/git"
-	"context"
-	"github.com/spf13/viper"
 	"github.com/mpppk/hlb/etc"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/mpppk/hlb/hlb"
@@ -16,24 +13,9 @@ var browseCmd = &cobra.Command{
 	Short: "browse repo",
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		ctx := context.Background()
-
-		var config etc.Config
-		err := viper.Unmarshal(&config)
+		base, err := hlb.NewCmdBase()
 		etc.PanicIfErrorExist(err)
-
-		remote, err := git.GetDefaultRemote(".")
-		etc.PanicIfErrorExist(err)
-
-		host, ok := config.FindHost(remote.ServiceHostName)
-		if !ok {
-			panic("host not found" + remote.ServiceHostName)
-		}
-
-		pj, err := hlb.GetService(ctx, host)
-		etc.PanicIfErrorExist(err)
-
-		url, err := pj.GetRepositoryURL(remote.Owner, remote.RepoName)
+		url, err := base.Service.GetRepositoryURL(base.Remote.Owner, base.Remote.RepoName)
 		etc.PanicIfErrorExist(err)
 		open.Run(url)
 	},
