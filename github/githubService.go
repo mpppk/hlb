@@ -2,30 +2,41 @@ package github
 
 import (
 	"context"
-	"github.com/google/go-github/github"
-	"golang.org/x/oauth2"
-	"net/url"
-	"github.com/mpppk/hlb/project"
 	"fmt"
+	"net/url"
+	"strings"
+
+	"github.com/google/go-github/github"
 	"github.com/mpppk/hlb/etc"
+	"github.com/mpppk/hlb/project"
+	"golang.org/x/oauth2"
 )
 
 type Service struct {
-	Client *github.Client
-	hostName string
+	Client      *github.Client
+	hostName    string
 	ListOptions *github.ListOptions
 }
 
 func NewService(ctx context.Context, host *etc.Host) (*Service, error) {
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: host.OAuthToken})
 	tc := oauth2.NewClient(ctx, ts)
-	client := github.NewClient(tc)
+	return newServiceFromClient(host, github.NewClient(tc))
+}
 
+func NewServiceViaBasicAuth(ctx context.Context, host *etc.Host, user, pass string) (*Service, error) {
+	tp := github.BasicAuthTransport{
+		Username: strings.TrimSpace(user),
+		Password: strings.TrimSpace(pass),
+	}
+	return newServiceFromClient(host, github.NewClient(tp.Client()))
+}
+
+func newServiceFromClient(host *etc.Host, client *github.Client) (*Service, error) {
 	baseUrl, err := url.Parse(host.Protocol + "://api." + host.Name)
 	if err != nil {
 		return nil, err
 	}
-
 	client.BaseURL = baseUrl
 	listOpt := &github.ListOptions{PerPage: 100}
 	return &Service{Client: client, hostName: host.Name, ListOptions: listOpt}, nil
@@ -120,4 +131,18 @@ func (s *Service) GetPullRequestURL(owner, repo string, id int) (string, error) 
 		return "", err
 	}
 	return fmt.Sprintf("%s/pull/%d", repoUrl, id), nil
+}
+
+func (s *Service) CreateToken(ctx context.Context) (string, error) {
+	authReq := &github.AuthorizationRequest{
+		Note:   github.String("hlb"),
+		Scopes: []github.Scope{github.ScopeRepo},
+	}
+
+	auth, _, err := s.Client.Authorizations.Create(ctx, authReq)
+	if err != nil {
+		return "", err
+	}
+
+	return *auth.Token, nil
 }

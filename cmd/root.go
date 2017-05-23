@@ -14,7 +14,7 @@ var cfgFile string
 var RootCmd = &cobra.Command{
 	Use:   "hlb",
 	Short: "multi git hosting service manager",
-	Long: ``,
+	Long:  ``,
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.
@@ -45,13 +45,15 @@ func initConfig() {
 		viper.SetConfigFile(cfgFile)
 	}
 
-	viper.SetConfigName(".hlb") // name of config file (without extension)
-	viper.AddConfigPath(os.Getenv("HOME")) // adding home directory as first search path
+	viper.SetConfigName(".hlb")                   // name of config file (without extension)
+	viper.AddConfigPath(os.Getenv("HOME"))        // adding home directory as first search path
 	viper.AddConfigPath(os.Getenv("USERPROFILE")) // adding home directory as first search path
-	viper.AutomaticEnv()                   // read in environment variables that match
+	viper.AutomaticEnv()                          // read in environment variables that match
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	} else {
+		// generate
 	}
 }

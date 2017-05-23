@@ -2,18 +2,18 @@ package hlb
 
 import (
 	"context"
+
 	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/git"
 	"github.com/mpppk/hlb/project"
 	"github.com/spf13/viper"
-	"errors"
 )
 
 type CmdBase struct {
 	Context context.Context
-	Config *etc.Config
-	Remote *git.Remote
-	Host *etc.Host
+	Config  *etc.Config
+	Remote  *git.Remote
+	Host    *etc.Host
 	Service project.Service
 }
 
@@ -31,10 +31,10 @@ func NewCmdBase() (*CmdBase, error) {
 		return nil, err
 	}
 
-	host, ok := config.FindHost(remote.ServiceHostName)
-	if !ok {
-		errors.New("host not found" + remote.ServiceHostName)
-	}
+	host, _ := config.FindHost(remote.ServiceHostName)
+	//if !ok {
+	//	errors.New("host not found" + remote.ServiceHostName)
+	//}
 
 	service, err := GetService(ctx, host)
 	if err != nil {
@@ -43,9 +43,9 @@ func NewCmdBase() (*CmdBase, error) {
 
 	return &CmdBase{
 		Context: ctx,
-		Config: &config,
-		Remote: remote,
-		Host: host,
+		Config:  &config,
+		Remote:  remote,
+		Host:    host,
 		Service: service,
 	}, nil
 }

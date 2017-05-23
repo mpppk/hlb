@@ -2,28 +2,29 @@ package gitlab
 
 import (
 	"context"
-	"github.com/xanzy/go-gitlab"
-	"github.com/mpppk/hlb/project"
 	"fmt"
+
 	"github.com/mpppk/hlb/etc"
+	"github.com/mpppk/hlb/project"
+	"github.com/xanzy/go-gitlab"
 )
 
 type Service struct {
-	Client *gitlab.Client
-	hostName string
+	Client      *gitlab.Client
+	hostName    string
 	ListOptions *gitlab.ListOptions
 }
 
 func NewService(host *etc.Host) (project.Service, error) {
 	client := gitlab.NewClient(nil, host.OAuthToken)
-	client.SetBaseURL(host.Protocol + "://" + host.Name+ "/api/v3")
+	client.SetBaseURL(host.Protocol + "://" + host.Name + "/api/v3")
 	listOpt := &gitlab.ListOptions{PerPage: 100}
 	return project.Service(&Service{Client: client, hostName: host.Name, ListOptions: listOpt}), nil
 }
 
 func (s *Service) GetIssues(ctx context.Context, owner, repo string) (issues []project.Issue, err error) {
 	opt := &gitlab.ListProjectIssuesOptions{ListOptions: *s.ListOptions}
-	gitLabIssues, _, err := s.Client.Issues.ListProjectIssues(owner + "/" + repo, opt)
+	gitLabIssues, _, err := s.Client.Issues.ListProjectIssues(owner+"/"+repo, opt)
 
 	for _, gitLabIssue := range gitLabIssues {
 		issues = append(issues, &Issue{Issue: gitLabIssue})
@@ -34,7 +35,7 @@ func (s *Service) GetIssues(ctx context.Context, owner, repo string) (issues []p
 
 func (s *Service) GetPullRequests(ctx context.Context, owner, repo string) (pullRequests []project.PullRequest, err error) {
 	opt := &gitlab.ListMergeRequestsOptions{ListOptions: *s.ListOptions}
-	gitLabMergeRequests, _, err := s.Client.MergeRequests.ListMergeRequests(owner + "/" + repo, opt)
+	gitLabMergeRequests, _, err := s.Client.MergeRequests.ListMergeRequests(owner+"/"+repo, opt)
 
 	for _, gitLabMergeRequest := range gitLabMergeRequests {
 		pullRequests = append(pullRequests, &PullRequest{MergeRequest: gitLabMergeRequest})
@@ -86,4 +87,8 @@ func (s *Service) GetPullRequestURL(owner, repo string, id int) (string, error) 
 		return "", err
 	}
 	return fmt.Sprintf("%s/%d", url, id), nil
+}
+
+func (s *Service) CreateToken(ctx context.Context) (string, error) {
+	return "hoge", nil
 }

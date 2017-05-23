@@ -1,8 +1,6 @@
 package etc
 
-import (
-	"strings"
-)
+import "strings"
 
 type HostType int
 
@@ -31,7 +29,7 @@ func (s HostType) String() string {
 type Host struct {
 	Name       string
 	Type       string
-	OAuthToken string `mapstructure:"oauth_token"`
+	OAuthToken string `mapstructure:"oauth_token" yaml:"oauth_token"`
 	Protocol   string
 }
 

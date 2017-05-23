@@ -1,6 +1,8 @@
 package hlb
 
 import (
+	"context"
+
 	"github.com/mpppk/hlb/project"
 )
 
@@ -34,4 +36,8 @@ func (s *ServiceWrapper) GetPullRequestURL(no int) (string, error) {
 
 func (s *ServiceWrapper) GetPullRequests() ([]project.PullRequest, error) {
 	return s.Base.Service.GetPullRequests(s.Base.Context, s.Base.Remote.Owner, s.Base.Remote.RepoName)
+}
+
+func (s *ServiceWrapper) CreateToken(ctx context.Context) (string, error) {
+	return s.Base.Service.CreateToken(ctx)
 }
