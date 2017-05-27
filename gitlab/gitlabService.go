@@ -90,5 +90,5 @@ func (s *Service) GetPullRequestURL(owner, repo string, id int) (string, error) 
 }
 
 func (s *Service) CreateToken(ctx context.Context) (string, error) {
-	return "hoge", nil
+	return "Not Implemented Yet", nil
 }

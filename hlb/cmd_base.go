@@ -2,6 +2,7 @@ package hlb
 
 import (
 	"context"
+	"errors"
 
 	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/git"
@@ -31,10 +32,10 @@ func NewCmdBase() (*CmdBase, error) {
 		return nil, err
 	}
 
-	host, _ := config.FindHost(remote.ServiceHostName)
-	//if !ok {
-	//	errors.New("host not found" + remote.ServiceHostName)
-	//}
+	host, ok := config.FindHost(remote.ServiceHostName)
+	if !ok {
+		errors.New("host not found" + remote.ServiceHostName)
+	}
 
 	service, err := GetService(ctx, host)
 	if err != nil {

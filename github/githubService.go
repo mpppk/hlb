@@ -134,8 +134,11 @@ func (s *Service) GetPullRequestURL(owner, repo string, id int) (string, error) 
 }
 
 func (s *Service) CreateToken(ctx context.Context) (string, error) {
+
+	note, err := s.getUniqueNote(ctx, "hlb")
+
 	authReq := &github.AuthorizationRequest{
-		Note:   github.String("hlb"),
+		Note:   github.String(note),
 		Scopes: []github.Scope{github.ScopeRepo},
 	}
 
@@ -145,4 +148,30 @@ func (s *Service) CreateToken(ctx context.Context) (string, error) {
 	}
 
 	return *auth.Token, nil
+}
+
+func hasAuthNote(auths []*github.Authorization, note string) bool {
+	for _, a := range auths {
+		if a.Note != nil && note == *a.Note {
+			return true
+		}
+	}
+	return false
+}
+
+func (s *Service) getUniqueNote(ctx context.Context, orgNote string) (string, error) {
+	auths, _, err := s.Client.Authorizations.List(ctx, nil)
+	if err != nil {
+		return "", err
+	}
+
+	cnt := 1
+	note := orgNote
+	for {
+		if !hasAuthNote(auths, note) {
+			return note, nil
+		}
+		cnt++
+		note = fmt.Sprint(orgNote, cnt)
+	}
 }
