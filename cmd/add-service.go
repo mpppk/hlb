@@ -8,6 +8,10 @@ import (
 	"os"
 	"path/filepath"
 
+	"time"
+
+	"github.com/AlecAivazis/survey"
+	"github.com/briandowns/spinner"
 	"github.com/mitchellh/go-homedir"
 	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/hlb"
@@ -42,9 +46,19 @@ var addServiceCmd = &cobra.Command{
 		host, ok := config.FindHost(parsedUrl.Host)
 		if ok {
 			if host.OAuthToken != "" {
-				fmt.Println("oauth token for", parsedUrl.Host, "is already exist.")
-				fmt.Println("Are you sure to over write oauth token?")
-				os.Exit(1)
+				msg := "oauth token for " + parsedUrl.Host + " is already exist.\n"
+				msg += "Are you sure to over write oauth token?"
+
+				replaceOAuthToken := false
+				prompt := &survey.Confirm{
+					Message: msg,
+				}
+				survey.AskOne(prompt, &replaceOAuthToken, nil)
+
+				if !replaceOAuthToken {
+					os.Exit(0)
+				}
+
 			}
 		} else {
 			host = &etc.Host{
@@ -57,10 +71,12 @@ var addServiceCmd = &cobra.Command{
 
 		username, password := project.PromptUserAndPassword(serviceType)
 
+		s := spinner.New(spinner.CharSets[14], 100*time.Millisecond) // Build our new spinner
+		s.Start()                                                    // Start the spinner
 		token, err := hlb.CreateToken(ctx, host, username, password)
 		etc.PanicIfErrorExist(err)
 		host.OAuthToken = token
-
+		s.Stop()
 		if !ok {
 			fmt.Println("Add new service:", parsedUrl.Host)
 			config.Hosts = append(config.Hosts, host)
