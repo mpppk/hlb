@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/mpppk/hlb/etc"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -54,6 +55,8 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	} else {
-		// generate
+		initCmd.Run(nil, nil)
+		err := viper.ReadInConfig()
+		etc.PanicIfErrorExist(err)
 	}
 }
