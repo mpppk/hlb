@@ -25,7 +25,7 @@ var initCmd = &cobra.Command{
 		}
 		configFilePath := path.Join(dirName, ".hlb.yaml")
 		if _, err := os.Stat(configFilePath); err != nil {
-			hosts := []*etc.Host{
+			hosts := []*etc.ServiceConfig{
 				{
 					Name:       "github.com",
 					Type:       "github",
@@ -40,7 +40,7 @@ var initCmd = &cobra.Command{
 				},
 			}
 
-			config := etc.Config{Hosts: hosts}
+			config := etc.Config{Services: hosts}
 			f, err := yaml.Marshal(config)
 			etc.PanicIfErrorExist(err)
 			ioutil.WriteFile(configFilePath, f, 0666)

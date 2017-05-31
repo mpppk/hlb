@@ -18,13 +18,13 @@ type Service struct {
 	ListOptions *github.ListOptions
 }
 
-func NewService(ctx context.Context, host *etc.Host) (*Service, error) {
+func NewService(ctx context.Context, host *etc.ServiceConfig) (*Service, error) {
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: host.OAuthToken})
 	tc := oauth2.NewClient(ctx, ts)
 	return newServiceFromClient(host, github.NewClient(tc))
 }
 
-func NewServiceViaBasicAuth(ctx context.Context, host *etc.Host, user, pass string) (*Service, error) {
+func NewServiceViaBasicAuth(ctx context.Context, host *etc.ServiceConfig, user, pass string) (*Service, error) {
 	tp := github.BasicAuthTransport{
 		Username: strings.TrimSpace(user),
 		Password: strings.TrimSpace(pass),
@@ -32,7 +32,7 @@ func NewServiceViaBasicAuth(ctx context.Context, host *etc.Host, user, pass stri
 	return newServiceFromClient(host, github.NewClient(tp.Client()))
 }
 
-func newServiceFromClient(host *etc.Host, client *github.Client) (*Service, error) {
+func newServiceFromClient(host *etc.ServiceConfig, client *github.Client) (*Service, error) {
 	baseUrl, err := url.Parse(host.Protocol + "://api." + host.Name)
 	if err != nil {
 		return nil, err

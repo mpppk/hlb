@@ -15,7 +15,7 @@ type Service struct {
 	ListOptions *gitlab.ListOptions
 }
 
-func NewService(host *etc.Host) (project.Service, error) {
+func NewService(host *etc.ServiceConfig) (project.Service, error) {
 	client := gitlab.NewClient(nil, host.OAuthToken)
 	client.SetBaseURL(host.Protocol + "://" + host.Name + "/api/v3")
 	listOpt := &gitlab.ListOptions{PerPage: 100}

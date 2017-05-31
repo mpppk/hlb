@@ -14,7 +14,7 @@ type CmdBase struct {
 	Context context.Context
 	Config  *etc.Config
 	Remote  *git.Remote
-	Host    *etc.Host
+	Host    *etc.ServiceConfig
 	Service project.Service
 }
 

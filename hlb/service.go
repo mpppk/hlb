@@ -10,7 +10,7 @@ import (
 	"github.com/mpppk/hlb/project"
 )
 
-func GetService(ctx context.Context, host *etc.Host) (project.Service, error) {
+func GetService(ctx context.Context, host *etc.ServiceConfig) (project.Service, error) {
 	switch host.Type {
 	case etc.HOST_TYPE_GITHUB.String():
 		service, err := github.NewService(ctx, host)
@@ -31,7 +31,7 @@ func GetService(ctx context.Context, host *etc.Host) (project.Service, error) {
 	return nil, errors.New("unknown host type: " + host.Type)
 }
 
-func CreateToken(ctx context.Context, host *etc.Host, username, pass string) (string, error) {
+func CreateToken(ctx context.Context, host *etc.ServiceConfig, username, pass string) (string, error) {
 	//user, pass := project.PromptUserAndPassword(host.Name)
 
 	var s project.Service
@@ -50,7 +50,7 @@ func CreateToken(ctx context.Context, host *etc.Host, username, pass string) (st
 		//	return nil, err
 		//}
 		//
-		//return project.Service(service), nil
+		//return project.ServiceConfig(service), nil
 	}
 	return s.CreateToken(ctx)
 }

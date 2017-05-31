@@ -61,7 +61,7 @@ var addServiceCmd = &cobra.Command{
 
 			}
 		} else {
-			host = &etc.Host{
+			host = &etc.ServiceConfig{
 				Name:       parsedUrl.Host,
 				Type:       serviceType,
 				OAuthToken: "",
@@ -79,7 +79,7 @@ var addServiceCmd = &cobra.Command{
 		s.Stop()
 		if !ok {
 			fmt.Println("Add new service:", parsedUrl.Host)
-			config.Hosts = append(config.Hosts, host)
+			config.Services = append(config.Services, host)
 		} else {
 			fmt.Println("Update service:", parsedUrl.Host)
 		}
