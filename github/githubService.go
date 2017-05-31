@@ -98,7 +98,7 @@ func (c *Client) GetRepository(ctx context.Context, owner, repo string) (service
 }
 
 func (c *Client) GetRepositoryURL(owner, repo string) (string, error) {
-	return fmt.Sprintf("https://%c/%c/%c", c.hostName, owner, repo), nil
+	return fmt.Sprintf("https://%s/%s/%s", c.hostName, owner, repo), nil
 }
 
 func (c *Client) GetIssuesURL(owner, repo string) (string, error) {
@@ -114,7 +114,7 @@ func (c *Client) GetIssueURL(owner, repo string, id int) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%c/%d", url, id), nil
+	return fmt.Sprintf("%s/%d", url, id), nil
 }
 
 func (c *Client) GetPullRequestsURL(owner, repo string) (string, error) {
@@ -130,7 +130,7 @@ func (c *Client) GetPullRequestURL(owner, repo string, id int) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%c/pull/%d", repoUrl, id), nil
+	return fmt.Sprintf("%s/pull/%d", repoUrl, id), nil
 }
 
 func (c *Client) CreateToken(ctx context.Context) (string, error) {
