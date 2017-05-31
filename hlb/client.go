@@ -10,14 +10,14 @@ import (
 	"github.com/mpppk/hlb/service"
 )
 
-func GetService(ctx context.Context, host *etc.ServiceConfig) (service.ServiceClient, error) {
+func GetClient(ctx context.Context, host *etc.ServiceConfig) (service.Client, error) {
 	switch host.Type {
 	case etc.HOST_TYPE_GITHUB.String():
 		client, err := github.NewClient(ctx, host)
 		if err != nil {
 			return nil, err
 		}
-		return service.ServiceClient(client), nil
+		return service.Client(client), nil
 	}
 	switch host.Type {
 	case etc.HOST_TYPE_GITLAB.String():
@@ -26,7 +26,7 @@ func GetService(ctx context.Context, host *etc.ServiceConfig) (service.ServiceCl
 			return nil, err
 		}
 
-		return service.ServiceClient(client), nil
+		return service.Client(client), nil
 	}
 	return nil, errors.New("unknown host type: " + host.Type)
 }
@@ -34,14 +34,14 @@ func GetService(ctx context.Context, host *etc.ServiceConfig) (service.ServiceCl
 func CreateToken(ctx context.Context, host *etc.ServiceConfig, username, pass string) (string, error) {
 	//user, pass := project.PromptUserAndPassword(host.Name)
 
-	var s service.ServiceClient
+	var s service.Client
 	switch host.Type {
 	case etc.HOST_TYPE_GITHUB.String():
 		client, err := github.NewClientViaBasicAuth(ctx, host, username, pass)
 		if err != nil {
 			return "", err
 		}
-		s = service.ServiceClient(client)
+		s = service.Client(client)
 	}
 	switch host.Type {
 	case etc.HOST_TYPE_GITLAB.String():

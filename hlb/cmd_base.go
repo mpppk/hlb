@@ -15,7 +15,7 @@ type CmdBase struct {
 	Config  *etc.Config
 	Remote  *git.Remote
 	Host    *etc.ServiceConfig
-	Service service.ServiceClient
+	Client  service.Client
 }
 
 func NewCmdBase() (*CmdBase, error) {
@@ -37,7 +37,7 @@ func NewCmdBase() (*CmdBase, error) {
 		errors.New("host not found" + remote.ServiceHostName)
 	}
 
-	service, err := GetService(ctx, host)
+	client, err := GetClient(ctx, host)
 	if err != nil {
 		return nil, err
 	}
@@ -47,6 +47,6 @@ func NewCmdBase() (*CmdBase, error) {
 		Config:  &config,
 		Remote:  remote,
 		Host:    host,
-		Service: service,
+		Client:  client,
 	}, nil
 }

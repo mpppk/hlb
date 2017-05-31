@@ -22,7 +22,7 @@ var browsepullrequestsCmd = &cobra.Command{
 
 		base, err := hlb.NewCmdBase()
 		etc.PanicIfErrorExist(err)
-		sw := hlb.ServiceWrapper{Base: base}
+		sw := hlb.ClientWrapper{Base: base}
 
 		if len(args) == 0 {
 			url, err := sw.GetPullRequestsURL()

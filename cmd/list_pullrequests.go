@@ -16,7 +16,7 @@ var listpullrequestsCmd = &cobra.Command{
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		base, err := hlb.NewCmdBase()
-		sw := hlb.ServiceWrapper{Base: base}
+		sw := hlb.ClientWrapper{Base: base}
 		etc.PanicIfErrorExist(err)
 
 		pulls, err := sw.GetPullRequests()

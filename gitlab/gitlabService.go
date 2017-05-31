@@ -15,11 +15,11 @@ type Client struct {
 	ListOptions *gitlab.ListOptions
 }
 
-func NewClient(host *etc.ServiceConfig) (service.ServiceClient, error) {
+func NewClient(host *etc.ServiceConfig) (service.Client, error) {
 	client := gitlab.NewClient(nil, host.OAuthToken)
 	client.SetBaseURL(host.Protocol + "://" + host.Name + "/api/v3")
 	listOpt := &gitlab.ListOptions{PerPage: 100}
-	return service.ServiceClient(&Client{RawClient: client, hostName: host.Name, ListOptions: listOpt}), nil
+	return service.Client(&Client{RawClient: client, hostName: host.Name, ListOptions: listOpt}), nil
 }
 
 func (c *Client) GetIssues(ctx context.Context, owner, repo string) (serviceIssues []service.Issue, err error) {
