@@ -1,16 +1,17 @@
 package git
 
 import (
-	"gopkg.in/src-d/go-git.v4"
 	"regexp"
 	"strings"
+
+	"gopkg.in/src-d/go-git.v4"
 )
 
 type Remote struct {
-	Remote *git.Remote
+	Remote          *git.Remote
 	ServiceHostName string
-	Owner    string
-	RepoName string
+	Owner           string
+	RepoName        string
 }
 
 func NewRemote(remote *git.Remote) *Remote {
@@ -20,22 +21,22 @@ func NewRemote(remote *git.Remote) *Remote {
 	var assigned *regexp.Regexp
 	if strings.HasPrefix(url, "http") {
 		assigned = regexp.MustCompile(`https?://[.+@]?(.+)/(.+)/(.+)$`)
-	}else if strings.HasPrefix(url, "git") {
+	} else if strings.HasPrefix(url, "git") {
 		assigned = regexp.MustCompile(`git@(.+):(.+)/(.+).git`)
-	}else {
+	} else {
 		panic("unknown remote: " + url)
 	}
 
-	newRemote := &Remote{}
 	result := assigned.FindStringSubmatch(url)
 	if result == nil {
 		panic("unknown url pattern: " + url)
 	}
-
-	newRemote.ServiceHostName = result[1]
-	newRemote.Owner = result[2]
-	newRemote.RepoName = strings.Replace(result[3], ".git", "", -1)
-	return newRemote
+	return &Remote{
+		Remote:          remote,
+		ServiceHostName: result[1],
+		Owner:           result[2],
+		RepoName:        strings.Replace(result[3], ".git", "", -1),
+	}
 }
 
 func GetDefaultRemote(path string) (*Remote, error) {
