@@ -1,4 +1,4 @@
-package project
+package service
 
 type Repository interface {
 	GetHTMLURL() string

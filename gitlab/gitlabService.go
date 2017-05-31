@@ -5,90 +5,90 @@ import (
 	"fmt"
 
 	"github.com/mpppk/hlb/etc"
-	"github.com/mpppk/hlb/project"
+	"github.com/mpppk/hlb/service"
 	"github.com/xanzy/go-gitlab"
 )
 
-type Service struct {
-	Client      *gitlab.Client
+type Client struct {
+	RawClient   *gitlab.Client
 	hostName    string
 	ListOptions *gitlab.ListOptions
 }
 
-func NewService(host *etc.ServiceConfig) (project.Service, error) {
+func NewClient(host *etc.ServiceConfig) (service.ServiceClient, error) {
 	client := gitlab.NewClient(nil, host.OAuthToken)
 	client.SetBaseURL(host.Protocol + "://" + host.Name + "/api/v3")
 	listOpt := &gitlab.ListOptions{PerPage: 100}
-	return project.Service(&Service{Client: client, hostName: host.Name, ListOptions: listOpt}), nil
+	return service.ServiceClient(&Client{RawClient: client, hostName: host.Name, ListOptions: listOpt}), nil
 }
 
-func (s *Service) GetIssues(ctx context.Context, owner, repo string) (issues []project.Issue, err error) {
-	opt := &gitlab.ListProjectIssuesOptions{ListOptions: *s.ListOptions}
-	gitLabIssues, _, err := s.Client.Issues.ListProjectIssues(owner+"/"+repo, opt)
+func (c *Client) GetIssues(ctx context.Context, owner, repo string) (serviceIssues []service.Issue, err error) {
+	opt := &gitlab.ListProjectIssuesOptions{ListOptions: *c.ListOptions}
+	issues, _, err := c.RawClient.Issues.ListProjectIssues(owner+"/"+repo, opt)
 
-	for _, gitLabIssue := range gitLabIssues {
-		issues = append(issues, &Issue{Issue: gitLabIssue})
+	for _, issue := range issues {
+		serviceIssues = append(serviceIssues, &Issue{Issue: issue})
 	}
 
-	return issues, err
+	return serviceIssues, err
 }
 
-func (s *Service) GetPullRequests(ctx context.Context, owner, repo string) (pullRequests []project.PullRequest, err error) {
-	opt := &gitlab.ListMergeRequestsOptions{ListOptions: *s.ListOptions}
-	gitLabMergeRequests, _, err := s.Client.MergeRequests.ListMergeRequests(owner+"/"+repo, opt)
+func (c *Client) GetPullRequests(ctx context.Context, owner, repo string) (servicePullRequests []service.PullRequest, err error) {
+	opt := &gitlab.ListMergeRequestsOptions{ListOptions: *c.ListOptions}
+	mergeRequests, _, err := c.RawClient.MergeRequests.ListMergeRequests(owner+"/"+repo, opt)
 
-	for _, gitLabMergeRequest := range gitLabMergeRequests {
-		pullRequests = append(pullRequests, &PullRequest{MergeRequest: gitLabMergeRequest})
+	for _, mergeRequest := range mergeRequests {
+		servicePullRequests = append(servicePullRequests, &PullRequest{MergeRequest: mergeRequest})
 	}
 
-	return pullRequests, err
+	return servicePullRequests, err
 }
 
-func (s *Service) GetRepository(ctx context.Context, owner, repo string) (project.Repository, error) {
-	gitLabProject, _, err := s.Client.Projects.GetProject(owner + "/" + repo)
+func (c *Client) GetRepository(ctx context.Context, owner, repo string) (service.Repository, error) {
+	project, _, err := c.RawClient.Projects.GetProject(owner + "/" + repo)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &Repository{Project: gitLabProject}, err
+	return &Repository{Project: project}, err
 }
 
-func (s *Service) GetRepositoryURL(owner, repo string) (string, error) {
-	return fmt.Sprintf("https://%s/%s/%s", s.hostName, owner, repo), nil
+func (c *Client) GetRepositoryURL(owner, repo string) (string, error) {
+	return fmt.Sprintf("https://%c/%c/%c", c.hostName, owner, repo), nil
 }
 
-func (s *Service) GetIssuesURL(owner, repo string) (string, error) {
-	repoUrl, err := s.GetRepositoryURL(owner, repo)
+func (c *Client) GetIssuesURL(owner, repo string) (string, error) {
+	repoUrl, err := c.GetRepositoryURL(owner, repo)
 	if err != nil {
 		return "", err
 	}
 	return repoUrl + "/issues", nil
 }
 
-func (s *Service) GetIssueURL(owner, repo string, id int) (string, error) {
-	url, err := s.GetIssuesURL(owner, repo)
+func (c *Client) GetIssueURL(owner, repo string, id int) (string, error) {
+	url, err := c.GetIssuesURL(owner, repo)
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%s/%d", url, id), nil
+	return fmt.Sprintf("%c/%d", url, id), nil
 }
-func (s *Service) GetPullRequestsURL(owner, repo string) (string, error) {
-	repoUrl, err := s.GetRepositoryURL(owner, repo)
+func (c *Client) GetPullRequestsURL(owner, repo string) (string, error) {
+	repoUrl, err := c.GetRepositoryURL(owner, repo)
 	if err != nil {
 		return "", err
 	}
 	return repoUrl + "/merge_requests", nil
 }
 
-func (s *Service) GetPullRequestURL(owner, repo string, id int) (string, error) {
-	url, err := s.GetPullRequestsURL(owner, repo)
+func (c *Client) GetPullRequestURL(owner, repo string, id int) (string, error) {
+	url, err := c.GetPullRequestsURL(owner, repo)
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%s/%d", url, id), nil
+	return fmt.Sprintf("%c/%d", url, id), nil
 }
 
-func (s *Service) CreateToken(ctx context.Context) (string, error) {
+func (c *Client) CreateToken(ctx context.Context) (string, error) {
 	return "Not Implemented Yet", nil
 }

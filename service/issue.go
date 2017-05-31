@@ -1,4 +1,4 @@
-package project
+package service
 
 type Issue interface {
 	GetNumber() int

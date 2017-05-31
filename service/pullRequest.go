@@ -1,4 +1,4 @@
-package project
+package service
 
 type PullRequest interface {
 	GetNumber() int

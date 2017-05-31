@@ -1,10 +1,10 @@
-package project
+package service
 
 import (
 	"context"
 )
 
-type Service interface {
+type ServiceClient interface {
 	GetPullRequests(ctx context.Context, owner, repo string) ([]PullRequest, error)
 	GetIssues(ctx context.Context, owner, repo string) ([]Issue, error)
 	GetRepository(ctx context.Context, owner, repo string) (Repository, error)

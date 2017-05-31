@@ -6,7 +6,7 @@ import (
 
 	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/git"
-	"github.com/mpppk/hlb/project"
+	"github.com/mpppk/hlb/service"
 	"github.com/spf13/viper"
 )
 
@@ -15,7 +15,7 @@ type CmdBase struct {
 	Config  *etc.Config
 	Remote  *git.Remote
 	Host    *etc.ServiceConfig
-	Service project.Service
+	Service service.ServiceClient
 }
 
 func NewCmdBase() (*CmdBase, error) {

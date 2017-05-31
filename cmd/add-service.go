@@ -15,7 +15,7 @@ import (
 	"github.com/mitchellh/go-homedir"
 	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/hlb"
-	"github.com/mpppk/hlb/project"
+	"github.com/mpppk/hlb/service"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
@@ -69,7 +69,7 @@ var addServiceCmd = &cobra.Command{
 			}
 		}
 
-		username, password := project.PromptUserAndPassword(serviceType)
+		username, password := service.PromptUserAndPassword(serviceType)
 
 		s := spinner.New(spinner.CharSets[14], 100*time.Millisecond) // Build our new spinner
 		s.Start()                                                    // Start the spinner
