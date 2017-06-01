@@ -30,13 +30,10 @@ var browseCmd = &cobra.Command{
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		var config etc.Config
 		err := viper.Unmarshal(&config)
-		fmt.Println("parse config")
 		etc.PanicIfErrorExist(err)
 		remote, err := git.GetDefaultRemote(".")
-		fmt.Println("get default remote")
 		etc.PanicIfErrorExist(err)
 		host, ok := config.FindHost(remote.ServiceHostName)
-		fmt.Println("search host")
 		if !ok {
 			if remote.ServiceHostName == "github" {
 				serviceUrl := remote.Remote.Config().URL
