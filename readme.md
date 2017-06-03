@@ -1,6 +1,13 @@
 # hlb: git + hub/lab/bucket and more
 hlb is a command line tool that provides a unified interface to multiple git repository hosting services.
+
 ## Installation
+### Homebrew
+```Shell
+$ brew tap mpppk/mpppk
+$ brew install hlb
+```
+
 ### Standalone
 Download from [release page](https://github.com/mpppk/hlb/releases) and put it anywhere in your executable path.
 
