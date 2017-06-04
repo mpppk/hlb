@@ -1,6 +1,8 @@
 # hlb: git + hub/lab/bucket and more
 hlb is a command line tool that provides a unified interface to multiple git repository hosting services.
 
+[![CircleCI](https://circleci.com/gh/mpppk/hlb/tree/master.svg?style=svg)](https://circleci.com/gh/mpppk/hlb/tree/master)
+
 ## Installation
 ### Homebrew
 ```Shell
