@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/mpppk/hlb/hlb"
+	"github.com/mpppk/hlb/hlblib"
 	"github.com/mpppk/hlb/etc"
 	"strconv"
 )
@@ -15,9 +15,9 @@ var listissuesCmd = &cobra.Command{
 	Short: "list issuses",
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		base, err := hlb.NewCmdBase()
+		base, err := hlblib.NewCmdBase()
 		etc.PanicIfErrorExist(err)
-		sw := hlb.ClientWrapper{Base: base}
+		sw := hlblib.ClientWrapper{Base: base}
 
 		issues, err := sw.GetIssues()
 		etc.PanicIfErrorExist(err)

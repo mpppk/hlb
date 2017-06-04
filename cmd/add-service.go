@@ -14,7 +14,7 @@ import (
 	"github.com/briandowns/spinner"
 	"github.com/mitchellh/go-homedir"
 	"github.com/mpppk/hlb/etc"
-	"github.com/mpppk/hlb/hlb"
+	"github.com/mpppk/hlb/hlblib"
 	"github.com/mpppk/hlb/service"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -73,7 +73,7 @@ var addServiceCmd = &cobra.Command{
 
 		s := spinner.New(spinner.CharSets[14], 100*time.Millisecond) // Build our new spinner
 		s.Start()                                                    // Start the spinner
-		token, err := hlb.CreateToken(ctx, host, username, password)
+		token, err := hlblib.CreateToken(ctx, host, username, password)
 		etc.PanicIfErrorExist(err)
 		host.OAuthToken = token
 		s.Stop()

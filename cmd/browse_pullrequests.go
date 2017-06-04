@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/mpppk/hlb/hlb"
+	"github.com/mpppk/hlb/hlblib"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/mpppk/hlb/etc"
 	"strconv"
@@ -20,9 +20,9 @@ var browsepullrequestsCmd = &cobra.Command{
 			fmt.Println("Too many issue IDs")
 		}
 
-		base, err := hlb.NewCmdBase()
+		base, err := hlblib.NewCmdBase()
 		etc.PanicIfErrorExist(err)
-		sw := hlb.ClientWrapper{Base: base}
+		sw := hlblib.ClientWrapper{Base: base}
 
 		if len(args) == 0 {
 			url, err := sw.GetPullRequestsURL()

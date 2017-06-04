@@ -1,0 +1,23 @@
+version: "{build}"
+
+platform: x64
+
+clone_folder: c:\gopath\src\github.com\mpppk\hlb
+
+environment:
+  GOPATH: c:\gopath
+
+install:
+  - echo %PATH%
+  - echo %GOPATH%
+  - git submodule update --init --recursive
+  - go version
+  - go env
+  - go get -v -t -d ./...
+
+build_script:
+  - go test -v -race ./...
+
+notifications:
+  - provider: Webhook
+    url: https://webhooks.gitter.im/e/ccf9e757374cba3932ac

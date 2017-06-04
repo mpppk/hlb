@@ -1,4 +1,4 @@
-package hlb
+package hlblib
 
 import (
 	"context"

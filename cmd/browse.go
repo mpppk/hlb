@@ -7,7 +7,7 @@ import (
 
 	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/git"
-	"github.com/mpppk/hlb/hlb"
+	"github.com/mpppk/hlb/hlblib"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -19,9 +19,9 @@ var browseCmd = &cobra.Command{
 	Short: "browse repo",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		base, err := hlb.NewCmdBase()
+		base, err := hlblib.NewCmdBase()
 		etc.PanicIfErrorExist(err)
-		sw := hlb.ClientWrapper{Base: base}
+		sw := hlblib.ClientWrapper{Base: base}
 		url, err := sw.GetRepositoryURL()
 		etc.PanicIfErrorExist(err)
 		fmt.Println(url)
