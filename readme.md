@@ -2,6 +2,7 @@
 hlb is a command line tool that provides a unified interface to multiple git repository hosting services.
 
 [![CircleCI](https://circleci.com/gh/mpppk/hlb/tree/master.svg?style=svg)](https://circleci.com/gh/mpppk/hlb/tree/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/9jw7n8ruxseys95n/branch/master?svg=true)](https://ci.appveyor.com/project/mpppk/hlb/branch/master)
 [![codebeat badge](https://codebeat.co/badges/544129f2-79a9-4641-8399-f06581cd2c53)](https://codebeat.co/projects/github-com-mpppk-hlb-master)
 
 ## Installation
