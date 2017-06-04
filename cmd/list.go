@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/mpppk/hlb/hlb"
+	"github.com/mpppk/hlb/hlblib"
 	"github.com/spf13/cobra"
 )
 
@@ -17,7 +17,7 @@ var listCmd = &cobra.Command{
 		fmt.Println("list called")
 	},
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		base, _ := hlb.NewCmdBase()
+		base, _ := hlblib.NewCmdBase()
 		if base.Host.OAuthToken == "" && base.Host.Type == "github" {
 			addServiceCmd.Run(nil, nil)
 		}

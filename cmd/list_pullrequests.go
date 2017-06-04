@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/mpppk/hlb/hlb"
+	"github.com/mpppk/hlb/hlblib"
 	"strconv"
 	"github.com/mpppk/hlb/etc"
 )
@@ -15,8 +15,8 @@ var listpullrequestsCmd = &cobra.Command{
 	Short: "list pull-requests",
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		base, err := hlb.NewCmdBase()
-		sw := hlb.ClientWrapper{Base: base}
+		base, err := hlblib.NewCmdBase()
+		sw := hlblib.ClientWrapper{Base: base}
 		etc.PanicIfErrorExist(err)
 
 		pulls, err := sw.GetPullRequests()
