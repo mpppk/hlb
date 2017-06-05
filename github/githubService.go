@@ -13,7 +13,7 @@ import (
 )
 
 type Client struct {
-	RawClient   *github.Client
+	RawClient   rawClient
 	hostName    string
 	ListOptions *github.ListOptions
 }
@@ -21,7 +21,7 @@ type Client struct {
 func NewClient(ctx context.Context, host *etc.ServiceConfig) (*Client, error) {
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: host.OAuthToken})
 	tc := oauth2.NewClient(ctx, ts)
-	return newServiceFromClient(host, github.NewClient(tc))
+	return newServiceFromClient(host, &RawClient{Client: github.NewClient(tc)})
 }
 
 func NewClientViaBasicAuth(ctx context.Context, host *etc.ServiceConfig, user, pass string) (*Client, error) {
@@ -29,22 +29,22 @@ func NewClientViaBasicAuth(ctx context.Context, host *etc.ServiceConfig, user, p
 		Username: strings.TrimSpace(user),
 		Password: strings.TrimSpace(pass),
 	}
-	return newServiceFromClient(host, github.NewClient(tp.Client()))
+	return newServiceFromClient(host, &RawClient{Client: github.NewClient(tp.Client())})
 }
 
-func newServiceFromClient(host *etc.ServiceConfig, client *github.Client) (*Client, error) {
+func newServiceFromClient(host *etc.ServiceConfig, client rawClient) (*Client, error) {
 	baseUrl, err := url.Parse(host.Protocol + "://api." + host.Name)
 	if err != nil {
 		return nil, err
 	}
-	client.BaseURL = baseUrl
+	client.SetBaseURL(baseUrl)
 	listOpt := &github.ListOptions{PerPage: 100}
 	return &Client{RawClient: client, hostName: host.Name, ListOptions: listOpt}, nil
 }
 
 func (c *Client) GetPullRequests(ctx context.Context, owner, repo string) (servicePullRequests []service.PullRequest, err error) {
 	opt := github.PullRequestListOptions{ListOptions: *c.ListOptions}
-	pullRequests, _, err := c.RawClient.PullRequests.List(ctx, owner, repo, &opt)
+	pullRequests, _, err := c.RawClient.GetPullRequests().List(ctx, owner, repo, &opt)
 
 	if err != nil {
 		return nil, err
@@ -72,8 +72,8 @@ func (c *Client) GetIssues(ctx context.Context, owner, repo string) (serviceIssu
 	return serviceIssues, err
 }
 
-func (c *Client) getGitHubIssues(ctx context.Context, client *github.Client, owner, repo string, opt *github.IssueListByRepoOptions) (issues []*github.Issue, err error) {
-	issuesAndPRs, _, err := client.Issues.ListByRepo(ctx, owner, repo, opt)
+func (c *Client) getGitHubIssues(ctx context.Context, client rawClient, owner, repo string, opt *github.IssueListByRepoOptions) (issues []*github.Issue, err error) {
+	issuesAndPRs, _, err := client.GetIssues().ListByRepo(ctx, owner, repo, opt)
 
 	if err != nil {
 		return nil, err
@@ -88,7 +88,7 @@ func (c *Client) getGitHubIssues(ctx context.Context, client *github.Client, own
 }
 
 func (c *Client) GetRepository(ctx context.Context, owner, repo string) (service.Repository, error) {
-	githubRepo, _, err := c.RawClient.Repositories.Get(ctx, owner, repo)
+	githubRepo, _, err := c.RawClient.GetRepositories().Get(ctx, owner, repo)
 
 	if err != nil {
 		return nil, err
@@ -142,7 +142,7 @@ func (c *Client) CreateToken(ctx context.Context) (string, error) {
 		Scopes: []github.Scope{github.ScopeRepo},
 	}
 
-	auth, _, err := c.RawClient.Authorizations.Create(ctx, authReq)
+	auth, _, err := c.RawClient.GetAuthorizations().Create(ctx, authReq)
 	if err != nil {
 		return "", err
 	}
@@ -160,7 +160,7 @@ func hasAuthNote(auths []*github.Authorization, note string) bool {
 }
 
 func (c *Client) getUniqueNote(ctx context.Context, orgNote string) (string, error) {
-	auths, _, err := c.RawClient.Authorizations.List(ctx, nil)
+	auths, _, err := c.RawClient.GetAuthorizations().List(ctx, nil)
 	if err != nil {
 		return "", err
 	}
