@@ -35,7 +35,10 @@ type authorizationsService interface {
 
 type RawClient struct {
 	*github.Client
-	rawClient
+}
+
+func (r *RawClient) GetRepositories() repositoriesService {
+	return repositoriesService(r.Repositories)
 }
 
 func (r *RawClient) GetIssues() issuesService {
@@ -44,6 +47,10 @@ func (r *RawClient) GetIssues() issuesService {
 
 func (r *RawClient) GetPullRequests() pullRequestsService {
 	return pullRequestsService(r.PullRequests)
+}
+
+func (r *RawClient) GetAuthorizations() authorizationsService {
+	return authorizationsService(r.Authorizations)
 }
 
 func (r *RawClient) SetBaseURL(baseUrl *url.URL) {
