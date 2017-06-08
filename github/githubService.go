@@ -9,6 +9,7 @@ import (
 	"github.com/google/go-github/github"
 	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/service"
+	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 )
 
@@ -98,15 +99,16 @@ func (c *Client) GetRepository(ctx context.Context, owner, repo string) (service
 }
 
 func (c *Client) GetRepositoryURL(owner, repo string) (string, error) {
-	return fmt.Sprintf("https://%s/%s/%s", c.hostName, owner, repo), nil
+	return fmt.Sprintf("https://%s/%s/%s", c.hostName, owner, repo), checkOwnerAndRepo(owner, repo)
 }
 
 func (c *Client) GetIssuesURL(owner, repo string) (string, error) {
-	repoUrl, err := c.GetRepositoryURL(owner, repo)
-	if err != nil {
+	if err := checkOwnerAndRepo(owner, repo); err != nil {
 		return "", err
 	}
-	return repoUrl + "/issues", nil
+
+	repoUrl, err := c.GetRepositoryURL(owner, repo)
+	return repoUrl + "/issues", err
 }
 
 func (c *Client) GetIssueURL(owner, repo string, id int) (string, error) {
@@ -174,4 +176,23 @@ func (c *Client) getUniqueNote(ctx context.Context, orgNote string) (string, err
 		cnt++
 		note = fmt.Sprint(orgNote, cnt)
 	}
+}
+
+func checkOwnerAndRepo(owner, repo string) error {
+	if owner == "" {
+		return errors.New("owner is empty")
+	}
+
+	if repo == "" {
+		return errors.New("repo is empty")
+	}
+
+	if strings.Contains(owner, "/") {
+		return errors.New("invalid owner: " + owner)
+	}
+
+	if strings.Contains(repo, "/") {
+		return errors.New("invalid repo: " + repo)
+	}
+	return nil
 }
