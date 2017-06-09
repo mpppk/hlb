@@ -10,7 +10,7 @@ import (
 )
 
 type Client struct {
-	RawClient   *gitlab.Client
+	RawClient   rawClient
 	hostName    string
 	ListOptions *gitlab.ListOptions
 }
@@ -19,12 +19,13 @@ func NewClient(host *etc.ServiceConfig) (service.Client, error) {
 	client := gitlab.NewClient(nil, host.OAuthToken)
 	client.SetBaseURL(host.Protocol + "://" + host.Name + "/api/v3")
 	listOpt := &gitlab.ListOptions{PerPage: 100}
-	return service.Client(&Client{RawClient: client, hostName: host.Name, ListOptions: listOpt}), nil
+	rawClient := &RawClient{Client: client}
+	return service.Client(&Client{RawClient: rawClient, hostName: host.Name, ListOptions: listOpt}), nil
 }
 
 func (c *Client) GetIssues(ctx context.Context, owner, repo string) (serviceIssues []service.Issue, err error) {
 	opt := &gitlab.ListProjectIssuesOptions{ListOptions: *c.ListOptions}
-	issues, _, err := c.RawClient.Issues.ListProjectIssues(owner+"/"+repo, opt)
+	issues, _, err := c.RawClient.GetIssues().ListProjectIssues(owner+"/"+repo, opt)
 
 	for _, issue := range issues {
 		serviceIssues = append(serviceIssues, &Issue{Issue: issue})
@@ -35,7 +36,7 @@ func (c *Client) GetIssues(ctx context.Context, owner, repo string) (serviceIssu
 
 func (c *Client) GetPullRequests(ctx context.Context, owner, repo string) (servicePullRequests []service.PullRequest, err error) {
 	opt := &gitlab.ListMergeRequestsOptions{ListOptions: *c.ListOptions}
-	mergeRequests, _, err := c.RawClient.MergeRequests.ListMergeRequests(owner+"/"+repo, opt)
+	mergeRequests, _, err := c.RawClient.GetMergeRequests().ListMergeRequests(owner+"/"+repo, opt)
 
 	for _, mergeRequest := range mergeRequests {
 		servicePullRequests = append(servicePullRequests, &PullRequest{MergeRequest: mergeRequest})
@@ -45,7 +46,7 @@ func (c *Client) GetPullRequests(ctx context.Context, owner, repo string) (servi
 }
 
 func (c *Client) GetRepository(ctx context.Context, owner, repo string) (service.Repository, error) {
-	project, _, err := c.RawClient.Projects.GetProject(owner + "/" + repo)
+	project, _, err := c.RawClient.GetProjects().GetProject(owner + "/" + repo)
 
 	if err != nil {
 		return nil, err
