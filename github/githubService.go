@@ -90,11 +90,6 @@ func (c *Client) getGitHubIssues(ctx context.Context, client rawClient, owner, r
 
 func (c *Client) GetRepository(ctx context.Context, owner, repo string) (service.Repository, error) {
 	githubRepo, _, err := c.RawClient.GetRepositories().Get(ctx, owner, repo)
-
-	if err != nil {
-		return nil, err
-	}
-
 	return &Repository{Repository: githubRepo}, err
 }
 
@@ -113,26 +108,17 @@ func (c *Client) GetIssuesURL(owner, repo string) (string, error) {
 
 func (c *Client) GetIssueURL(owner, repo string, id int) (string, error) {
 	url, err := c.GetIssuesURL(owner, repo)
-	if err != nil {
-		return "", err
-	}
-	return fmt.Sprintf("%s/%d", url, id), nil
+	return fmt.Sprintf("%s/%d", url, id), err
 }
 
 func (c *Client) GetPullRequestsURL(owner, repo string) (string, error) {
 	repoUrl, err := c.GetRepositoryURL(owner, repo)
-	if err != nil {
-		return "", err
-	}
-	return repoUrl + "/pulls", nil
+	return repoUrl + "/pulls", err
 }
 
 func (c *Client) GetPullRequestURL(owner, repo string, id int) (string, error) {
 	repoUrl, err := c.GetRepositoryURL(owner, repo)
-	if err != nil {
-		return "", err
-	}
-	return fmt.Sprintf("%s/pull/%d", repoUrl, id), nil
+	return fmt.Sprintf("%s/pull/%d", repoUrl, id), err
 }
 
 func (c *Client) CreateToken(ctx context.Context) (string, error) {
@@ -145,11 +131,7 @@ func (c *Client) CreateToken(ctx context.Context) (string, error) {
 	}
 
 	auth, _, err := c.RawClient.GetAuthorizations().Create(ctx, authReq)
-	if err != nil {
-		return "", err
-	}
-
-	return *auth.Token, nil
+	return *auth.Token, err
 }
 
 func hasAuthNote(auths []*github.Authorization, note string) bool {
