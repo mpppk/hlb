@@ -131,7 +131,7 @@ type Util struct {
 	t    *testing.T
 }
 
-func (u *Util) printErrorIfExist(err error, msg string) bool {
+func (u *Util) printErrorIfUnexpected(err error, msg string) bool {
 	ok := err == nil || u.test.willBeError
 	if !ok {
 		u.t.Errorf("%v: %v return error: %v", u.i, msg, err)
@@ -194,41 +194,41 @@ func TestClient_GetRepositoryURL(t *testing.T) {
 		util := Util{t: t, i: i, test: test}
 
 		client, err := newServiceFromClient(test.serviceConfig, test.rawClient)
-		if ok := util.printErrorIfExist(err, "client create fail"); !ok && test.willBeError {
+		if ok := util.printErrorIfUnexpected(err, "client create fail"); !ok && test.willBeError {
 			continue
 		}
 
 		title := "Repository URL"
 		repoURL, err := client.GetRepositoryURL(test.user, test.repo)
-		if ok := util.printErrorIfExist(err, title); ok && err != nil {
+		if ok := util.printErrorIfUnexpected(err, title); ok && err != nil {
 			continue
 		}
 		util.assertString(repoURL, test.expectedRepositoryURL, title)
 
 		title = "Issues URL"
 		issuesURL, err := client.GetIssuesURL(test.user, test.repo)
-		if ok := util.printErrorIfExist(err, title); ok && err != nil {
+		if ok := util.printErrorIfUnexpected(err, title); ok && err != nil {
 			continue
 		}
 		util.assertString(issuesURL, test.expectedIssuesURL, title)
 
 		title = "Issue URL"
 		issueURL, err := client.GetIssueURL(test.user, test.repo, test.issueID)
-		if ok := util.printErrorIfExist(err, title); ok && err != nil {
+		if ok := util.printErrorIfUnexpected(err, title); ok && err != nil {
 			continue
 		}
 		util.assertString(issueURL, test.expectedIssueURL, title)
 
 		title = "PullRequests URL"
 		pullRequestsURL, err := client.GetPullRequestsURL(test.user, test.repo)
-		if ok := util.printErrorIfExist(err, title); ok && err != nil {
+		if ok := util.printErrorIfUnexpected(err, title); ok && err != nil {
 			continue
 		}
 		util.assertString(pullRequestsURL, test.expectedPullRequestsURL, title)
 
 		title = "PullRequest URL"
 		pullRequestURL, err := client.GetPullRequestURL(test.user, test.repo, test.pullRequestID)
-		if ok := util.printErrorIfExist(err, title); ok && err != nil {
+		if ok := util.printErrorIfUnexpected(err, title); ok && err != nil {
 			continue
 		}
 		util.assertString(pullRequestURL, test.expectedPullRequestURL, title)
