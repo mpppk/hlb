@@ -10,16 +10,17 @@ import (
 )
 
 type Client struct {
-	RawClient   *gitlab.Client
-	hostName    string
-	ListOptions *gitlab.ListOptions
+	RawClient     *gitlab.Client
+	hostName      string
+	serviceConfig etc.ServiceConfig
+	ListOptions   *gitlab.ListOptions
 }
 
-func NewClient(host *etc.ServiceConfig) (service.Client, error) {
-	client := gitlab.NewClient(nil, host.OAuthToken)
-	client.SetBaseURL(host.Protocol + "://" + host.Name + "/api/v3")
+func NewClient(serviceConfig *etc.ServiceConfig) (service.Client, error) {
+	client := gitlab.NewClient(nil, serviceConfig.OAuthToken)
+	client.SetBaseURL(serviceConfig.Protocol + "://" + serviceConfig.Name + "/api/v3")
 	listOpt := &gitlab.ListOptions{PerPage: 100}
-	return service.Client(&Client{RawClient: client, hostName: host.Name, ListOptions: listOpt}), nil
+	return service.Client(&Client{RawClient: client, hostName: serviceConfig.Name, ListOptions: listOpt}), nil
 }
 
 func (c *Client) GetIssues(ctx context.Context, owner, repo string) (serviceIssues []service.Issue, err error) {
@@ -55,7 +56,7 @@ func (c *Client) GetRepository(ctx context.Context, owner, repo string) (service
 }
 
 func (c *Client) GetRepositoryURL(owner, repo string) (string, error) {
-	return fmt.Sprintf("https://%s/%s/%s", c.hostName, owner, repo), nil
+	return fmt.Sprintf(c.serviceConfig.Protocol,"://%s/%s/%s", c.hostName, owner, repo), nil
 }
 
 func (c *Client) GetIssuesURL(owner, repo string) (string, error) {
