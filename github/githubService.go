@@ -161,20 +161,22 @@ func (c *Client) getUniqueNote(ctx context.Context, orgNote string) (string, err
 }
 
 func checkOwnerAndRepo(owner, repo string) error {
-	if owner == "" {
-		return errors.New("owner is empty")
-	}
+	m := map[string]string{"owner": owner, "repo": repo}
 
-	if repo == "" {
-		return errors.New("repo is empty")
+	for strType, name := range m {
+		if err := validateOwnerOrRepo(strType, name); err != nil {
+			return err
+		}
 	}
+	return nil
+}
 
-	if strings.Contains(owner, "/") {
-		return errors.New("invalid owner: " + owner)
+func validateOwnerOrRepo(strType, name string) error {
+	if name == "" {
+		return errors.New(strType + " is empty")
 	}
-
-	if strings.Contains(repo, "/") {
-		return errors.New("invalid repo: " + repo)
+	if strings.Contains(name, "/") {
+		return errors.New(fmt.Sprintf("invalid %v: %v", strType, name))
 	}
 	return nil
 }
