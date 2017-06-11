@@ -4,7 +4,7 @@ import "github.com/xanzy/go-gitlab"
 
 type rawClient interface {
 	GetProjects() projectsService
-	GetMergeRequests() pullRequestsService
+	GetMergeRequests() mergeRequestsService
 	GetIssues() issuesService
 	SetBaseURL(baseUrl string) error
 }
@@ -17,7 +17,7 @@ type issuesService interface {
 	ListProjectIssues(pid interface{}, opt *gitlab.ListProjectIssuesOptions, options ...gitlab.OptionFunc) ([]*gitlab.Issue, *gitlab.Response, error)
 }
 
-type pullRequestsService interface {
+type mergeRequestsService interface {
 	ListMergeRequests(pid interface{}, opt *gitlab.ListMergeRequestsOptions, options ...gitlab.OptionFunc) ([]*gitlab.MergeRequest, *gitlab.Response, error)
 }
 
@@ -33,6 +33,6 @@ func (r *RawClient) GetIssues() issuesService {
 	return issuesService(r.Issues)
 }
 
-func (r *RawClient) GetMergeRequests() pullRequestsService {
-	return pullRequestsService(r.MergeRequests)
+func (r *RawClient) GetMergeRequests() mergeRequestsService {
+	return mergeRequestsService(r.MergeRequests)
 }
