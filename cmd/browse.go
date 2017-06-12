@@ -36,7 +36,7 @@ var browseCmd = &cobra.Command{
 		host, ok := config.FindHost(remote.ServiceHostName)
 		if !ok {
 			if remote.ServiceHostName == "github" {
-				serviceUrl := remote.Remote.Config().URL
+				serviceUrl := remote.URL
 				if !strings.Contains(serviceUrl, "http") {
 					serviceUrl = "https://" + remote.ServiceHostName
 				}
