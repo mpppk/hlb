@@ -90,6 +90,16 @@ func (c *Client) GetPullRequestURL(owner, repo string, id int) (string, error) {
 	return fmt.Sprintf("%s/%d", url, id), err
 }
 
+func (c *Client) GetProjectsURL(owner, repo string) (string, error) {
+	repoUrl, err := c.GetRepositoryURL(owner, repo)
+	return repoUrl + "/boards", err
+}
+
+func (c *Client) GetProjectURL(owner, repo string, id int) (string, error) {
+	// GitLab can not have multi boards
+	return c.GetProjectsURL(owner, repo)
+}
+
 func (c *Client) CreateToken(ctx context.Context) (string, error) {
 	return "Not Implemented Yet", nil
 }

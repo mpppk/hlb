@@ -13,5 +13,7 @@ type Client interface {
 	GetIssueURL(owner, repo string, no int) (string, error)
 	GetPullRequestsURL(owner, repo string) (string, error)
 	GetPullRequestURL(owner, repo string, no int) (string, error)
+	GetProjectsURL(owner, repo string) (string, error)
+	GetProjectURL(owner, repo string, no int) (string, error)
 	CreateToken(ctx context.Context) (string, error)
 }

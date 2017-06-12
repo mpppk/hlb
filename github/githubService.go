@@ -121,6 +121,17 @@ func (c *Client) GetPullRequestURL(owner, repo string, id int) (string, error) {
 	return fmt.Sprintf("%s/pull/%d", repoUrl, id), err
 }
 
+func (c *Client) GetProjectsURL(owner, repo string) (string, error) {
+	fmt.Println("get projects url")
+	repoUrl, err := c.GetRepositoryURL(owner, repo)
+	return repoUrl + "/projects", err
+}
+
+func (c *Client) GetProjectURL(owner, repo string, id int) (string, error) {
+	repoUrl, err := c.GetRepositoryURL(owner, repo)
+	return fmt.Sprintf("%s/projects/%d", repoUrl, id), err
+}
+
 func (c *Client) CreateToken(ctx context.Context) (string, error) {
 
 	note, err := c.getUniqueNote(ctx, "hlb")

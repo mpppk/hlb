@@ -38,6 +38,14 @@ func (c *ClientWrapper) GetPullRequests() ([]service.PullRequest, error) {
 	return c.Base.Client.GetPullRequests(c.Base.Context, c.Base.Remote.Owner, c.Base.Remote.RepoName)
 }
 
+func (c *ClientWrapper) GetProjectsURL() (string, error) {
+	return c.Base.Client.GetProjectsURL(c.Base.Remote.Owner, c.Base.Remote.RepoName)
+}
+
+func (c *ClientWrapper) GetProjectURL(no int) (string, error) {
+	return c.Base.Client.GetProjectURL(c.Base.Remote.Owner, c.Base.Remote.RepoName, no)
+}
+
 func (c *ClientWrapper) CreateToken(ctx context.Context) (string, error) {
 	return c.Base.Client.CreateToken(ctx)
 }
