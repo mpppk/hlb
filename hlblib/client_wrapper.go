@@ -58,6 +58,10 @@ func (c *ClientWrapper) GetWikisURL() (string, error) {
 	return c.Base.Client.GetWikisURL(c.Base.Remote.Owner, c.Base.Remote.RepoName)
 }
 
+func (c *ClientWrapper) GetCommitsURL() (string, error) {
+	return c.Base.Client.GetCommitsURL(c.Base.Remote.Owner, c.Base.Remote.RepoName)
+}
+
 func (c *ClientWrapper) CreateToken(ctx context.Context) (string, error) {
 	return c.Base.Client.CreateToken(ctx)
 }

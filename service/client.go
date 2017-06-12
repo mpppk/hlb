@@ -18,5 +18,6 @@ type Client interface {
 	GetMilestonesURL(owner, repo string) (string, error)
 	GetMilestoneURL(owner, repo string, no int) (string, error)
 	GetWikisURL(owner, repo string) (string, error)
+	GetCommitsURL(owner, repo string) (string, error)
 	CreateToken(ctx context.Context) (string, error)
 }

@@ -146,6 +146,11 @@ func (c *Client) GetWikisURL(owner, repo string) (string, error) {
 	return repoUrl + "/wiki", err
 }
 
+func (c *Client) GetCommitsURL(owner, repo string) (string, error) {
+	repoUrl, err := c.GetRepositoryURL(owner, repo)
+	return repoUrl + "/commits", err
+}
+
 func (c *Client) CreateToken(ctx context.Context) (string, error) {
 
 	note, err := c.getUniqueNote(ctx, "hlb")

@@ -115,6 +115,11 @@ func (c *Client) GetWikisURL(owner, repo string) (string, error) {
 	return repoUrl + "/wikis", err
 }
 
+func (c *Client) GetCommitsURL(owner, repo string) (string, error) {
+	repoUrl, err := c.GetRepositoryURL(owner, repo)
+	return repoUrl + "/commits/master", err
+}
+
 func (c *Client) CreateToken(ctx context.Context) (string, error) {
 	return "Not Implemented Yet", nil
 }
