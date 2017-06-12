@@ -46,6 +46,14 @@ func (c *ClientWrapper) GetProjectURL(no int) (string, error) {
 	return c.Base.Client.GetProjectURL(c.Base.Remote.Owner, c.Base.Remote.RepoName, no)
 }
 
+func (c *ClientWrapper) GetMilestonesURL() (string, error) {
+	return c.Base.Client.GetMilestonesURL(c.Base.Remote.Owner, c.Base.Remote.RepoName)
+}
+
+func (c *ClientWrapper) GetMilestoneURL(no int) (string, error) {
+	return c.Base.Client.GetMilestoneURL(c.Base.Remote.Owner, c.Base.Remote.RepoName, no)
+}
+
 func (c *ClientWrapper) CreateToken(ctx context.Context) (string, error) {
 	return c.Base.Client.CreateToken(ctx)
 }

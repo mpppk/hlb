@@ -100,6 +100,16 @@ func (c *Client) GetProjectURL(owner, repo string, id int) (string, error) {
 	return c.GetProjectsURL(owner, repo)
 }
 
+func (c *Client) GetMilestonesURL(owner, repo string) (string, error) {
+	repoUrl, err := c.GetRepositoryURL(owner, repo)
+	return repoUrl + "/milestones", err
+}
+
+func (c *Client) GetMilestoneURL(owner, repo string, id int) (string, error) {
+	url, err := c.GetMilestonesURL(owner, repo)
+	return fmt.Sprintf("%s/%d", url, id), err
+}
+
 func (c *Client) CreateToken(ctx context.Context) (string, error) {
 	return "Not Implemented Yet", nil
 }
