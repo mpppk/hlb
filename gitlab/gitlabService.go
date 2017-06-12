@@ -110,6 +110,11 @@ func (c *Client) GetMilestoneURL(owner, repo string, id int) (string, error) {
 	return fmt.Sprintf("%s/%d", url, id), err
 }
 
+func (c *Client) GetWikisURL(owner, repo string) (string, error) {
+	repoUrl, err := c.GetRepositoryURL(owner, repo)
+	return repoUrl + "/wikis", err
+}
+
 func (c *Client) CreateToken(ctx context.Context) (string, error) {
 	return "Not Implemented Yet", nil
 }
