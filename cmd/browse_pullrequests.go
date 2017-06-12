@@ -3,18 +3,18 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/spf13/cobra"
+	"strconv"
+
+	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/hlblib"
 	"github.com/skratchdot/open-golang/open"
-	"github.com/mpppk/hlb/etc"
-	"strconv"
+	"github.com/spf13/cobra"
 )
 
-// browsepullrequestsCmd represents the browsepullrequests command
 var browsepullrequestsCmd = &cobra.Command{
 	Use:   "pull-requests",
 	Short: "browse pull-requests",
-	Long: ``,
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) > 1 {
 			fmt.Println("Too many issue IDs")
@@ -29,7 +29,7 @@ var browsepullrequestsCmd = &cobra.Command{
 			etc.PanicIfErrorExist(err)
 			open.Run(url)
 			return
-		}else {
+		} else {
 			id, err := strconv.Atoi(args[0])
 			etc.PanicIfErrorExist(err)
 
