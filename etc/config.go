@@ -27,19 +27,19 @@ func (s HostType) String() string {
 }
 
 type ServiceConfig struct {
-	Name       string
-	Type       string
-	OAuthToken string `mapstructure:"oauth_token" yaml:"oauth_token"`
-	Protocol   string
+	Host     string
+	Type     string
+	Token    string `mapstructure:"oauth_token" yaml:"oauth_token"`
+	Protocol string
 }
 
 type Config struct {
 	Services []*ServiceConfig
 }
 
-func (c *Config) FindHost(name string) (*ServiceConfig, bool) {
+func (c *Config) FindServiceConfig(host string) (*ServiceConfig, bool) {
 	for _, h := range c.Services {
-		if strings.Contains(name, h.Name) {
+		if strings.Contains(host, h.Host) {
 			return h, true
 		}
 	}

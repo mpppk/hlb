@@ -151,10 +151,10 @@ func (u *Util) assertString(expected, actual string, msg string) bool {
 func TestClient_GetRepositoryURL(t *testing.T) {
 
 	serviceConfig := &etc.ServiceConfig{
-		Name:       "github.com",
-		Type:       "github",
-		OAuthToken: "testtoken",
-		Protocol:   "https",
+		Host:     "github.com",
+		Type:     "github",
+		Token:    "testtoken",
+		Protocol: "https",
 	}
 
 	mockRawClient := newMockRawClient()

@@ -46,12 +46,12 @@ var browseCmd = &cobra.Command{
 		etc.PanicIfErrorExist(err)
 		remote, err := git.GetDefaultRemote(".")
 		etc.PanicIfErrorExist(err)
-		host, ok := config.FindHost(remote.ServiceHostName)
+		serviceConfig, ok := config.FindServiceConfig(remote.ServiceHost)
 		if !ok {
-			if remote.ServiceHostName == "github" {
+			if remote.ServiceHost == "github" {
 				serviceUrl := remote.URL
 				if !strings.Contains(serviceUrl, "http") {
-					serviceUrl = "https://" + remote.ServiceHostName
+					serviceUrl = "https://" + remote.ServiceHost
 				}
 
 				addServiceCmd.Run(cmd, []string{"github", serviceUrl})
@@ -59,8 +59,8 @@ var browseCmd = &cobra.Command{
 			return
 		}
 
-		if host.OAuthToken == "" && host.Type == "github" {
-			serviceUrl := host.Protocol + "://" + host.Name
+		if serviceConfig.Token == "" && serviceConfig.Type == "github" {
+			serviceUrl := serviceConfig.Protocol + "://" + serviceConfig.Host
 			fmt.Println(serviceUrl)
 			addServiceCmd.Run(cmd, []string{"github", serviceUrl})
 		}

@@ -32,9 +32,9 @@ func NewCmdBase() (*CmdBase, error) {
 		return nil, err
 	}
 
-	host, ok := config.FindHost(remote.ServiceHostName)
+	host, ok := config.FindServiceConfig(remote.ServiceHost)
 	if !ok {
-		errors.New("host not found" + remote.ServiceHostName)
+		errors.New("host not found" + remote.ServiceHost)
 	}
 
 	client, err := GetClient(ctx, host)
