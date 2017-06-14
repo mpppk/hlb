@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/mitchellh/go-homedir"
 	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/git"
 	"github.com/mpppk/hlb/hlblib"
@@ -70,10 +71,14 @@ func initConfig() {
 		viper.SetConfigFile(cfgFile)
 	}
 
-	viper.SetConfigName(".hlb")                   // name of config file (without extension)
-	viper.AddConfigPath(os.Getenv("HOME"))        // adding home directory as first search path
-	viper.AddConfigPath(os.Getenv("USERPROFILE")) // adding home directory as first search path
-	viper.AutomaticEnv()                          // read in environment variables that match
+	viper.SetConfigName(".hlb") // name of config file (without extension)
+	dir, err := homedir.Dir()
+	if err != nil {
+		etc.PanicIfErrorExist(err)
+	}
+
+	viper.AddConfigPath(dir) // adding home directory as first search path
+	viper.AutomaticEnv()     // read in environment variables that match
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
