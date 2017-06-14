@@ -16,10 +16,10 @@ type RawRemote interface {
 }
 
 type Remote struct {
-	URL             string
-	ServiceHostName string
-	Owner           string
-	RepoName        string
+	URL         string
+	ServiceHost string
+	Owner       string
+	RepoName    string
 }
 
 func NewRemote(remoteUrl string) (*Remote, error) {
@@ -37,10 +37,10 @@ func NewRemote(remoteUrl string) (*Remote, error) {
 		return nil, errors.New("unknown remoteUrl pattern: " + remoteUrl)
 	}
 	return &Remote{
-		URL:             remoteUrl,
-		ServiceHostName: result[1],
-		Owner:           result[2],
-		RepoName:        strings.Replace(result[3], ".git", "", -1),
+		URL:         remoteUrl,
+		ServiceHost: result[1],
+		Owner:       result[2],
+		RepoName:    strings.Replace(result[3], ".git", "", -1),
 	}, nil
 }
 

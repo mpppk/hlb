@@ -27,16 +27,16 @@ var initCmd = &cobra.Command{
 		if _, err := os.Stat(configFilePath); err != nil {
 			hosts := []*etc.ServiceConfig{
 				{
-					Name:       "github.com",
-					Type:       "github",
-					OAuthToken: "",
-					Protocol:   "https",
+					Host:     "github.com",
+					Type:     "github",
+					Token:    "",
+					Protocol: "https",
 				},
 				{
-					Name:       "gitlab.com",
-					Type:       "gitlab",
-					OAuthToken: "",
-					Protocol:   "https",
+					Host:     "gitlab.com",
+					Type:     "gitlab",
+					Token:    "",
+					Protocol: "https",
 				},
 			}
 

@@ -15,16 +15,16 @@ type findHostTest struct {
 func TestFindHost(t *testing.T) {
 	services := []*ServiceConfig{
 		{
-			Name:       "nameA",
-			Type:       "typeA",
-			OAuthToken: "OAuthTokenA",
-			Protocol:   "protocolA",
+			Host:     "nameA",
+			Type:     "typeA",
+			Token:    "OAuthTokenA",
+			Protocol: "protocolA",
 		},
 		{
-			Name:       "nameB",
-			Type:       "typeB",
-			OAuthToken: "OAuthTokenB",
-			Protocol:   "protocolB",
+			Host:     "nameB",
+			Type:     "typeB",
+			Token:    "OAuthTokenB",
+			Protocol: "protocolB",
 		},
 	}
 
@@ -52,7 +52,7 @@ func TestFindHost(t *testing.T) {
 	for i, f := range findHostTests {
 		config := Config{f.services}
 
-		s, ok := config.FindHost(f.targetServiceName)
+		s, ok := config.FindServiceConfig(f.targetServiceName)
 
 		if ok != f.expectedStatus {
 			t.Errorf("%v: expected find status %v, but %v", i, f.expectedStatus, ok)

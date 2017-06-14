@@ -40,14 +40,20 @@ var addServiceCmd = &cobra.Command{
 		serviceType := args[0]
 		serviceUrl := args[1]
 
+		if !hlblib.CanCreateToken(serviceType) {
+			fmt.Println("Unsupported service type: ", serviceType)
+			fmt.Println("Please add the service configuration to config file(~/.hlb.yaml) manually")
+			os.Exit(1)
+		}
+
 		parsedUrl, err := url.Parse(serviceUrl)
 		etc.PanicIfErrorExist(err)
 
-		host, ok := config.FindHost(parsedUrl.Host)
+		serviceConfig, ok := config.FindServiceConfig(parsedUrl.Host)
 		if ok {
-			if host.OAuthToken != "" {
-				msg := "oauth token for " + parsedUrl.Host + " is already exist.\n"
-				msg += "Are you sure to over write oauth token?"
+			if serviceConfig.Token != "" {
+				msg := "token for " + parsedUrl.Host + " is already exist.\n"
+				msg += "Are you sure to over write token?"
 
 				replaceOAuthToken := false
 				prompt := &survey.Confirm{
@@ -61,11 +67,11 @@ var addServiceCmd = &cobra.Command{
 
 			}
 		} else {
-			host = &etc.ServiceConfig{
-				Name:       parsedUrl.Host,
-				Type:       serviceType,
-				OAuthToken: "",
-				Protocol:   parsedUrl.Scheme,
+			serviceConfig = &etc.ServiceConfig{
+				Host:     parsedUrl.Host,
+				Type:     serviceType,
+				Token:    "",
+				Protocol: parsedUrl.Scheme,
 			}
 		}
 
@@ -73,13 +79,13 @@ var addServiceCmd = &cobra.Command{
 
 		s := spinner.New(spinner.CharSets[14], 100*time.Millisecond) // Build our new spinner
 		s.Start()                                                    // Start the spinner
-		token, err := hlblib.CreateToken(ctx, host, username, password)
+		token, err := hlblib.CreateToken(ctx, serviceConfig, username, password)
 		etc.PanicIfErrorExist(err)
-		host.OAuthToken = token
+		serviceConfig.Token = token
 		s.Stop()
 		if !ok {
 			fmt.Println("Add new service:", parsedUrl.Host)
-			config.Services = append(config.Services, host)
+			config.Services = append(config.Services, serviceConfig)
 		} else {
 			fmt.Println("Update service:", parsedUrl.Host)
 		}

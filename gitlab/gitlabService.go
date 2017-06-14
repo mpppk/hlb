@@ -14,24 +14,24 @@ import (
 
 type Client struct {
 	RawClient   rawClient
-	hostName    string
+	host        string
 	ListOptions *gitlab.ListOptions
 }
 
-func NewClient(host *etc.ServiceConfig) (service.Client, error) {
-	rawClient := newGitLabRawClient(host)
-	return newClientFromRawClient(host, rawClient), nil
+func NewClient(serviceConfig *etc.ServiceConfig) (service.Client, error) {
+	rawClient := newGitLabRawClient(serviceConfig)
+	return newClientFromRawClient(serviceConfig, rawClient), nil
 }
 
-func newGitLabRawClient(host *etc.ServiceConfig) *RawClient {
-	client := gitlab.NewClient(nil, host.OAuthToken)
-	client.SetBaseURL(host.Protocol + "://" + host.Name + "/api/v3")
+func newGitLabRawClient(serviceConfig *etc.ServiceConfig) *RawClient {
+	client := gitlab.NewClient(nil, serviceConfig.Token)
+	client.SetBaseURL(serviceConfig.Protocol + "://" + serviceConfig.Host + "/api/v3")
 	return &RawClient{Client: client}
 }
 
-func newClientFromRawClient(host *etc.ServiceConfig, rawClient rawClient) service.Client {
+func newClientFromRawClient(serviceConfig *etc.ServiceConfig, rawClient rawClient) service.Client {
 	listOpt := &gitlab.ListOptions{PerPage: 100}
-	return service.Client(&Client{RawClient: rawClient, hostName: host.Name, ListOptions: listOpt})
+	return service.Client(&Client{RawClient: rawClient, host: serviceConfig.Host, ListOptions: listOpt})
 }
 
 func (c *Client) GetIssues(ctx context.Context, owner, repo string) (serviceIssues []service.Issue, err error) {
@@ -68,7 +68,7 @@ func (c *Client) GetRepository(ctx context.Context, owner, repo string) (service
 
 func (c *Client) GetRepositoryURL(owner, repo string) (string, error) {
 	err := checkOwnerAndRepo(owner, repo)
-	return fmt.Sprintf("https://%s/%s/%s", c.hostName, owner, repo), err
+	return fmt.Sprintf("https://%s/%s/%s", c.host, owner, repo), err
 }
 
 func (c *Client) GetIssuesURL(owner, repo string) (string, error) {

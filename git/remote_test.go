@@ -3,21 +3,21 @@ package git
 import "testing"
 
 type newRemoteTest struct {
-	url              string
-	willBeError      bool
-	expectedHostName string
-	expectedOwner    string
-	expectedRepoName string
+	url                 string
+	willBeError         bool
+	expectedServiceHost string
+	expectedOwner       string
+	expectedRepoName    string
 }
 
 func TestNewRemote(t *testing.T) {
 	newRemoteTests := []*newRemoteTest{
 		{
-			url:              "git@github.com:mpppk/hlb.git",
-			willBeError:      false,
-			expectedHostName: "github.com",
-			expectedOwner:    "mpppk",
-			expectedRepoName: "hlb",
+			url:                 "git@github.com:mpppk/hlb.git",
+			willBeError:         false,
+			expectedServiceHost: "github.com",
+			expectedOwner:       "mpppk",
+			expectedRepoName:    "hlb",
 		},
 		{
 			url:         "git@github.com:mpppk.git",
@@ -36,18 +36,18 @@ func TestNewRemote(t *testing.T) {
 			willBeError: true,
 		},
 		{
-			url:              "https://github.com/mpppk/hlb",
-			willBeError:      false,
-			expectedHostName: "github.com",
-			expectedOwner:    "mpppk",
-			expectedRepoName: "hlb",
+			url:                 "https://github.com/mpppk/hlb",
+			willBeError:         false,
+			expectedServiceHost: "github.com",
+			expectedOwner:       "mpppk",
+			expectedRepoName:    "hlb",
 		},
 		{
-			url:              "http://github.com/mpppk/hlb",
-			willBeError:      false,
-			expectedHostName: "github.com",
-			expectedOwner:    "mpppk",
-			expectedRepoName: "hlb",
+			url:                 "http://github.com/mpppk/hlb",
+			willBeError:         false,
+			expectedServiceHost: "github.com",
+			expectedOwner:       "mpppk",
+			expectedRepoName:    "hlb",
 		},
 		{
 			url:         "http://github.com/mpppk",
@@ -70,11 +70,11 @@ func TestNewRemote(t *testing.T) {
 				i, nr)
 		}
 
-		if remote.ServiceHostName != nr.expectedHostName {
-			t.Errorf("ServiceHostName field must be host name "+
+		if remote.ServiceHost != nr.expectedServiceHost {
+			t.Errorf("ServiceHost field must be host name "+
 				"that extracted from provided URL "+
 				"%v: expected: %v, actual(extract from %v): %v",
-				i, nr.expectedHostName, nr.url, remote.ServiceHostName)
+				i, nr.expectedServiceHost, nr.url, remote.ServiceHost)
 		}
 
 		if remote.Owner != nr.expectedOwner {
