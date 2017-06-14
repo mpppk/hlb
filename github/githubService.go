@@ -121,6 +121,36 @@ func (c *Client) GetPullRequestURL(owner, repo string, id int) (string, error) {
 	return fmt.Sprintf("%s/pull/%d", repoUrl, id), err
 }
 
+func (c *Client) GetProjectsURL(owner, repo string) (string, error) {
+	repoUrl, err := c.GetRepositoryURL(owner, repo)
+	return repoUrl + "/projects", err
+}
+
+func (c *Client) GetProjectURL(owner, repo string, id int) (string, error) {
+	repoUrl, err := c.GetRepositoryURL(owner, repo)
+	return fmt.Sprintf("%s/projects/%d", repoUrl, id), err
+}
+
+func (c *Client) GetMilestonesURL(owner, repo string) (string, error) {
+	repoUrl, err := c.GetRepositoryURL(owner, repo)
+	return repoUrl + "/milestones", err
+}
+
+func (c *Client) GetMilestoneURL(owner, repo string, id int) (string, error) {
+	repoUrl, err := c.GetRepositoryURL(owner, repo)
+	return fmt.Sprintf("%s/milestone/%d", repoUrl, id), err
+}
+
+func (c *Client) GetWikisURL(owner, repo string) (string, error) {
+	repoUrl, err := c.GetRepositoryURL(owner, repo)
+	return repoUrl + "/wiki", err
+}
+
+func (c *Client) GetCommitsURL(owner, repo string) (string, error) {
+	repoUrl, err := c.GetRepositoryURL(owner, repo)
+	return repoUrl + "/commits", err
+}
+
 func (c *Client) CreateToken(ctx context.Context) (string, error) {
 
 	note, err := c.getUniqueNote(ctx, "hlb")

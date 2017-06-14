@@ -5,6 +5,8 @@ import (
 
 	"strings"
 
+	"os"
+
 	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/git"
 	"github.com/mpppk/hlb/hlblib"
@@ -19,6 +21,17 @@ var browseCmd = &cobra.Command{
 	Short: "browse repo",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) > 0 {
+			fmt.Printf(`Unknown subcommand "%v" for "browse"`, args[0])
+			fmt.Println("\nDid you mean this?")
+
+			suggestedCmdNames := cmd.SuggestionsFor(args[0])
+			for _, s := range suggestedCmdNames {
+				fmt.Println("\t", s)
+			}
+			os.Exit(1)
+		}
+
 		base, err := hlblib.NewCmdBase()
 		etc.PanicIfErrorExist(err)
 		sw := hlblib.ClientWrapper{Base: base}
