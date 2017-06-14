@@ -3,8 +3,6 @@ package cmd
 import (
 	"fmt"
 
-	"strings"
-
 	"os"
 
 	"github.com/mpppk/hlb/etc"
@@ -47,22 +45,21 @@ var browseCmd = &cobra.Command{
 		remote, err := git.GetDefaultRemote(".")
 		etc.PanicIfErrorExist(err)
 		serviceConfig, ok := config.FindServiceConfig(remote.ServiceHost)
-		if !ok {
-			if remote.ServiceHost == "github" {
-				serviceUrl := remote.URL
-				if !strings.Contains(serviceUrl, "http") {
-					serviceUrl = "https://" + remote.ServiceHost
-				}
 
-				addServiceCmd.Run(cmd, []string{"github", serviceUrl})
-			}
-			return
+		if !ok {
+			fmt.Println(remote.ServiceHost, " is unknown host. Please add the service configuration to config file(~/.hlb.yaml)")
+			os.Exit(1)
 		}
 
-		if serviceConfig.Token == "" && serviceConfig.Type == "github" {
+		if serviceConfig.Token == "" {
+			if !hlblib.CanCreateToken(serviceConfig.Type) {
+				fmt.Println("The token of ", serviceConfig.Host, " can not create via hlb.")
+				fmt.Println(serviceConfig.Host, "Please add token to config file(~/.hlb.yaml) manually.")
+				os.Exit(1)
+			}
 			serviceUrl := serviceConfig.Protocol + "://" + serviceConfig.Host
 			fmt.Println(serviceUrl)
-			addServiceCmd.Run(cmd, []string{"github", serviceUrl})
+			addServiceCmd.Run(cmd, []string{serviceConfig.Type, serviceUrl})
 		}
 	},
 }

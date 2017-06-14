@@ -40,6 +40,12 @@ var addServiceCmd = &cobra.Command{
 		serviceType := args[0]
 		serviceUrl := args[1]
 
+		if !hlblib.CanCreateToken(serviceType) {
+			fmt.Println("Unsupported service type: ", serviceType)
+			fmt.Println("Please add the service configuration to config file(~/.hlb.yaml) manually")
+			os.Exit(1)
+		}
+
 		parsedUrl, err := url.Parse(serviceUrl)
 		etc.PanicIfErrorExist(err)
 
