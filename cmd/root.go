@@ -25,16 +25,14 @@ var RootCmd = &cobra.Command{
 		remote, err := git.GetDefaultRemote(".")
 		etc.PanicIfErrorExist(err)
 		serviceConfig, ok := config.FindServiceConfig(remote.ServiceHost)
-
 		if !ok {
-			fmt.Println(remote.ServiceHost, " is unknown host. Please add the service configuration to config file(~/.hlb.yaml)")
+			fmt.Println(remote.ServiceHost, "is unknown host. Please add the service configuration to config file(~/.hlb.yaml)")
 			os.Exit(1)
 		}
-
 		if serviceConfig.Token == "" {
 			if !hlblib.CanCreateToken(serviceConfig.Type) {
-				fmt.Println("The token of ", serviceConfig.Host, " can not create via hlb.")
-				fmt.Println(serviceConfig.Host, "Please add token to config file(~/.hlb.yaml) manually.")
+				fmt.Println("The token of", serviceConfig.Host, "can not create via hlb.")
+				fmt.Println("Please add token to config file(~/.hlb.yaml) manually.")
 				os.Exit(1)
 			}
 			serviceUrl := serviceConfig.Protocol + "://" + serviceConfig.Host
