@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mitchellh/go-homedir"
 	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/git"
 	"github.com/mpppk/hlb/hlblib"
@@ -20,24 +19,28 @@ var RootCmd = &cobra.Command{
 	Short: "multi git hosting service manager",
 	Long:  ``,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		configFilePath, err := etc.GetConfigDirPath()
+		if err != nil {
+			etc.PanicIfErrorExist(err)
+		}
+
 		var config etc.Config
-		err := viper.Unmarshal(&config)
+		err = viper.Unmarshal(&config)
 		etc.PanicIfErrorExist(err)
 		remote, err := git.GetDefaultRemote(".")
 		etc.PanicIfErrorExist(err)
 		serviceConfig, ok := config.FindServiceConfig(remote.ServiceHost)
 		if !ok {
-			fmt.Println(remote.ServiceHost, "is unknown host. Please add the service configuration to config file(~/.hlb.yaml)")
+			fmt.Println(remote.ServiceHost, "is unknown host. Please add the service configuration to config file("+configFilePath+")")
 			os.Exit(1)
 		}
 		if serviceConfig.Token == "" {
 			if !hlblib.CanCreateToken(serviceConfig.Type) {
 				fmt.Println("The token of", serviceConfig.Host, "can not create via hlb.")
-				fmt.Println("Please add token to config file(~/.hlb.yaml) manually.")
+				fmt.Println("Please add token to config file(" + configFilePath + ") manually.")
 				os.Exit(1)
 			}
 			serviceUrl := serviceConfig.Protocol + "://" + serviceConfig.Host
-			fmt.Println(serviceUrl)
 			addServiceCmd.Run(cmd, []string{serviceConfig.Type, serviceUrl})
 		}
 	},
@@ -55,11 +58,10 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	// Here you will define your flags and configuration settings.
-	// Cobra supports Persistent Flags, which, if defined here,
-	// will be global for your application.
+	configFilePath, err := etc.GetConfigFilePath()
+	etc.PanicIfErrorExist(err)
 
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.hlb.yaml)")
+	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is "+configFilePath+")")
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
@@ -72,13 +74,11 @@ func initConfig() {
 	}
 
 	viper.SetConfigName(".hlb") // name of config file (without extension)
-	dir, err := homedir.Dir()
-	if err != nil {
-		etc.PanicIfErrorExist(err)
-	}
+	configFilePath, err := etc.GetConfigDirPath()
+	etc.PanicIfErrorExist(err)
 
-	viper.AddConfigPath(dir) // adding home directory as first search path
-	viper.AutomaticEnv()     // read in environment variables that match
+	viper.AddConfigPath(configFilePath) // adding home directory as first search path
+	viper.AutomaticEnv()                // read in environment variables that match
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
