@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path"
 
-	"github.com/mitchellh/go-homedir"
 	"github.com/mpppk/hlb/etc"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
@@ -18,12 +16,8 @@ var initCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		// ファイルが無ければ作成
-		dirName, err := homedir.Dir()
-		if err != nil {
-			panic(err)
-		}
-		configFilePath := path.Join(dirName, ".hlb.yaml")
+		configFilePath, err := etc.GetConfigFilePath()
+		etc.PanicIfErrorExist(err)
 		if _, err := os.Stat(configFilePath); err != nil {
 			hosts := []*etc.ServiceConfig{
 				{
@@ -43,7 +37,11 @@ var initCmd = &cobra.Command{
 			config := etc.Config{Services: hosts}
 			f, err := yaml.Marshal(config)
 			etc.PanicIfErrorExist(err)
-			ioutil.WriteFile(configFilePath, f, 0666)
+			configFileDirPath, err := etc.GetConfigDirPath()
+			err = os.MkdirAll(configFileDirPath, 0777)
+			etc.PanicIfErrorExist(err)
+			err = ioutil.WriteFile(configFilePath, f, 0666)
+			etc.PanicIfErrorExist(err)
 		} else {
 			fmt.Println("config file already exist:", configFilePath)
 		}

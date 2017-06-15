@@ -6,13 +6,11 @@ import (
 	"io/ioutil"
 	"net/url"
 	"os"
-	"path/filepath"
 
 	"time"
 
 	"github.com/AlecAivazis/survey"
 	"github.com/briandowns/spinner"
-	"github.com/mitchellh/go-homedir"
 	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/hlblib"
 	"github.com/mpppk/hlb/service"
@@ -42,7 +40,9 @@ var addServiceCmd = &cobra.Command{
 
 		if !hlblib.CanCreateToken(serviceType) {
 			fmt.Println("Unsupported service type: ", serviceType)
-			fmt.Println("Please add the service configuration to config file(~/.hlb.yaml) manually")
+			filePath, _ := etc.GetConfigFilePath()
+
+			fmt.Println("Please add the service configuration to config file(" + filePath + ") manually")
 			os.Exit(1)
 		}
 
@@ -91,9 +91,8 @@ var addServiceCmd = &cobra.Command{
 		}
 
 		f, err := yaml.Marshal(config)
-		homeDir, err := homedir.Dir()
+		configFilePath, err := etc.GetConfigFilePath()
 		etc.PanicIfErrorExist(err)
-		configFilePath := filepath.Join(homeDir, ".hlb.yaml")
 		ioutil.WriteFile(configFilePath, f, 0666)
 	},
 }

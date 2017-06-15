@@ -21,7 +21,7 @@ $ go get github.com/mpppk/hlb
 ```
 
 ## Authentication
-authenticate infomation of hlb is stored in `~/.hlb.yaml`.
+authenticate infomation of hlb is stored in `~/.config/hlb/.hlb.yaml`.
 
 ### github.com & GitHub Enterprise
 a. Use `hlb add-service` command
@@ -32,7 +32,7 @@ a. Use `hlb add-service` command
  ```
 (Currently, add-service command only supports GitHub)
 
-b. Add below setting to `~/.hlb.yaml`  
+b. Add below setting to `~/.config/hlb/.hlb.yaml`  
 (If file does not exist yet, execute `hlb init` first)
 ```yaml
 services:
@@ -44,7 +44,7 @@ services:
 (oauth_token can generate from [GitHub Personal access token page](https://github.com/settings/tokens))
 
 ### gitlab.com & your GitLab Server 
-Add below setting to `~/.hlb.yaml`
+Add below setting to `~/.config/hlb/.hlb.yaml`
 
 ```yaml
 services:
@@ -57,7 +57,7 @@ services:
 
 ## Commands
 ### hlb init
-Create config file(`~/.hlb.yaml`).
+Create config file to `~/.config/hlb/.hlb.yaml`.
 
 ### hlb add-service
 Get OAuth token from git service and add to config file.

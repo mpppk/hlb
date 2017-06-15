@@ -1,6 +1,11 @@
 package etc
 
-import "strings"
+import (
+	"path"
+	"strings"
+
+	"github.com/mitchellh/go-homedir"
+)
 
 type HostType int
 
@@ -44,4 +49,22 @@ func (c *Config) FindServiceConfig(host string) (*ServiceConfig, bool) {
 		}
 	}
 	return nil, false
+}
+
+func GetConfigDirName() string {
+	return path.Join(".config", "hlb")
+}
+
+func GetConfigFileName() string {
+	return ".hlb.yaml"
+}
+
+func GetConfigDirPath() (string, error) {
+	dir, err := homedir.Dir()
+	return path.Join(dir, GetConfigDirName()), err
+}
+
+func GetConfigFilePath() (string, error) {
+	configDirPath, err := GetConfigDirPath()
+	return path.Join(configDirPath, GetConfigFileName()), err
 }
