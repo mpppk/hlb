@@ -25,7 +25,7 @@ type Remote struct {
 func NewRemote(remoteUrl string) (*Remote, error) {
 	var assigned *regexp.Regexp
 	if strings.HasPrefix(remoteUrl, "http") {
-		assigned = regexp.MustCompile(`https?://[.+@]?(.+)/(.+)/(.+)$`)
+		assigned = regexp.MustCompile(`https?://[.+]?(.+)/(.+)/(.+)$`)
 	} else if strings.HasPrefix(remoteUrl, "git") {
 		assigned = regexp.MustCompile(`git@(.+):(.+)/(.+).git`)
 	} else {
@@ -33,12 +33,15 @@ func NewRemote(remoteUrl string) (*Remote, error) {
 	}
 
 	result := assigned.FindStringSubmatch(remoteUrl)
-	if result == nil {
+
+	if result == nil || len(result) < 4 {
 		return nil, errors.New("unknown remoteUrl pattern: " + remoteUrl)
 	}
+	hostNames := strings.Split(result[1], "@")
+	serviceHost := hostNames[len(hostNames)-1]
 	return &Remote{
 		URL:         remoteUrl,
-		ServiceHost: result[1],
+		ServiceHost: serviceHost,
 		Owner:       result[2],
 		RepoName:    strings.Replace(result[3], ".git", "", -1),
 	}, nil

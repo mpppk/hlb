@@ -1,6 +1,9 @@
 package git
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 type newRemoteTest struct {
 	url                 string
@@ -44,6 +47,13 @@ func TestNewRemote(t *testing.T) {
 		},
 		{
 			url:                 "http://github.com/mpppk/hlb",
+			willBeError:         false,
+			expectedServiceHost: "github.com",
+			expectedOwner:       "mpppk",
+			expectedRepoName:    "hlb",
+		},
+		{
+			url:                 "https://mpppk@github.com/mpppk/hlb",
 			willBeError:         false,
 			expectedServiceHost: "github.com",
 			expectedOwner:       "mpppk",
