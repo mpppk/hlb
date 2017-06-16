@@ -13,9 +13,10 @@ import (
 )
 
 type Client struct {
-	RawClient   rawClient
-	host        string
-	ListOptions *gitlab.ListOptions
+	RawClient     rawClient
+	host          string
+	serviceConfig *etc.ServiceConfig
+	ListOptions   *gitlab.ListOptions
 }
 
 func NewClient(serviceConfig *etc.ServiceConfig) (service.Client, error) {
@@ -31,7 +32,7 @@ func newGitLabRawClient(serviceConfig *etc.ServiceConfig) *RawClient {
 
 func newClientFromRawClient(serviceConfig *etc.ServiceConfig, rawClient rawClient) service.Client {
 	listOpt := &gitlab.ListOptions{PerPage: 100}
-	return service.Client(&Client{RawClient: rawClient, host: serviceConfig.Host, ListOptions: listOpt})
+	return service.Client(&Client{RawClient: rawClient, serviceConfig: serviceConfig, host: serviceConfig.Host, ListOptions: listOpt})
 }
 
 func (c *Client) GetIssues(ctx context.Context, owner, repo string) (serviceIssues []service.Issue, err error) {
@@ -68,7 +69,7 @@ func (c *Client) GetRepository(ctx context.Context, owner, repo string) (service
 
 func (c *Client) GetRepositoryURL(owner, repo string) (string, error) {
 	err := checkOwnerAndRepo(owner, repo)
-	return fmt.Sprintf("https://%s/%s/%s", c.host, owner, repo), err
+	return fmt.Sprintf("%s://%s/%s/%s", c.serviceConfig.Protocol, c.host, owner, repo), err
 }
 
 func (c *Client) GetIssuesURL(owner, repo string) (string, error) {
