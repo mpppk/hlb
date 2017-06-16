@@ -4,39 +4,47 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/pkg/errors"
 	"gopkg.in/src-d/go-git.v4"
 )
 
-type Remote struct {
-	Remote          *git.Remote
-	ServiceHostName string
-	Owner           string
-	RepoName        string
+type RawRemoteConfig interface {
 }
 
-func NewRemote(remote *git.Remote) *Remote {
-	remoteConfig := remote.Config()
-	url := remoteConfig.URL
+type RawRemote interface {
+	Config() *RawRemoteConfig
+}
 
+type Remote struct {
+	URL         string
+	ServiceHost string
+	Owner       string
+	RepoName    string
+}
+
+func NewRemote(remoteUrl string) (*Remote, error) {
 	var assigned *regexp.Regexp
-	if strings.HasPrefix(url, "http") {
-		assigned = regexp.MustCompile(`https?://[.+@]?(.+)/(.+)/(.+)$`)
-	} else if strings.HasPrefix(url, "git") {
+	if strings.HasPrefix(remoteUrl, "http") {
+		assigned = regexp.MustCompile(`https?://[.+]?(.+)/(.+)/(.+)$`)
+	} else if strings.HasPrefix(remoteUrl, "git") {
 		assigned = regexp.MustCompile(`git@(.+):(.+)/(.+).git`)
 	} else {
-		panic("unknown remote: " + url)
+		return nil, errors.New("unknown remote: " + remoteUrl)
 	}
 
-	result := assigned.FindStringSubmatch(url)
-	if result == nil {
-		panic("unknown url pattern: " + url)
+	result := assigned.FindStringSubmatch(remoteUrl)
+
+	if result == nil || len(result) < 4 {
+		return nil, errors.New("unknown remoteUrl pattern: " + remoteUrl)
 	}
+	hostNames := strings.Split(result[1], "@")
+	serviceHost := hostNames[len(hostNames)-1]
 	return &Remote{
-		Remote:          remote,
-		ServiceHostName: result[1],
-		Owner:           result[2],
-		RepoName:        strings.Replace(result[3], ".git", "", -1),
-	}
+		URL:         remoteUrl,
+		ServiceHost: serviceHost,
+		Owner:       result[2],
+		RepoName:    strings.Replace(result[3], ".git", "", -1),
+	}, nil
 }
 
 func GetDefaultRemote(path string) (*Remote, error) {
@@ -49,6 +57,6 @@ func GetDefaultRemote(path string) (*Remote, error) {
 	if err != nil {
 		return nil, err
 	}
-	return NewRemote(remote), nil
+	return NewRemote(remote.Config().URL)
 
 }

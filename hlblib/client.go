@@ -10,42 +10,51 @@ import (
 	"github.com/mpppk/hlb/service"
 )
 
-func GetClient(ctx context.Context, host *etc.ServiceConfig) (service.Client, error) {
-	switch host.Type {
+func GetClient(ctx context.Context, serviceConfig *etc.ServiceConfig) (service.Client, error) {
+	switch serviceConfig.Type {
 	case etc.HOST_TYPE_GITHUB.String():
-		client, err := github.NewClient(ctx, host)
+		client, err := github.NewClient(ctx, serviceConfig)
 		if err != nil {
 			return nil, err
 		}
 		return service.Client(client), nil
 	}
-	switch host.Type {
+	switch serviceConfig.Type {
 	case etc.HOST_TYPE_GITLAB.String():
-		client, err := gitlab.NewClient(host)
+		client, err := gitlab.NewClient(serviceConfig)
 		if err != nil {
 			return nil, err
 		}
 
 		return service.Client(client), nil
 	}
-	return nil, errors.New("unknown host type: " + host.Type)
+	return nil, errors.New("unknown serviceConfig type: " + serviceConfig.Type)
 }
 
-func CreateToken(ctx context.Context, host *etc.ServiceConfig, username, pass string) (string, error) {
-	//user, pass := project.PromptUserAndPassword(host.Name)
+func CanCreateToken(serviceType string) bool {
+	switch serviceType {
+	case etc.HOST_TYPE_GITHUB.String():
+		return true
+	default:
+		return false
+	}
+}
+
+func CreateToken(ctx context.Context, serviceConfig *etc.ServiceConfig, username, pass string) (string, error) {
+	//user, pass := project.PromptUserAndPassword(serviceConfig.Host)
 
 	var s service.Client
-	switch host.Type {
+	switch serviceConfig.Type {
 	case etc.HOST_TYPE_GITHUB.String():
-		client, err := github.NewClientViaBasicAuth(ctx, host, username, pass)
+		client, err := github.NewClientViaBasicAuth(ctx, serviceConfig, username, pass)
 		if err != nil {
 			return "", err
 		}
 		s = service.Client(client)
 	}
-	switch host.Type {
+	switch serviceConfig.Type {
 	case etc.HOST_TYPE_GITLAB.String():
-		//service, err := gitlab.NewClientViaBasicAuth(host, user, name)
+		//service, err := gitlab.NewClientViaBasicAuth(serviceConfig, user, name)
 		//if err != nil {
 		//	return nil, err
 		//}

@@ -1,6 +1,11 @@
 package etc
 
-import "strings"
+import (
+	"path"
+	"strings"
+
+	"github.com/mitchellh/go-homedir"
+)
 
 type HostType int
 
@@ -27,21 +32,39 @@ func (s HostType) String() string {
 }
 
 type ServiceConfig struct {
-	Name       string
-	Type       string
-	OAuthToken string `mapstructure:"oauth_token" yaml:"oauth_token"`
-	Protocol   string
+	Host     string
+	Type     string
+	Token    string `mapstructure:"oauth_token" yaml:"oauth_token"`
+	Protocol string
 }
 
 type Config struct {
 	Services []*ServiceConfig
 }
 
-func (c *Config) FindHost(name string) (*ServiceConfig, bool) {
+func (c *Config) FindServiceConfig(host string) (*ServiceConfig, bool) {
 	for _, h := range c.Services {
-		if strings.Contains(name, h.Name) {
+		if strings.Contains(host, h.Host) {
 			return h, true
 		}
 	}
 	return nil, false
+}
+
+func GetConfigDirName() string {
+	return path.Join(".config", "hlb")
+}
+
+func GetConfigFileName() string {
+	return ".hlb.yaml"
+}
+
+func GetConfigDirPath() (string, error) {
+	dir, err := homedir.Dir()
+	return path.Join(dir, GetConfigDirName()), err
+}
+
+func GetConfigFilePath() (string, error) {
+	configDirPath, err := GetConfigDirPath()
+	return path.Join(configDirPath, GetConfigFileName()), err
 }
