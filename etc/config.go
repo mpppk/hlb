@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/mitchellh/go-homedir"
+	"github.com/pkg/errors"
 )
 
 type HostType int
@@ -61,10 +62,10 @@ func GetConfigFileName() string {
 
 func GetConfigDirPath() (string, error) {
 	dir, err := homedir.Dir()
-	return path.Join(dir, GetConfigDirName()), err
+	return path.Join(dir, GetConfigDirName()), errors.Wrap(err, "Error occurred in etc.GetConfigDirPath")
 }
 
 func GetConfigFilePath() (string, error) {
 	configDirPath, err := GetConfigDirPath()
-	return path.Join(configDirPath, GetConfigFileName()), err
+	return path.Join(configDirPath, GetConfigFileName()), errors.Wrap(err, "Error occurred in etc.GetConfigFilePath")
 }

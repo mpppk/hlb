@@ -2,13 +2,13 @@ package gitlab
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"strings"
 
 	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/service"
+	"github.com/pkg/errors"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -43,7 +43,7 @@ func (c *Client) GetIssues(ctx context.Context, owner, repo string) (serviceIssu
 		serviceIssues = append(serviceIssues, &Issue{Issue: issue})
 	}
 
-	return serviceIssues, err
+	return serviceIssues, errors.Wrap(err, "Failed to get Issues by raw client in gitlab.Client.GetIssues")
 }
 
 func (c *Client) GetPullRequests(ctx context.Context, owner, repo string) (servicePullRequests []service.PullRequest, err error) {
@@ -54,14 +54,14 @@ func (c *Client) GetPullRequests(ctx context.Context, owner, repo string) (servi
 		servicePullRequests = append(servicePullRequests, &PullRequest{MergeRequest: mergeRequest})
 	}
 
-	return servicePullRequests, err
+	return servicePullRequests, errors.Wrap(err, "Failed to get Pull Requests by raw client in gitlab.Client.GetPullRequests")
 }
 
 func (c *Client) GetRepository(ctx context.Context, owner, repo string) (service.Repository, error) {
 	project, _, err := c.RawClient.GetProjects().GetProject(owner + "/" + repo)
 
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "Failed to get Repository by raw client in gitlab.Client.GetRepository")
 	}
 
 	return &Repository{Project: project}, err
@@ -69,31 +69,31 @@ func (c *Client) GetRepository(ctx context.Context, owner, repo string) (service
 
 func (c *Client) GetRepositoryURL(owner, repo string) (string, error) {
 	err := checkOwnerAndRepo(owner, repo)
-	return fmt.Sprintf("%s://%s/%s/%s", c.serviceConfig.Protocol, c.host, owner, repo), err
+	return fmt.Sprintf("%s://%s/%s/%s", c.serviceConfig.Protocol, c.host, owner, repo), errors.Wrap(err, "Error occurred in gitlab.Client.GetRepositoryURL")
 }
 
 func (c *Client) GetIssuesURL(owner, repo string) (string, error) {
 	repoUrl, err := c.GetRepositoryURL(owner, repo)
-	return repoUrl + "/issues", err
+	return repoUrl + "/issues", errors.Wrap(err, "Error occurred in gitlab.Client.GetIssuesURL")
 }
 
 func (c *Client) GetIssueURL(owner, repo string, id int) (string, error) {
 	url, err := c.GetIssuesURL(owner, repo)
-	return fmt.Sprintf("%s/%d", url, id), err
+	return fmt.Sprintf("%s/%d", url, id), errors.Wrap(err, "Error occurred in gitlab.Client.GetIssueURL")
 }
 func (c *Client) GetPullRequestsURL(owner, repo string) (string, error) {
 	repoUrl, err := c.GetRepositoryURL(owner, repo)
-	return repoUrl + "/merge_requests", err
+	return repoUrl + "/merge_requests", errors.Wrap(err, "Error occurred in gitlab.Client.GetPullRequestsURL")
 }
 
 func (c *Client) GetPullRequestURL(owner, repo string, id int) (string, error) {
 	url, err := c.GetPullRequestsURL(owner, repo)
-	return fmt.Sprintf("%s/%d", url, id), err
+	return fmt.Sprintf("%s/%d", url, id), errors.Wrap(err, "Error occurred in gitlab.Client.GetPUllRequestURL")
 }
 
 func (c *Client) GetProjectsURL(owner, repo string) (string, error) {
 	repoUrl, err := c.GetRepositoryURL(owner, repo)
-	return repoUrl + "/boards", err
+	return repoUrl + "/boards", errors.Wrap(err, "Error occurred in gitlab.Client.GetProjectsURL")
 }
 
 func (c *Client) GetProjectURL(owner, repo string, id int) (string, error) {
@@ -103,26 +103,26 @@ func (c *Client) GetProjectURL(owner, repo string, id int) (string, error) {
 
 func (c *Client) GetMilestonesURL(owner, repo string) (string, error) {
 	repoUrl, err := c.GetRepositoryURL(owner, repo)
-	return repoUrl + "/milestones", err
+	return repoUrl + "/milestones", errors.Wrap(err, "Error occurred in gitlab.Client.GetMilestonesURL")
 }
 
 func (c *Client) GetMilestoneURL(owner, repo string, id int) (string, error) {
 	url, err := c.GetMilestonesURL(owner, repo)
-	return fmt.Sprintf("%s/%d", url, id), err
+	return fmt.Sprintf("%s/%d", url, id), errors.Wrap(err, "Error occurred in gitlab.Client.GetMilestoneURL")
 }
 
 func (c *Client) GetWikisURL(owner, repo string) (string, error) {
 	repoUrl, err := c.GetRepositoryURL(owner, repo)
-	return repoUrl + "/wikis", err
+	return repoUrl + "/wikis", errors.Wrap(err, "Error occurred in gitlab.Client.GetWikisURL")
 }
 
 func (c *Client) GetCommitsURL(owner, repo string) (string, error) {
 	repoUrl, err := c.GetRepositoryURL(owner, repo)
-	return repoUrl + "/commits/master", err
+	return repoUrl + "/commits/master", errors.Wrap(err, "Error occurred in gitlab.Client.GetCommitsURL")
 }
 
 func (c *Client) CreateToken(ctx context.Context) (string, error) {
-	return "Not Implemented Yet", nil
+	return "", errors.New("Not Implemented Yet")
 }
 
 func checkOwnerAndRepo(owner, repo string) error {

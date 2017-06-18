@@ -36,7 +36,7 @@ func NewClientViaBasicAuth(ctx context.Context, serviceConfig *etc.ServiceConfig
 func newServiceFromClient(serviceConfig *etc.ServiceConfig, client rawClient) (*Client, error) {
 	baseUrl, err := url.Parse(serviceConfig.Protocol + "://api." + serviceConfig.Host)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "Failed to parse base URL based on serviceConfig in github.Client.newServiceFromClient")
 	}
 	client.SetBaseURL(baseUrl)
 	listOpt := &github.ListOptions{PerPage: 100}
@@ -48,14 +48,14 @@ func (c *Client) GetPullRequests(ctx context.Context, owner, repo string) (servi
 	pullRequests, _, err := c.RawClient.GetPullRequests().List(ctx, owner, repo, &opt)
 
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "Failed to get Pull Requests by raw client in github.Client.GetPullRequests")
 	}
 
-	for _, gitHubPullRequest := range pullRequests {
-		servicePullRequests = append(servicePullRequests, &PullRequest{PullRequest: gitHubPullRequest})
+	for _, pullRequest := range pullRequests {
+		servicePullRequests = append(servicePullRequests, &PullRequest{PullRequest: pullRequest})
 	}
 
-	return servicePullRequests, err
+	return servicePullRequests, nil
 }
 
 func (c *Client) GetIssues(ctx context.Context, owner, repo string) (serviceIssues []service.Issue, err error) {
@@ -63,21 +63,21 @@ func (c *Client) GetIssues(ctx context.Context, owner, repo string) (serviceIssu
 	issues, err := c.getGitHubIssues(ctx, c.RawClient, owner, repo, opt)
 
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "Failed to get Issues by raw client in github.Client.GetIssues")
 	}
 
 	for _, issue := range issues {
 		serviceIssues = append(serviceIssues, &Issue{Issue: issue})
 	}
 
-	return serviceIssues, err
+	return serviceIssues, errors.Wrap(err, "Error occurred in github.Client.GetIssues")
 }
 
 func (c *Client) getGitHubIssues(ctx context.Context, client rawClient, owner, repo string, opt *github.IssueListByRepoOptions) (issues []*github.Issue, err error) {
 	issuesAndPRs, _, err := client.GetIssues().ListByRepo(ctx, owner, repo, opt)
 
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "Error occurred in github.Client.getGitHubIssues")
 	}
 
 	for _, issueOrPR := range issuesAndPRs {
@@ -90,7 +90,7 @@ func (c *Client) getGitHubIssues(ctx context.Context, client rawClient, owner, r
 
 func (c *Client) GetRepository(ctx context.Context, owner, repo string) (service.Repository, error) {
 	githubRepo, _, err := c.RawClient.GetRepositories().Get(ctx, owner, repo)
-	return &Repository{Repository: githubRepo}, err
+	return &Repository{Repository: githubRepo}, errors.Wrap(err, "Failed to get Repositories by raw client")
 }
 
 func (c *Client) GetRepositoryURL(owner, repo string) (string, error) {
@@ -99,56 +99,56 @@ func (c *Client) GetRepositoryURL(owner, repo string) (string, error) {
 
 func (c *Client) GetIssuesURL(owner, repo string) (string, error) {
 	if err := checkOwnerAndRepo(owner, repo); err != nil {
-		return "", err
+		return "", errors.Wrap(err, "Invalid owner or repo was passed to GetIssuesURL")
 	}
 
 	repoUrl, err := c.GetRepositoryURL(owner, repo)
-	return repoUrl + "/issues", err
+	return repoUrl + "/issues", errors.Wrap(err, "Error occurred in github.Client.GetIssuesURL")
 }
 
 func (c *Client) GetIssueURL(owner, repo string, id int) (string, error) {
 	url, err := c.GetIssuesURL(owner, repo)
-	return fmt.Sprintf("%s/%d", url, id), err
+	return fmt.Sprintf("%s/%d", url, id), errors.Wrap(err, "Error occurred in github.Client.GetIssueURL")
 }
 
 func (c *Client) GetPullRequestsURL(owner, repo string) (string, error) {
 	repoUrl, err := c.GetRepositoryURL(owner, repo)
-	return repoUrl + "/pulls", err
+	return repoUrl + "/pulls", errors.Wrap(err, "Error occurred in github.Client.GetPullRequestsURL")
 }
 
 func (c *Client) GetPullRequestURL(owner, repo string, id int) (string, error) {
 	repoUrl, err := c.GetRepositoryURL(owner, repo)
-	return fmt.Sprintf("%s/pull/%d", repoUrl, id), err
+	return fmt.Sprintf("%s/pull/%d", repoUrl, id), errors.Wrap(err, "Error occurred in github.Client.GetPullRequestURL")
 }
 
 func (c *Client) GetProjectsURL(owner, repo string) (string, error) {
 	repoUrl, err := c.GetRepositoryURL(owner, repo)
-	return repoUrl + "/projects", err
+	return repoUrl + "/projects", errors.Wrap(err, "Error occurred in github.Client.GetProjectsURL")
 }
 
 func (c *Client) GetProjectURL(owner, repo string, id int) (string, error) {
 	repoUrl, err := c.GetRepositoryURL(owner, repo)
-	return fmt.Sprintf("%s/projects/%d", repoUrl, id), err
+	return fmt.Sprintf("%s/projects/%d", repoUrl, id), errors.Wrap(err, "Error occurred in github.Client.GetProjectURL")
 }
 
 func (c *Client) GetMilestonesURL(owner, repo string) (string, error) {
 	repoUrl, err := c.GetRepositoryURL(owner, repo)
-	return repoUrl + "/milestones", err
+	return repoUrl + "/milestones", errors.Wrap(err, "Error occurred in github.Client.GetMilestonesURL")
 }
 
 func (c *Client) GetMilestoneURL(owner, repo string, id int) (string, error) {
 	repoUrl, err := c.GetRepositoryURL(owner, repo)
-	return fmt.Sprintf("%s/milestone/%d", repoUrl, id), err
+	return fmt.Sprintf("%s/milestone/%d", repoUrl, id), errors.Wrap(err, "Error occurred in github.Client.GetMilestoneURL")
 }
 
 func (c *Client) GetWikisURL(owner, repo string) (string, error) {
 	repoUrl, err := c.GetRepositoryURL(owner, repo)
-	return repoUrl + "/wiki", err
+	return repoUrl + "/wiki", errors.Wrap(err, "Error occurred in github.Client.GetWikisURL")
 }
 
 func (c *Client) GetCommitsURL(owner, repo string) (string, error) {
 	repoUrl, err := c.GetRepositoryURL(owner, repo)
-	return repoUrl + "/commits", err
+	return repoUrl + "/commits", errors.Wrap(err, "Error occurred in github.Client.GetCommitsURL")
 }
 
 func (c *Client) CreateToken(ctx context.Context) (string, error) {
@@ -161,7 +161,7 @@ func (c *Client) CreateToken(ctx context.Context) (string, error) {
 	}
 
 	auth, _, err := c.RawClient.GetAuthorizations().Create(ctx, authReq)
-	return *auth.Token, err
+	return *auth.Token, errors.Wrap(err, "Failed to get authorizations by raw client in github.Client.CreateToken")
 }
 
 func hasAuthNote(auths []*github.Authorization, note string) bool {
@@ -176,7 +176,7 @@ func hasAuthNote(auths []*github.Authorization, note string) bool {
 func (c *Client) getUniqueNote(ctx context.Context, orgNote string) (string, error) {
 	auths, _, err := c.RawClient.GetAuthorizations().List(ctx, nil)
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "Failed to get authorizations by raw client in github.Client.GetPullRequestsURL")
 	}
 
 	cnt := 1
