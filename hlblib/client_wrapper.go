@@ -62,6 +62,10 @@ func (c *ClientWrapper) GetCommitsURL() (string, error) {
 	return c.Base.Client.GetCommitsURL(c.Base.Remote.Owner, c.Base.Remote.RepoName)
 }
 
+func (c *ClientWrapper) CreateRepository(repo string) (service.Repository, error) {
+	return c.Base.Client.CreateRepository(c.Base.Context, repo)
+}
+
 func (c *ClientWrapper) CreateToken(ctx context.Context) (string, error) {
 	return c.Base.Client.CreateToken(ctx)
 }

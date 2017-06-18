@@ -11,6 +11,7 @@ type rawClient interface {
 
 type projectsService interface {
 	GetProject(pid interface{}, options ...gitlab.OptionFunc) (*gitlab.Project, *gitlab.Response, error)
+	CreateProject(opt *gitlab.CreateProjectOptions, options ...gitlab.OptionFunc) (*gitlab.Project, *gitlab.Response, error)
 }
 
 type issuesService interface {

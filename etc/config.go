@@ -52,6 +52,33 @@ func (c *Config) FindServiceConfig(host string) (*ServiceConfig, bool) {
 	return nil, false
 }
 
+func (c *Config) FindServiceConfigs(host string) *Config {
+	var serviceConfigs []*ServiceConfig
+	for _, s := range c.Services {
+		if strings.Contains(s.Host, host) {
+			serviceConfigs = append(serviceConfigs, s)
+		}
+	}
+	return &Config{Services: serviceConfigs}
+}
+
+func (c *Config) FindServiceConfigsByType(serviceType string) *Config {
+	var serviceConfigs []*ServiceConfig
+	for _, s := range c.Services {
+		if s.Type == serviceType {
+			serviceConfigs = append(serviceConfigs, s)
+		}
+	}
+	return &Config{Services: serviceConfigs}
+}
+
+func (c *Config) ListServiceConfigHost() (hosts []string) {
+	for _, s := range c.Services {
+		hosts = append(hosts, s.Host)
+	}
+	return hosts
+}
+
 func GetConfigDirName() string {
 	return path.Join(".config", "hlb")
 }

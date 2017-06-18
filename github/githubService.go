@@ -151,6 +151,12 @@ func (c *Client) GetCommitsURL(owner, repo string) (string, error) {
 	return repoUrl + "/commits", errors.Wrap(err, "Error occurred in github.Client.GetCommitsURL")
 }
 
+func (c *Client) CreateRepository(ctx context.Context, repo string) (service.Repository, error) {
+	repository := &github.Repository{Name: github.String(repo)}
+	retRepository, _, err := c.RawClient.GetRepositories().Create(ctx, "", repository)
+	return &Repository{retRepository}, err
+}
+
 func (c *Client) CreateToken(ctx context.Context) (string, error) {
 
 	note, err := c.getUniqueNote(ctx, "hlb")

@@ -121,6 +121,12 @@ func (c *Client) GetCommitsURL(owner, repo string) (string, error) {
 	return repoUrl + "/commits/master", errors.Wrap(err, "Error occurred in gitlab.Client.GetCommitsURL")
 }
 
+func (c *Client) CreateRepository(ctx context.Context, repo string) (service.Repository, error) {
+	opt := &gitlab.CreateProjectOptions{}
+	retRepository, _, err := c.RawClient.GetProjects().CreateProject(opt, nil)
+	return &Repository{retRepository}, err
+}
+
 func (c *Client) CreateToken(ctx context.Context) (string, error) {
 	return "", errors.New("Not Implemented Yet")
 }
