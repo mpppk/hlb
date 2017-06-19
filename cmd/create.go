@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -10,6 +9,7 @@ import (
 
 	"github.com/AlecAivazis/survey"
 	"github.com/mpppk/hlb/etc"
+	"github.com/mpppk/hlb/git"
 	"github.com/mpppk/hlb/hlblib"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -21,14 +21,16 @@ var createCmd = &cobra.Command{
 	Short: "Create a new public repository",
 	Long:  `Sample: hlb create github/gitlab`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("in create")
 		ctx := context.Background()
 		var config etc.Config
 		err := viper.Unmarshal(&config)
 		etc.PanicIfErrorExist(errors.Wrap(err, "Error occurred when unmarshal viper config"))
 
-		subConfig := config.FindServiceConfigs(args[0])
-		fmt.Println("sub config:", subConfig)
+		subConfig := &config
+		if len(args) > 0 {
+			subConfig = config.FindServiceConfigs(args[0])
+		}
+
 		hosts := subConfig.ListServiceConfigHost()
 
 		var qs = []*survey.Question{
@@ -47,23 +49,23 @@ var createCmd = &cobra.Command{
 
 		// perform the questions
 		err = survey.Ask(qs, &answers)
-		etc.PanicIfErrorExist(err)
-
-		fmt.Println("answers:", answers)
+		etc.PanicIfErrorExist(errors.Wrap(err, "Error occurred while the user was selecting the git service in create command"))
 
 		serviceConfig, _ := config.FindServiceConfig(answers.ServiceHost)
 
 		client, err := hlblib.GetClient(ctx, serviceConfig)
-		etc.PanicIfErrorExist(err)
+		etc.PanicIfErrorExist(errors.Wrap(err, "Error occurred when client creating in create command"))
 
 		currentDirPath, err := filepath.Abs(filepath.Dir(os.Args[0]))
-		etc.PanicIfErrorExist(err)
+		etc.PanicIfErrorExist(errors.Wrap(err, "Retrieve current directory path is failed in create command"))
 		currentDirName := path.Base(currentDirPath)
-		fmt.Println(currentDirName)
 
 		repo, err := client.CreateRepository(ctx, currentDirName)
-		etc.PanicIfErrorExist(err)
-		fmt.Println(repo)
+		etc.PanicIfErrorExist(errors.Wrap(err, "Repository creating is failed in create command"))
+
+		// service.repositoryにgitのURLを取得するAPIを追加する
+		_, err = git.SetRemote(".", "origin", repo.GetGitURL())
+		etc.PanicIfErrorExist(errors.Wrap(err, "Remote URL setting is failed in create command"))
 	},
 }
 

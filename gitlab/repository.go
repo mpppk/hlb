@@ -10,3 +10,6 @@ func (repo *Repository) GetHTMLURL() string {
 	return repo.WebURL
 }
 
+func (repo *Repository) GetGitURL() string {
+	return repo.HTTPURLToRepo
+}
