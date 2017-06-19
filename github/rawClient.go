@@ -18,6 +18,7 @@ type rawClient interface {
 
 type repositoriesService interface {
 	Get(ctx context.Context, owner, repo string) (*github.Repository, *github.Response, error)
+	Create(ctx context.Context, org string, repo *github.Repository) (*github.Repository, *github.Response, error)
 }
 
 type issuesService interface {

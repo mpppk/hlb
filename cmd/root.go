@@ -19,9 +19,16 @@ var RootCmd = &cobra.Command{
 	Short: "multi git hosting service manager",
 	Long:  ``,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		bypassCmds := []string{"create"}
 		configFilePath, err := etc.GetConfigDirPath()
 		if err != nil {
 			etc.PanicIfErrorExist(err)
+		}
+
+		for _, bypassCmd := range bypassCmds {
+			if bypassCmd == cmd.Name() {
+				return
+			}
 		}
 
 		var config etc.Config

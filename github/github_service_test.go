@@ -17,6 +17,10 @@ func (m *MockRepositoriesService) Get(ctx context.Context, owner, repo string) (
 	return &github.Repository{HTMLURL: github.String("https://github.com/samplerepo")}, nil, nil
 }
 
+func (m *MockRepositoriesService) Create(ctx context.Context, org string, repo *github.Repository) (*github.Repository, *github.Response, error) {
+	return &github.Repository{HTMLURL: github.String("https://github.com/newrepo")}, nil, nil
+}
+
 type MockIssuesService struct{}
 
 func (m *MockIssuesService) ListByRepo(ctx context.Context, owner, repo string, opt *github.IssueListByRepoOptions) ([]*github.Issue, *github.Response, error) {

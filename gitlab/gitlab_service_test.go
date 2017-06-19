@@ -14,6 +14,10 @@ func (m *MockProjectsService) GetProject(pid interface{}, options ...gitlab.Opti
 	return &gitlab.Project{WebURL: "https://gitlab.com/user/samplerepo"}, nil, nil
 }
 
+func (m *MockProjectsService) CreateProject(opt *gitlab.CreateProjectOptions, options ...gitlab.OptionFunc) (*gitlab.Project, *gitlab.Response, error) {
+	return &gitlab.Project{WebURL: "https://gitlab.com/user/newrepo"}, nil, nil
+}
+
 type MockIssuesService struct{}
 
 func (m *MockIssuesService) ListProjectIssues(pid interface{}, opt *gitlab.ListProjectIssuesOptions, options ...gitlab.OptionFunc) ([]*gitlab.Issue, *gitlab.Response, error) {

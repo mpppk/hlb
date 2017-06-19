@@ -1,8 +1,6 @@
 package service
 
-import (
-	"context"
-)
+import "context"
 
 type Client interface {
 	GetPullRequests(ctx context.Context, owner, repo string) ([]PullRequest, error)
@@ -19,5 +17,6 @@ type Client interface {
 	GetMilestoneURL(owner, repo string, no int) (string, error)
 	GetWikisURL(owner, repo string) (string, error)
 	GetCommitsURL(owner, repo string) (string, error)
+	CreateRepository(ctx context.Context, repo string) (Repository, error)
 	CreateToken(ctx context.Context) (string, error)
 }
