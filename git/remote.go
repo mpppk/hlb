@@ -27,7 +27,9 @@ func NewRemote(remoteUrl string) (*Remote, error) {
 	var assigned *regexp.Regexp
 	if strings.HasPrefix(remoteUrl, "http") {
 		assigned = regexp.MustCompile(`https?://[.+]?(.+)/(.+)/(.+)$`)
-	} else if strings.HasPrefix(remoteUrl, "git") {
+	} else if strings.HasPrefix(remoteUrl, "git://") {
+		assigned = regexp.MustCompile(`git://[.+]?(.+)/(.+)/(.+)$`)
+	} else if strings.HasPrefix(remoteUrl, "git@") {
 		assigned = regexp.MustCompile(`git@(.+):(.+)/(.+).git`)
 	} else {
 		return nil, errors.New("unknown remote: " + remoteUrl)

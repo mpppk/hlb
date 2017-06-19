@@ -59,6 +59,13 @@ func TestNewRemote(t *testing.T) {
 			expectedRepoName:    "hlb",
 		},
 		{
+			url:                 "git://github.com/mpppk/hlb.git",
+			willBeError:         false,
+			expectedServiceHost: "github.com",
+			expectedOwner:       "mpppk",
+			expectedRepoName:    "hlb",
+		},
+		{
 			url:         "http://github.com/mpppk",
 			willBeError: true,
 		},
