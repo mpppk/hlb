@@ -122,8 +122,8 @@ func (c *Client) GetCommitsURL(owner, repo string) (string, error) {
 }
 
 func (c *Client) CreateRepository(ctx context.Context, repo string) (service.Repository, error) {
-	opt := &gitlab.CreateProjectOptions{}
-	retRepository, _, err := c.RawClient.GetProjects().CreateProject(opt, nil)
+	opt := &gitlab.CreateProjectOptions{Name: &repo}
+	retRepository, _, err := c.RawClient.GetProjects().CreateProject(opt)
 	return &Repository{retRepository}, err
 }
 

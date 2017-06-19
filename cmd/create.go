@@ -7,7 +7,10 @@ import (
 
 	"path"
 
+	"time"
+
 	"github.com/AlecAivazis/survey"
+	"github.com/briandowns/spinner"
 	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/git"
 	"github.com/mpppk/hlb/hlblib"
@@ -16,42 +19,75 @@ import (
 	"github.com/spf13/viper"
 )
 
+func chooseService(host string, config *etc.Config) (*etc.ServiceConfig, error) {
+	subConfig := config
+	if host != "" {
+		subConfig = config.FindServiceConfigs(host)
+	}
+
+	hosts := subConfig.ListServiceConfigHost()
+
+	var qs = []*survey.Question{
+		{
+			Name: "serviceHost",
+			Prompt: &survey.Select{
+				Message: "Choose target service:",
+				Options: hosts,
+			},
+		},
+	}
+
+	answers := struct {
+		ServiceHost string `survey:"serviceHost"` // survey will match the question and field names
+	}{}
+
+	// perform the questions
+	err := survey.Ask(qs, &answers)
+	if err != nil {
+		return nil, errors.Wrap(err, "Error occurred while the user was selecting the git service in create command")
+	}
+	serviceConfig, ok := config.FindServiceConfig(answers.ServiceHost)
+
+	if !ok {
+		return nil, errors.New("host name not found in config file: " + host)
+	}
+
+	return serviceConfig, nil
+}
+
 var createCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create a new public repository",
-	Long:  `Sample: hlb create github/gitlab`,
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		var config etc.Config
 		err := viper.Unmarshal(&config)
 		etc.PanicIfErrorExist(errors.Wrap(err, "Error occurred when unmarshal viper config"))
 
-		subConfig := &config
+		host := ""
 		if len(args) > 0 {
-			subConfig = config.FindServiceConfigs(args[0])
+			host = args[0]
 		}
 
-		hosts := subConfig.ListServiceConfigHost()
-
-		var qs = []*survey.Question{
-			{
-				Name: "serviceHost",
-				Prompt: &survey.Select{
-					Message: "Choose target service:",
-					Options: hosts,
-				},
-			},
+		subConfig := config.FindServiceConfigs(host)
+		interactiveFlag := true
+		if len(subConfig.Services) == 1 {
+			interactiveFlag = false
 		}
 
-		answers := struct {
-			ServiceHost string `survey:"serviceHost"` // survey will match the question and field names
-		}{}
+		var serviceConfig *etc.ServiceConfig
+		if interactiveFlag {
+			serviceConfig, err = chooseService(host, &config)
+			etc.PanicIfErrorExist(errors.Wrap(err, "Error occurred while selecting the git service in create command"))
+		} else {
+			serviceConfig = subConfig.Services[0]
+		}
 
-		// perform the questions
-		err = survey.Ask(qs, &answers)
-		etc.PanicIfErrorExist(errors.Wrap(err, "Error occurred while the user was selecting the git service in create command"))
-
-		serviceConfig, _ := config.FindServiceConfig(answers.ServiceHost)
+		s := spinner.New(spinner.CharSets[14], 100*time.Millisecond) // Build our new spinner
+		if interactiveFlag {
+			s.Start()
+		}
 
 		client, err := hlblib.GetClient(ctx, serviceConfig)
 		etc.PanicIfErrorExist(errors.Wrap(err, "Error occurred when client creating in create command"))
@@ -66,6 +102,7 @@ var createCmd = &cobra.Command{
 		// service.repositoryにgitのURLを取得するAPIを追加する
 		_, err = git.SetRemote(".", "origin", repo.GetGitURL())
 		etc.PanicIfErrorExist(errors.Wrap(err, "Remote URL setting is failed in create command"))
+		s.Stop()
 	},
 }
 
