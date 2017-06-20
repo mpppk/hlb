@@ -18,5 +18,6 @@ type Client interface {
 	GetWikisURL(owner, repo string) (string, error)
 	GetCommitsURL(owner, repo string) (string, error)
 	CreateRepository(ctx context.Context, repo string) (Repository, error)
+	CreatePullRequest(ctx context.Context, baseOwner, baseBranch, headOwner, headBranch, repo, title, message string) (PullRequest, error)
 	CreateToken(ctx context.Context) (string, error)
 }
