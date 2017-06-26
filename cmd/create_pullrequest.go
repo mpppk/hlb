@@ -16,6 +16,7 @@ import (
 
 	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/git"
+	"github.com/mpppk/hlb/github"
 	"github.com/mpppk/hlb/hlblib"
 	"github.com/spf13/cobra"
 )
@@ -61,8 +62,22 @@ var createpullrequestCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
+		base, err := hlblib.NewCmdBase()
+		etc.PanicIfErrorExist(err)
+		sw := hlblib.ClientWrapper{Base: base}
+
+		baseOwner := base.Remote.Owner
+		baseBranch := DEFAULT_BRANCH_NAME
+		headBranch, err := git.GetCurrentBranch(".")
+
+		comments, err := github.RenderPullRequestTpl("This is init msg", "#", baseBranch, headBranch, "")
+		etc.PanicIfErrorExist(err)
+
 		pullreqFileName := "PULLREQ_EDITMSG"
-		c := exec.Command("vim", pullreqFileName)
+		ioutil.WriteFile(pullreqFileName, []byte(comments), 0777)
+
+		editorName := "vim"
+		c := exec.Command(editorName, pullreqFileName)
 		c.Stdin = os.Stdin
 		c.Stdout = os.Stdout
 		c.Stderr = os.Stderr
@@ -76,14 +91,6 @@ var createpullrequestCmd = &cobra.Command{
 
 		title, message, err := readTitleAndmessage(bytes.NewReader(contents), "#")
 		etc.PanicIfErrorExist(err)
-
-		base, err := hlblib.NewCmdBase()
-		etc.PanicIfErrorExist(err)
-		sw := hlblib.ClientWrapper{Base: base}
-
-		baseOwner := base.Remote.Owner
-		baseBranch := DEFAULT_BRANCH_NAME
-		headBranch, err := git.GetCurrentBranch(".")
 
 		pr, err := sw.CreatePullRequest(baseOwner, baseBranch, headBranch, title, message)
 		etc.PanicIfErrorExist(err)
