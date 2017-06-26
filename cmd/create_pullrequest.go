@@ -70,13 +70,15 @@ var createpullrequestCmd = &cobra.Command{
 		baseBranch := DEFAULT_BRANCH_NAME
 		headBranch, err := git.GetCurrentBranch(".")
 
-		comments, err := github.RenderPullRequestTpl("This is init msg", "#", baseBranch, headBranch, "")
+		comments, err := github.RenderPullRequestTpl("", "#", baseBranch, headBranch, "")
 		etc.PanicIfErrorExist(err)
 
 		pullreqFileName := "PULLREQ_EDITMSG"
 		ioutil.WriteFile(pullreqFileName, []byte(comments), 0777)
 
-		editorName := "vim"
+		editorName, err := git.GetEditorName()
+		etc.PanicIfErrorExist(err)
+
 		c := exec.Command(editorName, pullreqFileName)
 		c.Stdin = os.Stdin
 		c.Stdout = os.Stdout
