@@ -25,7 +25,7 @@ const (
 	DEFAULT_BRANCH_NAME = "master"
 )
 
-func readTitleAndmessage(reader io.Reader, cs string) (title, body string, err error) {
+func readTitleAndMessage(reader io.Reader, cs string) (title, body string, err error) {
 	var titleParts, bodyParts []string
 
 	r := regexp.MustCompile("\\S")
@@ -91,7 +91,7 @@ var createpullrequestCmd = &cobra.Command{
 		err = os.Remove(pullreqFileName)
 		etc.PanicIfErrorExist(err)
 
-		title, message, err := readTitleAndmessage(bytes.NewReader(contents), "#")
+		title, message, err := readTitleAndMessage(bytes.NewReader(contents), "#")
 		etc.PanicIfErrorExist(err)
 
 		pr, err := sw.CreatePullRequest(baseOwner, baseBranch, headBranch, title, message)

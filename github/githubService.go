@@ -13,6 +13,12 @@ import (
 	"golang.org/x/oauth2"
 )
 
+const (
+	VALIDATION_FAILED_MSG = "Validation Failed"
+	NO_COMMITS_MSG_PREFIX = "No commits between"
+	CODE_INVALID          = "invalid"
+)
+
 type Client struct {
 	RawClient   rawClient
 	host        string
@@ -158,15 +164,31 @@ func (c *Client) CreateRepository(ctx context.Context, repo string) (service.Rep
 }
 
 func (c *Client) CreatePullRequest(ctx context.Context, baseOwner, baseBranch, headOwner, headBranch, repo, title, message string) (service.PullRequest, error) {
+	head := fmt.Sprintf("%s:%s", headOwner, headBranch)
+
 	newPullRequest := &github.NewPullRequest{
 		Title: github.String(title),
 		Body:  github.String(message),
 		Base:  github.String(baseBranch),
-		Head:  github.String(fmt.Sprintf("%s:%s", headOwner, headBranch)),
+		Head:  github.String(head),
 	}
 
 	createdPullRequest, _, err := c.RawClient.GetPullRequests().Create(ctx, baseOwner, repo, newPullRequest)
-	return createdPullRequest, err
+
+	if e, ok := err.(*github.ErrorResponse); ok && e.Message == VALIDATION_FAILED_MSG {
+		for _, es := range e.Errors {
+			if es.Message == NO_COMMITS_MSG_PREFIX {
+				return createdPullRequest, errors.Wrap(err, es.Message)
+			}
+			if es.Field == "head" && es.Code == CODE_INVALID {
+				errMsg := fmt.Sprintf("head branch(%v) is invalid.\n", head)
+				errMsg += "The branch you are trying to create a pull request may not exist in the remote repository. Please try the following command.\n"
+				errMsg += fmt.Sprintf("git push origin %v\n", headBranch)
+				return createdPullRequest, errors.Wrap(err, errMsg)
+			}
+		}
+	}
+	return createdPullRequest, errors.Wrap(err, "Error occurred in github.CreatePullRequest")
 }
 
 func (c *Client) CreateToken(ctx context.Context) (string, error) {
