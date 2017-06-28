@@ -96,7 +96,7 @@ var createpullrequestCmd = &cobra.Command{
 
 		pr, err := sw.CreatePullRequest(baseOwner, baseBranch, headBranch, title, message)
 		etc.PanicIfErrorExist(err)
-		fmt.Println(pr)
+		fmt.Println(pr.GetHTMLURL())
 	},
 }
 
