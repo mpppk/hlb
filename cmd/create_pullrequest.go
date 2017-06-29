@@ -19,6 +19,8 @@ import (
 	"github.com/mpppk/hlb/github"
 	"github.com/mpppk/hlb/hlblib"
 	"github.com/spf13/cobra"
+	gogit "gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
 const (
@@ -70,7 +72,35 @@ var createpullrequestCmd = &cobra.Command{
 		baseBranch := DEFAULT_BRANCH_NAME
 		headBranch, err := git.GetCurrentBranch(".")
 
-		comments, err := github.RenderPullRequestTpl("", "#", baseBranch, headBranch, "")
+		r, err := gogit.PlainOpen(".")
+		logs, err := r.Log(&gogit.LogOptions{})
+		etc.PanicIfErrorExist(err)
+
+		branches, err := r.Branches()
+		etc.PanicIfErrorExist(err)
+		var masterHash plumbing.Hash
+		branches.ForEach(func(ref *plumbing.Reference) error {
+			if ref.Name().Short() == "master" {
+				masterHash = ref.Hash()
+			}
+			fmt.Println(ref.Name(), ref.Hash())
+			return nil
+		})
+
+		initMsg := ""
+
+		co, err := logs.Next()
+		etc.PanicIfErrorExist(err)
+		co2, err2 := logs.Next()
+		etc.PanicIfErrorExist(err2)
+
+		if err == nil && err2 == nil && co2.Hash == masterHash {
+			initMsg = co.Message
+		}
+
+		logs.Close()
+
+		comments, err := github.RenderPullRequestTpl(initMsg, "#", baseBranch, headBranch, "")
 		etc.PanicIfErrorExist(err)
 
 		pullreqFileName := "PULLREQ_EDITMSG"
