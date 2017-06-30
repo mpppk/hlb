@@ -110,6 +110,12 @@ var createpullrequestCmd = &cobra.Command{
 		etc.PanicIfErrorExist(err)
 
 		c := exec.Command(editorName, pullreqFileName)
+		vimr := regexp.MustCompile("[mg]?vi[m]$")
+		if vimr.MatchString(editorName) {
+			c.Args = append(c.Args, "--cmd")
+			c.Args = append(c.Args, "set ft=gitcommit tw=0 wrap lbr")
+		}
+
 		c.Stdin = os.Stdin
 		c.Stdout = os.Stdout
 		c.Stderr = os.Stderr
