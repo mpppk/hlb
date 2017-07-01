@@ -163,17 +163,19 @@ func (c *Client) CreateRepository(ctx context.Context, repo string) (service.Rep
 	return &Repository{retRepository}, err
 }
 
-func (c *Client) CreatePullRequest(ctx context.Context, baseOwner, baseBranch, headOwner, headBranch, repo, title, message string) (service.PullRequest, error) {
-	head := fmt.Sprintf("%s:%s", headOwner, headBranch)
+func (c *Client) CreatePullRequest(ctx context.Context, repo string, newPR *service.NewPullRequest) (service.PullRequest, error) {
+	head := fmt.Sprintf("%s:%s", newPR.HeadOwner, newPR.HeadBranch)
+
+	fmt.Println("github body:", newPR.Body)
 
 	newPullRequest := &github.NewPullRequest{
-		Title: github.String(title),
-		Body:  github.String(message),
-		Base:  github.String(baseBranch),
+		Title: github.String(newPR.Title),
+		Body:  github.String(newPR.Body),
+		Base:  github.String(newPR.BaseBranch),
 		Head:  github.String(head),
 	}
 
-	createdPullRequest, _, err := c.RawClient.GetPullRequests().Create(ctx, baseOwner, repo, newPullRequest)
+	createdPullRequest, _, err := c.RawClient.GetPullRequests().Create(ctx, newPR.BaseOwner, repo, newPullRequest)
 
 	if e, ok := err.(*github.ErrorResponse); ok && e.Message == VALIDATION_FAILED_MSG {
 		for _, es := range e.Errors {
@@ -183,7 +185,7 @@ func (c *Client) CreatePullRequest(ctx context.Context, baseOwner, baseBranch, h
 			if es.Field == "head" && es.Code == CODE_INVALID {
 				errMsg := fmt.Sprintf("head branch(%v) is invalid.\n", head)
 				errMsg += "The branch you are trying to create a pull request may not exist in the remote repository. Please try the following command.\n"
-				errMsg += fmt.Sprintf("git push origin %v\n", headBranch)
+				errMsg += fmt.Sprintf("git push origin %v\n", newPR.HeadBranch)
 				return createdPullRequest, errors.Wrap(err, errMsg)
 			}
 		}

@@ -127,14 +127,14 @@ func (c *Client) CreateRepository(ctx context.Context, repo string) (service.Rep
 	return &Repository{retRepository}, err
 }
 
-func (c *Client) CreatePullRequest(ctx context.Context, baseOwner, baseBranch, headOwner, headBranch, repo, title, message string) (service.PullRequest, error) {
+func (c *Client) CreatePullRequest(ctx context.Context, repo string, newPR *service.NewPullRequest) (service.PullRequest, error) {
 	opt := &gitlab.CreateMergeRequestOptions{
-		Title:        &title,
-		Description:  &message,
-		SourceBranch: &headBranch,
-		TargetBranch: &baseBranch,
+		Title:        &newPR.Title,
+		Description:  &newPR.Body,
+		SourceBranch: &newPR.HeadBranch,
+		TargetBranch: &newPR.BaseBranch,
 	}
-	newMergeRequest, _, err := c.RawClient.GetMergeRequests().CreateMergeRequest(baseOwner+"/"+repo, opt)
+	newMergeRequest, _, err := c.RawClient.GetMergeRequests().CreateMergeRequest(newPR.BaseOwner+"/"+repo, opt)
 	return &PullRequest{MergeRequest: newMergeRequest}, err
 }
 

@@ -18,13 +18,16 @@ import (
 	"github.com/mpppk/hlb/git"
 	"github.com/mpppk/hlb/github"
 	"github.com/mpppk/hlb/hlblib"
+	"github.com/mpppk/hlb/service"
 	"github.com/spf13/cobra"
 	gogit "gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
 const (
-	DEFAULT_BRANCH_NAME = "master"
+	DEFAULT_BRANCH_NAME  = "master"
+	DEFAULT_PR_FILE_NAME = "PULLREQ_EDITMSG"
+	DEFAULT_CS           = "#"
 )
 
 var baseBranch string
@@ -57,7 +60,6 @@ func readTitleAndMessage(reader io.Reader, cs string) (title, body string, err e
 
 	body = strings.Join(bodyParts, "\n")
 	body = strings.TrimSpace(body)
-
 	return
 }
 
@@ -75,7 +77,6 @@ func getInitMessage(baseBranch string) string {
 		if ref.Name().Short() == baseBranch {
 			baseBranchHash = ref.Hash()
 		}
-		fmt.Println(ref.Name(), ref.Hash())
 		return nil
 	})
 
@@ -91,6 +92,37 @@ func getInitMessage(baseBranch string) string {
 	return initMsg
 }
 
+func editPRTitleAndMessage(pullreqFileName, initMsg, cs string) (title, body string, err error) {
+	// TODO Add commit logs
+	comments, err := github.RenderPullRequestTpl(initMsg, cs, baseBranch, headBranch, "")
+	etc.PanicIfErrorExist(err)
+
+	ioutil.WriteFile(pullreqFileName, []byte(comments), 0777)
+
+	editorName, err := git.GetEditorName()
+	etc.PanicIfErrorExist(err)
+
+	c := exec.Command(editorName, pullreqFileName)
+	vimr := regexp.MustCompile("[mg]?vi[m]$")
+	if vimr.MatchString(editorName) {
+		c.Args = append(c.Args, "--cmd")
+		c.Args = append(c.Args, "set ft=gitcommit tw=0 wrap lbr")
+	}
+
+	c.Stdin = os.Stdin
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
+	c.Run()
+
+	contents, err := ioutil.ReadFile(pullreqFileName)
+	etc.PanicIfErrorExist(err)
+
+	err = os.Remove(pullreqFileName)
+	etc.PanicIfErrorExist(err)
+
+	return readTitleAndMessage(bytes.NewReader(contents), cs)
+}
+
 var createpullrequestCmd = &cobra.Command{
 	Use:   "pull-request",
 	Short: "Create pull request",
@@ -101,46 +133,27 @@ var createpullrequestCmd = &cobra.Command{
 		etc.PanicIfErrorExist(err)
 		sw := hlblib.ClientWrapper{Base: base}
 
-		baseOwner := base.Remote.Owner
+		newPR := &service.NewPullRequest{
+			// TODO Set head owner from config file
+			HeadOwner:  base.Remote.Owner,
+			BaseBranch: baseBranch,
+		}
+		newPR.BaseOwner = base.Remote.Owner
 
 		if headBranch == "" {
 			headBranch, err = git.GetCurrentBranch(".")
 			etc.PanicIfErrorExist(err)
 		}
+		newPR.HeadBranch = headBranch
 
 		initMsg := getInitMessage(baseBranch)
 
-		comments, err := github.RenderPullRequestTpl(initMsg, "#", baseBranch, headBranch, "")
+		title, message, err := editPRTitleAndMessage(DEFAULT_PR_FILE_NAME, initMsg, DEFAULT_CS)
 		etc.PanicIfErrorExist(err)
+		newPR.Title = title
+		newPR.Body = message
 
-		pullreqFileName := "PULLREQ_EDITMSG"
-		ioutil.WriteFile(pullreqFileName, []byte(comments), 0777)
-
-		editorName, err := git.GetEditorName()
-		etc.PanicIfErrorExist(err)
-
-		c := exec.Command(editorName, pullreqFileName)
-		vimr := regexp.MustCompile("[mg]?vi[m]$")
-		if vimr.MatchString(editorName) {
-			c.Args = append(c.Args, "--cmd")
-			c.Args = append(c.Args, "set ft=gitcommit tw=0 wrap lbr")
-		}
-
-		c.Stdin = os.Stdin
-		c.Stdout = os.Stdout
-		c.Stderr = os.Stderr
-		c.Run()
-
-		contents, err := ioutil.ReadFile(pullreqFileName)
-		etc.PanicIfErrorExist(err)
-
-		err = os.Remove(pullreqFileName)
-		etc.PanicIfErrorExist(err)
-
-		title, message, err := readTitleAndMessage(bytes.NewReader(contents), "#")
-		etc.PanicIfErrorExist(err)
-
-		pr, err := sw.CreatePullRequest(baseOwner, baseBranch, headBranch, title, message)
+		pr, err := sw.CreatePullRequest(newPR)
 		etc.PanicIfErrorExist(err)
 		fmt.Println(pr.GetHTMLURL())
 	},

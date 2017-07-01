@@ -10,6 +10,7 @@ import (
 
 	"github.com/google/go-github/github"
 	"github.com/mpppk/hlb/etc"
+	"github.com/mpppk/hlb/service"
 )
 
 const (
@@ -267,7 +268,15 @@ func TestClient_GetRepositoryURL(t *testing.T) {
 		util.assertString(pullRequestURL, test.expectedPullRequestURL, title)
 
 		title = "Create PullRequest"
-		createdPullRequest, err := client.CreatePullRequest(context.Background(), test.user, DEFAULT_BASE_BRANCH, test.user, DEFAULT_HEAD_BRANCH, test.createRepo, DEFAULT_CREATED_PR_TITLE, DEFAULT_CREATED_PR_MESSAGE)
+		newPR := &service.NewPullRequest{
+			BaseOwner:  test.user,
+			BaseBranch: DEFAULT_BASE_BRANCH,
+			HeadOwner:  test.user,
+			HeadBranch: DEFAULT_HEAD_BRANCH,
+			Title:      DEFAULT_CREATED_PR_TITLE,
+			Body:       DEFAULT_CREATED_PR_MESSAGE,
+		}
+		createdPullRequest, err := client.CreatePullRequest(context.Background(), test.createRepo, newPR)
 		if ok := util.printErrorIfUnexpected(err, title); ok && err != nil {
 			continue
 		}
