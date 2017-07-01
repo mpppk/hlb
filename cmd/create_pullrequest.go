@@ -27,6 +27,9 @@ const (
 	DEFAULT_BRANCH_NAME = "master"
 )
 
+var baseBranch string
+var headBranch string
+
 func readTitleAndMessage(reader io.Reader, cs string) (title, body string, err error) {
 	var titleParts, bodyParts []string
 
@@ -99,8 +102,11 @@ var createpullrequestCmd = &cobra.Command{
 		sw := hlblib.ClientWrapper{Base: base}
 
 		baseOwner := base.Remote.Owner
-		baseBranch := DEFAULT_BRANCH_NAME
-		headBranch, err := git.GetCurrentBranch(".")
+
+		if headBranch == "" {
+			headBranch, err = git.GetCurrentBranch(".")
+			etc.PanicIfErrorExist(err)
+		}
 
 		initMsg := getInitMessage(baseBranch)
 
@@ -142,4 +148,6 @@ var createpullrequestCmd = &cobra.Command{
 
 func init() {
 	createCmd.AddCommand(createpullrequestCmd)
+	createpullrequestCmd.PersistentFlags().StringVarP(&baseBranch, "base", "b", DEFAULT_BRANCH_NAME, "Base branch(Default is master)")
+	createpullrequestCmd.PersistentFlags().StringVarP(&headBranch, "head", "H", "", "Head branch(Default is current branch)")
 }
