@@ -6,6 +6,8 @@ import (
 	"net/url"
 	"testing"
 
+	"fmt"
+
 	"github.com/google/go-github/github"
 	"github.com/mpppk/hlb/etc"
 )
@@ -54,6 +56,15 @@ func (m *MockPullRequestsService) List(ctx context.Context, owner, repo string, 
 			Title:   github.String("Other Pull Request"),
 			HTMLURL: github.String("https://sample.com/pulls/2"),
 		},
+	}, nil, nil
+}
+
+func (m *MockPullRequestsService) Create(ctx context.Context, owner string, repo string, pull *github.NewPullRequest) (*github.PullRequest, *github.Response, error) {
+	prNumber := 2
+	return &github.PullRequest{
+		Number:  github.Int(prNumber),
+		Title:   pull.Title,
+		HTMLURL: github.String(fmt.Sprintf("https://github.com/%v/%v/pull/%v", owner, repo, prNumber)),
 	}, nil, nil
 }
 
@@ -115,18 +126,21 @@ func newMockRawClient() *MockRawClient {
 }
 
 type Client_GetRepositoryURLTest struct {
-	serviceConfig           *etc.ServiceConfig
-	rawClient               rawClient
-	willBeError             bool
-	user                    string
-	repo                    string
-	issueID                 int
-	pullRequestID           int
-	expectedRepositoryURL   string
-	expectedIssuesURL       string
-	expectedIssueURL        string
-	expectedPullRequestsURL string
-	expectedPullRequestURL  string
+	serviceConfig                   *etc.ServiceConfig
+	rawClient                       rawClient
+	willBeError                     bool
+	user                            string
+	repo                            string
+	createRepo                      string
+	issueID                         int
+	pullRequestID                   int
+	expectedRepositoryURL           string
+	expectedIssuesURL               string
+	expectedIssueURL                string
+	expectedPullRequestsURL         string
+	expectedPullRequestURL          string
+	expectedCreatedPullRequestURL   string
+	expectedCreatedPullRequestTitle string
 }
 
 type Util struct {
@@ -143,7 +157,7 @@ func (u *Util) printErrorIfUnexpected(err error, msg string) bool {
 	return ok
 }
 
-func (u *Util) assertString(expected, actual string, msg string) bool {
+func (u *Util) assertString(actual, expected string, msg string) bool {
 	ok := actual == expected
 	if !ok {
 		u.t.Errorf("%v: Expected %v: %v, Actual: %v",
@@ -179,18 +193,21 @@ func TestClient_GetRepositoryURL(t *testing.T) {
 			repo:          "",
 		},
 		{
-			serviceConfig:           serviceConfig,
-			rawClient:               mockRawClient,
-			willBeError:             false,
-			user:                    "testuser",
-			repo:                    "testrepo",
-			issueID:                 1,
-			pullRequestID:           1,
-			expectedRepositoryURL:   "https://github.com/testuser/testrepo",
-			expectedIssuesURL:       "https://github.com/testuser/testrepo/issues",
-			expectedIssueURL:        "https://github.com/testuser/testrepo/issues/1",
-			expectedPullRequestsURL: "https://github.com/testuser/testrepo/pulls",
-			expectedPullRequestURL:  "https://github.com/testuser/testrepo/pull/1",
+			serviceConfig:                   serviceConfig,
+			rawClient:                       mockRawClient,
+			willBeError:                     false,
+			user:                            "testuser",
+			repo:                            "testrepo",
+			createRepo:                      "newrepo",
+			issueID:                         1,
+			pullRequestID:                   1,
+			expectedRepositoryURL:           "https://github.com/testuser/testrepo",
+			expectedIssuesURL:               "https://github.com/testuser/testrepo/issues",
+			expectedIssueURL:                "https://github.com/testuser/testrepo/issues/1",
+			expectedPullRequestsURL:         "https://github.com/testuser/testrepo/pulls",
+			expectedPullRequestURL:          "https://github.com/testuser/testrepo/pull/1",
+			expectedCreatedPullRequestURL:   "https://github.com/testuser/newrepo/pull/2",
+			expectedCreatedPullRequestTitle: "Created PullRequest",
 		},
 	}
 
@@ -236,6 +253,13 @@ func TestClient_GetRepositoryURL(t *testing.T) {
 			continue
 		}
 		util.assertString(pullRequestURL, test.expectedPullRequestURL, title)
+
+		title = "Create PullRequest"
+		createdPullRequest, err := client.CreatePullRequest(context.Background(), test.user, "master", test.user, "feature", test.createRepo, "New PullRequest", "Test Message")
+		if ok := util.printErrorIfUnexpected(err, title); ok && err != nil {
+			continue
+		}
+		util.assertString(createdPullRequest.GetHTMLURL(), test.expectedCreatedPullRequestURL, title)
 
 		if test.willBeError {
 			t.Errorf("%v: Error expected, params: %#v",
