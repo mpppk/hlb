@@ -58,6 +58,36 @@ func readTitleAndMessage(reader io.Reader, cs string) (title, body string, err e
 	return
 }
 
+func getInitMessage(baseBranch string) string {
+	initMsg := ""
+
+	r, err := gogit.PlainOpen(".")
+	logs, err := r.Log(&gogit.LogOptions{})
+	etc.PanicIfErrorExist(err)
+
+	branches, err := r.Branches()
+	etc.PanicIfErrorExist(err)
+	var baseBranchHash plumbing.Hash
+	branches.ForEach(func(ref *plumbing.Reference) error {
+		if ref.Name().Short() == baseBranch {
+			baseBranchHash = ref.Hash()
+		}
+		fmt.Println(ref.Name(), ref.Hash())
+		return nil
+	})
+
+	co, err := logs.Next()
+	co2, err2 := logs.Next()
+
+	if err == nil && err2 == nil && co2.Hash == baseBranchHash {
+		initMsg = co.Message
+	}
+
+	logs.Close()
+
+	return initMsg
+}
+
 var createpullrequestCmd = &cobra.Command{
 	Use:   "pull-request",
 	Short: "Create pull request",
@@ -72,33 +102,7 @@ var createpullrequestCmd = &cobra.Command{
 		baseBranch := DEFAULT_BRANCH_NAME
 		headBranch, err := git.GetCurrentBranch(".")
 
-		r, err := gogit.PlainOpen(".")
-		logs, err := r.Log(&gogit.LogOptions{})
-		etc.PanicIfErrorExist(err)
-
-		branches, err := r.Branches()
-		etc.PanicIfErrorExist(err)
-		var masterHash plumbing.Hash
-		branches.ForEach(func(ref *plumbing.Reference) error {
-			if ref.Name().Short() == "master" {
-				masterHash = ref.Hash()
-			}
-			fmt.Println(ref.Name(), ref.Hash())
-			return nil
-		})
-
-		initMsg := ""
-
-		co, err := logs.Next()
-		etc.PanicIfErrorExist(err)
-		co2, err2 := logs.Next()
-		etc.PanicIfErrorExist(err2)
-
-		if err == nil && err2 == nil && co2.Hash == masterHash {
-			initMsg = co.Message
-		}
-
-		logs.Close()
+		initMsg := getInitMessage(baseBranch)
 
 		comments, err := github.RenderPullRequestTpl(initMsg, "#", baseBranch, headBranch, "")
 		etc.PanicIfErrorExist(err)
