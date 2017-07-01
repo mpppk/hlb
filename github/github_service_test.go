@@ -12,15 +12,25 @@ import (
 	"github.com/mpppk/hlb/etc"
 )
 
-type MockRepositoriesService struct {
-}
+const (
+	DEFAULT_BASE_URL           = "https://github.com"
+	DEFAULT_OWNER_NAME         = "testuser"
+	DEFAULT_REPO_NAME          = "testrepo"
+	DEFAULT_CREATED_REPO_NAME  = "newrepo"
+	DEFAULT_CREATED_PR_TITLE   = "New PullRequest"
+	DEFAULT_CREATED_PR_MESSAGE = "New Message"
+	DEFAULT_BASE_BRANCH        = "master"
+	DEFAULT_HEAD_BRANCH        = "feature"
+)
+
+type MockRepositoriesService struct{}
 
 func (m *MockRepositoriesService) Get(ctx context.Context, owner, repo string) (*github.Repository, *github.Response, error) {
-	return &github.Repository{HTMLURL: github.String("https://github.com/samplerepo")}, nil, nil
+	return &github.Repository{HTMLURL: github.String(fmt.Sprintf("%v/%v/%v", DEFAULT_BASE_URL, owner, repo))}, nil, nil
 }
 
 func (m *MockRepositoriesService) Create(ctx context.Context, org string, repo *github.Repository) (*github.Repository, *github.Response, error) {
-	return &github.Repository{HTMLURL: github.String("https://github.com/newrepo")}, nil, nil
+	return &github.Repository{HTMLURL: github.String(fmt.Sprintf("%v/%v/%v", DEFAULT_BASE_URL, DEFAULT_OWNER_NAME, repo))}, nil, nil
 }
 
 type MockIssuesService struct{}
@@ -30,13 +40,13 @@ func (m *MockIssuesService) ListByRepo(ctx context.Context, owner, repo string, 
 		{
 			Number:           github.Int(1),
 			Title:            github.String("Test Issue"),
-			HTMLURL:          github.String("https://github.com/issues/1"),
+			HTMLURL:          github.String(fmt.Sprintf("%v/%v/%v/issues/1", DEFAULT_BASE_URL, owner, repo)),
 			PullRequestLinks: nil,
 		},
 		{
 			Number:           github.Int(2),
 			Title:            github.String("Test Pull Request"),
-			HTMLURL:          github.String("https://github.com/pulls/2"),
+			HTMLURL:          github.String(fmt.Sprintf("%v/%v/%v/pulls/1", DEFAULT_BASE_URL, owner, repo)),
 			PullRequestLinks: &github.PullRequestLinks{},
 		},
 	}, nil, nil
@@ -49,12 +59,12 @@ func (m *MockPullRequestsService) List(ctx context.Context, owner, repo string, 
 		{
 			Number:  github.Int(1),
 			Title:   github.String("Test Pull Request"),
-			HTMLURL: github.String("https://github.com/pulls/1"),
+			HTMLURL: github.String(fmt.Sprintf("%v/%v/%v/pulls/1", DEFAULT_BASE_URL, owner, repo)),
 		},
 		{
 			Number:  github.Int(2),
 			Title:   github.String("Other Pull Request"),
-			HTMLURL: github.String("https://sample.com/pulls/2"),
+			HTMLURL: github.String(fmt.Sprintf("%v/%v/%v/pulls/2", DEFAULT_BASE_URL, owner, repo)),
 		},
 	}, nil, nil
 }
@@ -64,7 +74,7 @@ func (m *MockPullRequestsService) Create(ctx context.Context, owner string, repo
 	return &github.PullRequest{
 		Number:  github.Int(prNumber),
 		Title:   pull.Title,
-		HTMLURL: github.String(fmt.Sprintf("https://github.com/%v/%v/pull/%v", owner, repo, prNumber)),
+		HTMLURL: github.String(fmt.Sprintf("%v/%v/%v/pull/%v", DEFAULT_BASE_URL, owner, repo, prNumber)),
 	}, nil, nil
 }
 
@@ -115,7 +125,7 @@ func (m *MockRawClient) SetBaseURL(baseUrl *url.URL) {
 }
 
 func newMockRawClient() *MockRawClient {
-	baseURL, _ := url.Parse("https://github.com")
+	baseURL, _ := url.Parse(DEFAULT_BASE_URL)
 	return &MockRawClient{
 		Repositories:   &MockRepositoriesService{},
 		Issues:         &MockIssuesService{},
@@ -126,21 +136,22 @@ func newMockRawClient() *MockRawClient {
 }
 
 type Client_GetRepositoryURLTest struct {
-	serviceConfig                   *etc.ServiceConfig
-	rawClient                       rawClient
-	willBeError                     bool
-	user                            string
-	repo                            string
-	createRepo                      string
-	issueID                         int
-	pullRequestID                   int
-	expectedRepositoryURL           string
-	expectedIssuesURL               string
-	expectedIssueURL                string
-	expectedPullRequestsURL         string
-	expectedPullRequestURL          string
-	expectedCreatedPullRequestURL   string
-	expectedCreatedPullRequestTitle string
+	serviceConfig                     *etc.ServiceConfig
+	rawClient                         rawClient
+	willBeError                       bool
+	user                              string
+	repo                              string
+	createRepo                        string
+	issueID                           int
+	pullRequestID                     int
+	expectedRepositoryURL             string
+	expectedIssuesURL                 string
+	expectedIssueURL                  string
+	expectedPullRequestsURL           string
+	expectedPullRequestURL            string
+	expectedCreatedPullRequestURL     string
+	expectedCreatedPullRequestTitle   string
+	expectedCreatedPullRequestMessage string
 }
 
 type Util struct {
@@ -183,31 +194,32 @@ func TestClient_GetRepositoryURL(t *testing.T) {
 			rawClient:     mockRawClient,
 			willBeError:   true,
 			user:          "",
-			repo:          "testrepo",
+			repo:          DEFAULT_REPO_NAME,
 		},
 		{
 			serviceConfig: serviceConfig,
 			rawClient:     mockRawClient,
 			willBeError:   true,
-			user:          "testuser",
+			user:          DEFAULT_OWNER_NAME,
 			repo:          "",
 		},
 		{
-			serviceConfig:                   serviceConfig,
-			rawClient:                       mockRawClient,
-			willBeError:                     false,
-			user:                            "testuser",
-			repo:                            "testrepo",
-			createRepo:                      "newrepo",
-			issueID:                         1,
-			pullRequestID:                   1,
-			expectedRepositoryURL:           "https://github.com/testuser/testrepo",
-			expectedIssuesURL:               "https://github.com/testuser/testrepo/issues",
-			expectedIssueURL:                "https://github.com/testuser/testrepo/issues/1",
-			expectedPullRequestsURL:         "https://github.com/testuser/testrepo/pulls",
-			expectedPullRequestURL:          "https://github.com/testuser/testrepo/pull/1",
-			expectedCreatedPullRequestURL:   "https://github.com/testuser/newrepo/pull/2",
-			expectedCreatedPullRequestTitle: "Created PullRequest",
+			serviceConfig:                     serviceConfig,
+			rawClient:                         mockRawClient,
+			willBeError:                       false,
+			user:                              DEFAULT_OWNER_NAME,
+			repo:                              DEFAULT_REPO_NAME,
+			createRepo:                        DEFAULT_CREATED_REPO_NAME,
+			issueID:                           1,
+			pullRequestID:                     1,
+			expectedRepositoryURL:             fmt.Sprintf("%v/%v/%v", DEFAULT_BASE_URL, DEFAULT_OWNER_NAME, DEFAULT_REPO_NAME),
+			expectedIssuesURL:                 fmt.Sprintf("%v/%v/%v/issues", DEFAULT_BASE_URL, DEFAULT_OWNER_NAME, DEFAULT_REPO_NAME),
+			expectedIssueURL:                  fmt.Sprintf("%v/%v/%v/issues/1", DEFAULT_BASE_URL, DEFAULT_OWNER_NAME, DEFAULT_REPO_NAME),
+			expectedPullRequestsURL:           fmt.Sprintf("%v/%v/%v/pulls", DEFAULT_BASE_URL, DEFAULT_OWNER_NAME, DEFAULT_REPO_NAME),
+			expectedPullRequestURL:            fmt.Sprintf("%v/%v/%v/pull/1", DEFAULT_BASE_URL, DEFAULT_OWNER_NAME, DEFAULT_REPO_NAME),
+			expectedCreatedPullRequestURL:     fmt.Sprintf("%v/%v/%v/pull/2", DEFAULT_BASE_URL, DEFAULT_OWNER_NAME, DEFAULT_CREATED_REPO_NAME),
+			expectedCreatedPullRequestTitle:   DEFAULT_CREATED_PR_TITLE,
+			expectedCreatedPullRequestMessage: DEFAULT_CREATED_PR_MESSAGE,
 		},
 	}
 
@@ -255,7 +267,7 @@ func TestClient_GetRepositoryURL(t *testing.T) {
 		util.assertString(pullRequestURL, test.expectedPullRequestURL, title)
 
 		title = "Create PullRequest"
-		createdPullRequest, err := client.CreatePullRequest(context.Background(), test.user, "master", test.user, "feature", test.createRepo, "New PullRequest", "Test Message")
+		createdPullRequest, err := client.CreatePullRequest(context.Background(), test.user, DEFAULT_BASE_BRANCH, test.user, DEFAULT_HEAD_BRANCH, test.createRepo, DEFAULT_CREATED_PR_TITLE, DEFAULT_CREATED_PR_MESSAGE)
 		if ok := util.printErrorIfUnexpected(err, title); ok && err != nil {
 			continue
 		}
