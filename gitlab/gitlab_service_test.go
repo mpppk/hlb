@@ -3,34 +3,67 @@ package gitlab
 import (
 	"testing"
 
+	"fmt"
+
+	"context"
+
+	"strings"
+
 	"github.com/mpppk/hlb/etc"
+	"github.com/mpppk/hlb/service"
+	"github.com/pkg/errors"
 	"github.com/xanzy/go-gitlab"
 )
+
+const (
+	DEFAULT_BASE_URL           = "https://gitlab.com"
+	DEFAULT_OWNER_NAME         = "testuser"
+	DEFAULT_REPO_NAME          = "testrepo"
+	DEFAULT_CREATED_REPO_NAME  = "newrepo"
+	DEFAULT_CREATED_PR_TITLE   = "New PullRequest"
+	DEFAULT_CREATED_PR_MESSAGE = "New Message"
+	DEFAULT_BASE_BRANCH        = "master"
+	DEFAULT_HEAD_BRANCH        = "feature"
+)
+
+func getOwnerAndRepoFromPid(pid interface{}) (string, string, error) {
+	pidStr, ok := pid.(string)
+	if !ok {
+		return "", "", errors.New("pid is not string")
+	}
+
+	ownerAndRepo := strings.Split(pidStr, "/")
+	return ownerAndRepo[0], ownerAndRepo[1], nil
+}
 
 type MockProjectsService struct {
 }
 
 func (m *MockProjectsService) GetProject(pid interface{}, options ...gitlab.OptionFunc) (*gitlab.Project, *gitlab.Response, error) {
-	return &gitlab.Project{WebURL: "https://gitlab.com/user/samplerepo"}, nil, nil
+	owner, repo, _ := getOwnerAndRepoFromPid(pid)
+
+	return &gitlab.Project{WebURL: fmt.Sprintf("%v/%v/%v", DEFAULT_BASE_URL, owner, repo)}, nil, nil
 }
 
 func (m *MockProjectsService) CreateProject(opt *gitlab.CreateProjectOptions, options ...gitlab.OptionFunc) (*gitlab.Project, *gitlab.Response, error) {
-	return &gitlab.Project{WebURL: "https://gitlab.com/user/newrepo"}, nil, nil
+	return &gitlab.Project{WebURL: fmt.Sprintf("%v/%v/%v", DEFAULT_BASE_URL, DEFAULT_OWNER_NAME, opt.Name)}, nil, nil
 }
 
 type MockIssuesService struct{}
 
 func (m *MockIssuesService) ListProjectIssues(pid interface{}, opt *gitlab.ListProjectIssuesOptions, options ...gitlab.OptionFunc) ([]*gitlab.Issue, *gitlab.Response, error) {
+	owner, repo, _ := getOwnerAndRepoFromPid(pid)
+
 	return []*gitlab.Issue{
 		{
 			IID:    1,
 			Title:  "Test Issue",
-			WebURL: "https://gitlab.com/issues/1",
+			WebURL: fmt.Sprintf("%v/%v/%v/issues/1", DEFAULT_BASE_URL, owner, repo),
 		},
 		{
 			IID:    2,
 			Title:  "Test Pull Request",
-			WebURL: "https://gitlab.com/pulls/2",
+			WebURL: fmt.Sprintf("%v/%v/%v/issues/2", DEFAULT_BASE_URL, owner, repo),
 		},
 	}, nil, nil
 }
@@ -38,17 +71,30 @@ func (m *MockIssuesService) ListProjectIssues(pid interface{}, opt *gitlab.ListP
 type MockMergeRequestsService struct{}
 
 func (m *MockMergeRequestsService) ListMergeRequests(pid interface{}, opt *gitlab.ListMergeRequestsOptions, options ...gitlab.OptionFunc) ([]*gitlab.MergeRequest, *gitlab.Response, error) {
+	owner, repo, _ := getOwnerAndRepoFromPid(pid)
+
 	return []*gitlab.MergeRequest{
 		{
 			IID:    1,
 			Title:  "Test Pull Request",
-			WebURL: "https://gitlab.com/pulls/1",
+			WebURL: fmt.Sprintf("%v/%v/%v/merge_requests/1", DEFAULT_BASE_URL, owner, repo),
 		},
 		{
 			IID:    2,
 			Title:  "Other Pull Request",
-			WebURL: "https://sample.com/pulls/2",
+			WebURL: fmt.Sprintf("%v/%v/%v/merge_requests/2", DEFAULT_BASE_URL, owner, repo),
 		},
+	}, nil, nil
+}
+
+func (m *MockMergeRequestsService) CreateMergeRequest(pid interface{}, opt *gitlab.CreateMergeRequestOptions, options ...gitlab.OptionFunc) (*gitlab.MergeRequest, *gitlab.Response, error) {
+	mrIID := 2
+	owner, repo, _ := getOwnerAndRepoFromPid(pid)
+
+	return &gitlab.MergeRequest{
+		IID:    mrIID,
+		Title:  *opt.Title,
+		WebURL: fmt.Sprintf("%v/%v/%v/merge_requests/%v", DEFAULT_BASE_URL, owner, repo, mrIID),
 	}, nil, nil
 }
 
@@ -81,23 +127,29 @@ func newMockRawClient() *MockRawClient {
 		Projects:      &MockProjectsService{},
 		Issues:        &MockIssuesService{},
 		MergeRequests: &MockMergeRequestsService{},
-		BaseURL:       "https://gitlab.com",
+		BaseURL:       "%v",
 	}
 }
 
 type Client_GetRepositoryURLTest struct {
-	serviceConfig            *etc.ServiceConfig
-	rawClient                rawClient
-	willBeError              bool
-	user                     string
-	repo                     string
-	issueID                  int
-	pullRequestID            int
-	expectedRepositoryURL    string
-	expectedIssuesURL        string
-	expectedIssueURL         string
-	expectedMergeRequestsURL string
-	expectedPullRequestURL   string
+	serviceConfig                     *etc.ServiceConfig
+	rawClient                         rawClient
+	willBeError                       bool
+	user                              string
+	repo                              string
+	createRepo                        string
+	createPRTitle                     string
+	createPRMessage                   string
+	issueID                           int
+	pullRequestID                     int
+	expectedRepositoryURL             string
+	expectedIssuesURL                 string
+	expectedIssueURL                  string
+	expectedMergeRequestsURL          string
+	expectedPullRequestURL            string
+	expectedCreatedPullRequestURL     string
+	expectedCreatedPullRequestTitle   string
+	expectedCreatedPullRequestMessage string
 }
 
 type Util struct {
@@ -114,7 +166,7 @@ func (u *Util) printErrorIfUnexpected(err error, msg string) bool {
 	return ok
 }
 
-func (u *Util) assertString(expected, actual string, msg string) bool {
+func (u *Util) assertString(actual, expected string, msg string) bool {
 	ok := actual == expected
 	if !ok {
 		u.t.Errorf("%v: Expected %v: %v, Actual: %v",
@@ -140,28 +192,34 @@ func TestClient_GetRepositoryURL(t *testing.T) {
 			rawClient:     mockRawClient,
 			willBeError:   true,
 			user:          "",
-			repo:          "testrepo",
+			repo:          DEFAULT_REPO_NAME,
 		},
 		{
 			serviceConfig: serviceConfig,
 			rawClient:     mockRawClient,
 			willBeError:   true,
-			user:          "testuser",
+			user:          DEFAULT_OWNER_NAME,
 			repo:          "",
 		},
 		{
-			serviceConfig:            serviceConfig,
-			rawClient:                mockRawClient,
-			willBeError:              false,
-			user:                     "testuser",
-			repo:                     "testrepo",
-			issueID:                  1,
-			pullRequestID:            1,
-			expectedRepositoryURL:    "https://gitlab.com/testuser/testrepo",
-			expectedIssuesURL:        "https://gitlab.com/testuser/testrepo/issues",
-			expectedIssueURL:         "https://gitlab.com/testuser/testrepo/issues/1",
-			expectedMergeRequestsURL: "https://gitlab.com/testuser/testrepo/merge_requests",
-			expectedPullRequestURL:   "https://gitlab.com/testuser/testrepo/merge_requests/1",
+			serviceConfig:                     serviceConfig,
+			rawClient:                         mockRawClient,
+			willBeError:                       false,
+			user:                              DEFAULT_OWNER_NAME,
+			repo:                              DEFAULT_REPO_NAME,
+			createRepo:                        DEFAULT_CREATED_REPO_NAME,
+			createPRTitle:                     DEFAULT_CREATED_PR_TITLE,
+			createPRMessage:                   DEFAULT_CREATED_PR_MESSAGE,
+			issueID:                           1,
+			pullRequestID:                     1,
+			expectedRepositoryURL:             fmt.Sprintf("%v/%v/%v", DEFAULT_BASE_URL, DEFAULT_OWNER_NAME, DEFAULT_REPO_NAME),
+			expectedIssuesURL:                 fmt.Sprintf("%v/%v/%v/issues", DEFAULT_BASE_URL, DEFAULT_OWNER_NAME, DEFAULT_REPO_NAME),
+			expectedIssueURL:                  fmt.Sprintf("%v/%v/%v/issues/1", DEFAULT_BASE_URL, DEFAULT_OWNER_NAME, DEFAULT_REPO_NAME),
+			expectedMergeRequestsURL:          fmt.Sprintf("%v/%v/%v/merge_requests", DEFAULT_BASE_URL, DEFAULT_OWNER_NAME, DEFAULT_REPO_NAME),
+			expectedPullRequestURL:            fmt.Sprintf("%v/%v/%v/merge_requests/1", DEFAULT_BASE_URL, DEFAULT_OWNER_NAME, DEFAULT_REPO_NAME),
+			expectedCreatedPullRequestURL:     fmt.Sprintf("%v/%v/%v/merge_requests/2", DEFAULT_BASE_URL, DEFAULT_OWNER_NAME, DEFAULT_CREATED_REPO_NAME),
+			expectedCreatedPullRequestTitle:   DEFAULT_CREATED_PR_TITLE,
+			expectedCreatedPullRequestMessage: DEFAULT_CREATED_PR_MESSAGE,
 		},
 	}
 
@@ -204,6 +262,22 @@ func TestClient_GetRepositoryURL(t *testing.T) {
 			continue
 		}
 		util.assertString(pullRequestURL, test.expectedPullRequestURL, title)
+
+		title = "Created MergeRequest"
+		newPR := &service.NewPullRequest{
+			BaseOwner:  test.user,
+			BaseBranch: DEFAULT_BASE_BRANCH,
+			HeadOwner:  test.user,
+			HeadBranch: DEFAULT_HEAD_BRANCH,
+			Title:      DEFAULT_CREATED_PR_TITLE,
+			Body:       DEFAULT_CREATED_PR_MESSAGE,
+		}
+		createdPullRequest, err := client.CreatePullRequest(context.Background(), test.createRepo, newPR)
+		if ok := util.printErrorIfUnexpected(err, title); ok && err != nil {
+			continue
+		}
+		util.assertString(createdPullRequest.GetHTMLURL(), test.expectedCreatedPullRequestURL, title+" URL")
+		util.assertString(createdPullRequest.GetTitle(), test.expectedCreatedPullRequestTitle, title+" Title")
 
 		if test.willBeError {
 			t.Errorf("%v: Error expected, params: %#v",

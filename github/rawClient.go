@@ -27,6 +27,7 @@ type issuesService interface {
 
 type pullRequestsService interface {
 	List(ctx context.Context, owner, repo string, opt *github.PullRequestListOptions) ([]*github.PullRequest, *github.Response, error)
+	Create(ctx context.Context, owner string, repo string, pull *github.NewPullRequest) (*github.PullRequest, *github.Response, error)
 }
 
 type authorizationsService interface {

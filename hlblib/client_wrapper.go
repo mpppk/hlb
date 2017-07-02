@@ -66,6 +66,10 @@ func (c *ClientWrapper) CreateRepository(repo string) (service.Repository, error
 	return c.Base.Client.CreateRepository(c.Base.Context, repo)
 }
 
+func (c *ClientWrapper) CreatePullRequest(newPR *service.NewPullRequest) (service.PullRequest, error) {
+	return c.Base.Client.CreatePullRequest(c.Base.Context, c.Base.Remote.RepoName, newPR)
+}
+
 func (c *ClientWrapper) CreateToken(ctx context.Context) (string, error) {
 	return c.Base.Client.CreateToken(ctx)
 }

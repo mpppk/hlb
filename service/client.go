@@ -2,6 +2,15 @@ package service
 
 import "context"
 
+type NewPullRequest struct {
+	Title      string
+	Body       string
+	BaseBranch string
+	HeadBranch string
+	BaseOwner  string
+	HeadOwner  string
+}
+
 type Client interface {
 	GetPullRequests(ctx context.Context, owner, repo string) ([]PullRequest, error)
 	GetIssues(ctx context.Context, owner, repo string) ([]Issue, error)
@@ -18,5 +27,6 @@ type Client interface {
 	GetWikisURL(owner, repo string) (string, error)
 	GetCommitsURL(owner, repo string) (string, error)
 	CreateRepository(ctx context.Context, repo string) (Repository, error)
+	CreatePullRequest(ctx context.Context, repo string, opt *NewPullRequest) (PullRequest, error)
 	CreateToken(ctx context.Context) (string, error)
 }
