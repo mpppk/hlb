@@ -16,6 +16,19 @@ type Linker interface {
 	GetURL() string
 }
 
+type FilterableURL struct {
+	String string
+	URL string
+}
+
+func (f *FilterableURL) GetURL() string{
+	return f.URL
+}
+
+func (f *FilterableURL) FilterString() string{
+	return f.String
+}
+
 type FilterableIssue struct {
 	service.Issue
 }
@@ -32,6 +45,26 @@ func ToFilterableIssues(issues []service.Issue) (fis []*FilterableIssue) {
 	for _, issue := range issues {
 		fi := &FilterableIssue{Issue: issue}
 		fis = append(fis, fi)
+	}
+	return fis
+}
+
+type FilterablePullRequest struct {
+	service.PullRequest
+}
+
+func (f *FilterablePullRequest) GetURL() string{
+	return f.GetHTMLURL()
+}
+
+func (f *FilterablePullRequest) FilterString() string{
+	return "!" + strconv.Itoa(f.GetNumber()) + " " + f.GetTitle()
+}
+
+func ToFilterablePullRequests(pulls []service.PullRequest) (fis []*FilterablePullRequest) {
+	for _, pull := range pulls {
+		fp := &FilterablePullRequest{PullRequest: pull}
+		fis = append(fis, fp)
 	}
 	return fis
 }
