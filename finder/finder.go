@@ -4,17 +4,38 @@ import (
 	"os/exec"
 	"io"
 	"strings"
+	"github.com/mpppk/hlb/service"
+	"strconv"
 )
 
 type FilterStringer interface {
 	FilterString() string
 }
 
-type FilterableString string
-
-func (f FilterableString) FilterString() string{
-	return string(f)
+type Linker interface {
+	GetURL() string
 }
+
+type FilterableIssue struct {
+	service.Issue
+}
+
+func (f *FilterableIssue) GetURL() string{
+	return f.GetHTMLURL()
+}
+
+func (f *FilterableIssue) FilterString() string{
+	return "#" + strconv.Itoa(f.GetNumber()) + " " + f.GetTitle()
+}
+
+func ToFilterableIssues(issues []service.Issue) (fis []*FilterableIssue) {
+	for _, issue := range issues {
+		fi := &FilterableIssue{Issue: issue}
+		fis = append(fis, fi)
+	}
+	return fis
+}
+
 
 func PipeToPeco(texts []string) (string, error) {
 	cmd := exec.Command("peco")
@@ -50,25 +71,4 @@ func Find(stringers []FilterStringer) ([]FilterStringer, error){
 		}
 	}
 	return selectedStringers, nil
-}
-
-func FindFromFilterableStrings(fstrs []FilterableString) ([]FilterableString, error) {
-	filterStringers := []FilterStringer{}
-	for _, s := range fstrs {
-		filterStringers = append(filterStringers, s)
-	}
-	selectedFStringers, err := Find(filterStringers)
-	if err != nil {
-		return nil, err
-	}
-
-	retFStrs := []FilterableString{}
-	for _, sfs := range selectedFStringers {
-		for _, s := range fstrs {
-			if s.FilterString() == sfs.FilterString() {
-				retFStrs = append(retFStrs, s)
-			}
-		}
-	}
-	return retFStrs, nil
 }

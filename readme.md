@@ -97,3 +97,6 @@ Get OAuth token from git service and add to config file.
 - [ ] [Gogs](https://gogs.io)
 - [ ] [AWS CodeCommit](https://aws.amazon.com/codecommit/)
 - [ ] [GCP Cloud Source Repositories](https://cloud.google.com/source-repositories/)
+
+### interactive filterの抽象化
+
