@@ -77,7 +77,8 @@ func PipeToPeco(texts []string) (string, error) {
 	stdin.Close()
 	out, err := cmd.Output()
 
-	if err != nil {
+	// If peco is exited by Esc key, err return with exit status 1
+	if err != nil && err.Error() != "exit status 1" {
 		return "", err
 	}
 
