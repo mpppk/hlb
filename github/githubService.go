@@ -193,6 +193,12 @@ func (c *Client) CreatePullRequest(ctx context.Context, repo string, newPR *serv
 	return createdPullRequest, errors.Wrap(err, "Error occurred in github.CreatePullRequest")
 }
 
+func (c *Client) CreateFork(ctx context.Context, owner, repo string) (service.Repository, error) {
+	opt := &github.RepositoryCreateForkOptions{}
+	retRepository, _, err := c.RawClient.GetRepositories().CreateFork(ctx, owner, repo, opt)
+	return &Repository{retRepository}, err
+}
+
 func (c *Client) CreateToken(ctx context.Context) (string, error) {
 
 	note, err := c.getUniqueNote(ctx, "hlb")

@@ -138,6 +138,11 @@ func (c *Client) CreatePullRequest(ctx context.Context, repo string, newPR *serv
 	return &PullRequest{MergeRequest: newMergeRequest}, err
 }
 
+func (c *Client) CreateFork(ctx context.Context, owner, repo string) (service.Repository, error) {
+	retProject, _, err := c.RawClient.GetProjects().ForkProject(owner + "/" + repo)
+	return &Repository{retProject}, err
+}
+
 func (c *Client) CreateToken(ctx context.Context) (string, error) {
 	return "", errors.New("Not Implemented Yet")
 }
