@@ -11,11 +11,11 @@ import (
 )
 
 type CmdBase struct {
-	Context context.Context
-	Config  *etc.Config
-	Remote  *git.Remote
-	Host    *etc.ServiceConfig
-	Client  service.Client
+	Context       context.Context
+	Config        *etc.Config
+	Remote        *git.Remote
+	ServiceConfig *etc.ServiceConfig
+	Client        service.Client
 }
 
 func NewCmdBase() (*CmdBase, error) {
@@ -32,21 +32,21 @@ func NewCmdBase() (*CmdBase, error) {
 		return nil, err
 	}
 
-	host, ok := config.FindServiceConfig(remote.ServiceHost)
+	serviceConfig, ok := config.FindServiceConfig(remote.ServiceHost)
 	if !ok {
-		errors.New("host not found" + remote.ServiceHost)
+		errors.New("serviceConfig not found" + remote.ServiceHost)
 	}
 
-	client, err := GetClient(ctx, host)
+	client, err := GetClient(ctx, serviceConfig)
 	if err != nil {
 		return nil, err
 	}
 
 	return &CmdBase{
-		Context: ctx,
-		Config:  &config,
-		Remote:  remote,
-		Host:    host,
-		Client:  client,
+		Context:       ctx,
+		Config:        &config,
+		Remote:        remote,
+		ServiceConfig: serviceConfig,
+		Client:        client,
 	}, nil
 }

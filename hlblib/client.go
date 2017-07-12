@@ -41,8 +41,6 @@ func CanCreateToken(serviceType string) bool {
 }
 
 func CreateToken(ctx context.Context, serviceConfig *etc.ServiceConfig, username, pass string) (string, error) {
-	//user, pass := project.PromptUserAndPassword(serviceConfig.Host)
-
 	var s service.Client
 	switch serviceConfig.Type {
 	case etc.HOST_TYPE_GITHUB.String():

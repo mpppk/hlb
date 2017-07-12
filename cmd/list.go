@@ -18,7 +18,7 @@ var listCmd = &cobra.Command{
 	},
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		base, _ := hlblib.NewCmdBase()
-		if base.Host.Token == "" && base.Host.Type == "github" {
+		if base.ServiceConfig.Token == "" && base.ServiceConfig.Type == "github" {
 			addServiceCmd.Run(nil, nil)
 		}
 	},

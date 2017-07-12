@@ -76,6 +76,7 @@ var addServiceCmd = &cobra.Command{
 		}
 
 		username, password := service.PromptUserAndPassword(serviceType)
+		serviceConfig.User = username
 
 		s := spinner.New(spinner.CharSets[14], 100*time.Millisecond) // Build our new spinner
 		s.Start()                                                    // Start the spinner
