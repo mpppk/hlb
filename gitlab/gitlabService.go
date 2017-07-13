@@ -138,6 +138,13 @@ func (c *Client) CreatePullRequest(ctx context.Context, repo string, newPR *serv
 	return &PullRequest{MergeRequest: newMergeRequest}, err
 }
 
+func (c *Client) CreateRelease(ctx context.Context, owner, repo string, newRelease *service.NewRelease) (service.Release, error) {
+	panic("Not Implemented Yet")
+	//opt := &gitlab.CreateTagOptions{}
+	//tag, _, err := c.RawClient.GetTags().CreateTag(owner+"/"+repo, opt)
+	//return tag, err
+}
+
 func (c *Client) CreateToken(ctx context.Context) (string, error) {
 	return "", errors.New("Not Implemented Yet")
 }
