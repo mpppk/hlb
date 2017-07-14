@@ -1,12 +1,19 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
+	"io"
+	"os/exec"
+
+	"os"
+
+	"strings"
+
+	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/finder"
 	"github.com/mpppk/hlb/hlblib"
-	"github.com/mpppk/hlb/etc"
-	"github.com/skratchdot/open-golang/open"
 	"github.com/mpppk/hlb/service"
+	"github.com/skratchdot/open-golang/open"
+	"github.com/spf13/cobra"
 )
 
 func toFilterStringerFromIssues(issues []service.Issue) (fss []finder.FilterStringer) {
@@ -26,13 +33,13 @@ func toFilterStringerFromPullRequests(pulls []service.PullRequest) (fss []finder
 var ibrowseCmd = &cobra.Command{
 	Use:   "ibrowse",
 	Short: "Browse interactive",
-	Long: ``,
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		base, err := hlblib.NewCmdBase()
 		etc.PanicIfErrorExist(err)
 		sw := hlblib.ClientWrapper{Base: base}
 
-		fstrs := []finder.FilterStringer{}
+		list := []finder.FilterStringer{}
 
 		//var links []finder.Linker
 		repoUrl, err := sw.GetRepositoryURL()
@@ -50,7 +57,7 @@ var ibrowseCmd = &cobra.Command{
 		wikisUrl, err := sw.GetWikisURL()
 		etc.PanicIfErrorExist(err)
 
-		fstrs = append(fstrs,
+		list = append(list,
 			&finder.FilterableURL{URL: repoUrl, String: "*repo"},
 			&finder.FilterableURL{URL: issuesUrl, String: "#issues"},
 			&finder.FilterableURL{URL: pullsUrl, String: "!pullrequests"},
@@ -60,19 +67,63 @@ var ibrowseCmd = &cobra.Command{
 			&finder.FilterableURL{URL: wikisUrl, String: "wikis"},
 		)
 
-		issues, err := sw.GetIssues()
-		etc.PanicIfErrorExist(err)
-		fstrs = append(fstrs, toFilterStringerFromIssues(issues)...)
+		mycmd := exec.Command("peco")
+		stdin, _ := mycmd.StdinPipe()
 
-		pulls, err := sw.GetPullRequests()
-		etc.PanicIfErrorExist(err)
-		fstrs = append(fstrs, toFilterStringerFromPullRequests(pulls)...)
+		for _, fstr := range list {
+			io.WriteString(stdin, fstr.FilterString()+"\n")
+		}
 
-		selectedFstrs, err := finder.Find(fstrs)
+		issuesChan := make(chan []finder.FilterStringer)
+		pullsChan := make(chan []finder.FilterStringer)
+
+		go func() {
+			issues, err := sw.GetIssues()
+			etc.PanicIfErrorExist(err)
+			fstrs := toFilterStringerFromIssues(issues)
+			for _, fstr := range fstrs {
+				io.WriteString(stdin, fstr.FilterString()+"\n")
+			}
+			issuesChan <- fstrs
+		}()
+
+		go func() {
+			pulls, err := sw.GetPullRequests()
+			etc.PanicIfErrorExist(err)
+			fstrs := toFilterStringerFromPullRequests(pulls)
+			for _, fstr := range fstrs {
+				io.WriteString(stdin, fstr.FilterString()+"\n")
+			}
+			pullsChan <- fstrs
+		}()
+
+		out, err := mycmd.Output()
+
+		select {
+		case issues := <-issuesChan:
+			list = append(list, issues...)
+		default:
+			close(issuesChan)
+		}
+
+		select {
+		case pulls := <-pullsChan:
+			list = append(list, pulls...)
+		default:
+			close(issuesChan)
+		}
+
+		stdin.Close()
 		etc.PanicIfErrorExist(err)
 
-		for _, ss := range selectedFstrs {
-			open.Run(ss.(finder.Linker).GetURL())
+		selectedStr := strings.TrimSpace(string(out))
+		selectedStr = strings.Trim(selectedStr, "\n")
+
+		for _, l := range list {
+			if l.FilterString() == selectedStr {
+				open.Run(l.(finder.Linker).GetURL())
+				os.Exit(0)
+			}
 		}
 	},
 }
