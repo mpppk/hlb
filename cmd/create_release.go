@@ -3,10 +3,16 @@ package cmd
 import (
 	"fmt"
 
+	"os"
+
 	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/hlblib"
 	"github.com/mpppk/hlb/service"
 	"github.com/spf13/cobra"
+)
+
+const (
+	DEFAULT_RELEASE_FILE_NAME = "RELEASE_EDITMSG"
 )
 
 var createReleaseCmd = &cobra.Command{
@@ -18,10 +24,17 @@ var createReleaseCmd = &cobra.Command{
 		etc.PanicIfErrorExist(err)
 		sw := hlblib.ClientWrapper{Base: base}
 
+		if len(args) < 1 {
+			fmt.Println("Missed argument TAG")
+			os.Exit(1)
+		}
+
+		title, message, err := editTitleAndMessage(DEFAULT_RELEASE_FILE_NAME, "", DEFAULT_CS)
+
 		newRelease := &service.NewRelease{
-			TagName: "v0.0.1",
-			Name:    "Test Release",
-			Body:    "This is test release",
+			TagName: args[0],
+			Name:    title,
+			Body:    message,
 		}
 
 		release, err := sw.CreateRelease(newRelease)
