@@ -13,3 +13,7 @@ func (repo *Repository) GetHTMLURL() string {
 func (repo *Repository) GetGitURL() string {
 	return repo.HTTPURLToRepo
 }
+
+func (repo *Repository) GetCloneURL() string {
+	return repo.HTTPURLToRepo
+}
