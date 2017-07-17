@@ -6,7 +6,7 @@ type rawClient interface {
 	GetProjects() projectsService
 	GetMergeRequests() mergeRequestsService
 	GetIssues() issuesService
-	GetTags() tagsService
+	//GetTags() tagsService
 	SetBaseURL(baseUrl string) error
 }
 
@@ -24,9 +24,9 @@ type mergeRequestsService interface {
 	CreateMergeRequest(pid interface{}, opt *gitlab.CreateMergeRequestOptions, options ...gitlab.OptionFunc) (*gitlab.MergeRequest, *gitlab.Response, error)
 }
 
-type tagsService interface {
-	CreateTag(pid interface{}, opt *gitlab.CreateTagOptions, options ...gitlab.OptionFunc) (*gitlab.Tag, *gitlab.Response, error)
-}
+//type tagsService interface {
+//	CreateTag(pid interface{}, opt *gitlab.CreateTagOptions, options ...gitlab.OptionFunc) (*gitlab.Tag, *gitlab.Response, error)
+//}
 
 type RawClient struct {
 	*gitlab.Client
@@ -44,6 +44,6 @@ func (r *RawClient) GetMergeRequests() mergeRequestsService {
 	return mergeRequestsService(r.MergeRequests)
 }
 
-func (r *RawClient) GetTags() tagsService {
-	return tagsService(r.Tags)
-}
+//func (r *RawClient) GetTags() tagsService {
+//	return tagsService(r.Tags)
+//}
