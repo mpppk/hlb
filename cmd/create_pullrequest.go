@@ -93,7 +93,7 @@ func getInitMessage(baseBranch string) string {
 	return initMsg
 }
 
-func editPRTitleAndMessage(pullreqFileName, initMsg, cs string) (title, body string, err error) {
+func editTitleAndMessage(pullreqFileName, initMsg, cs string) (title, body string, err error) {
 	// TODO Add commit logs
 	comments, err := github.RenderPullRequestTpl(initMsg, cs, baseBranch, headBranch, "")
 	etc.PanicIfErrorExist(err)
@@ -151,7 +151,7 @@ var createpullrequestCmd = &cobra.Command{
 
 		var title, body string
 		if argMessage == "" {
-			title, body, err = editPRTitleAndMessage(DEFAULT_PR_FILE_NAME, initMsg, DEFAULT_CS)
+			title, body, err = editTitleAndMessage(DEFAULT_PR_FILE_NAME, initMsg, DEFAULT_CS)
 		} else {
 			title, body, err = readTitleAndMessage(strings.NewReader(argMessage), DEFAULT_CS)
 		}

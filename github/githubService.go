@@ -193,6 +193,20 @@ func (c *Client) CreatePullRequest(ctx context.Context, repo string, newPR *serv
 	return createdPullRequest, errors.Wrap(err, "Error occurred in github.CreatePullRequest")
 }
 
+func (c *Client) CreateRelease(ctx context.Context, owner, repo string, newRelease *service.NewRelease) (service.Release, error) {
+	newGHRelease := &github.RepositoryRelease{
+		TagName: github.String(newRelease.GetTagName()),
+		Name:    github.String(newRelease.GetName()),
+		Body:    github.String(newRelease.GetBody()),
+	}
+
+	createdRelease, _, err := c.RawClient.GetRepositories().CreateRelease(ctx, owner, repo, newGHRelease)
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to get Issues by raw client in github.Client.CreateRelease")
+	}
+	return createdRelease, nil
+}
+
 func (c *Client) CreateToken(ctx context.Context) (string, error) {
 
 	note, err := c.getUniqueNote(ctx, "hlb")
