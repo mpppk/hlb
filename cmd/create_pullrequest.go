@@ -32,6 +32,7 @@ const (
 
 var baseBranch string
 var headBranch string
+var argMessage string
 
 func readTitleAndMessage(reader io.Reader, cs string) (title, body string, err error) {
 	var titleParts, bodyParts []string
@@ -148,10 +149,15 @@ var createpullrequestCmd = &cobra.Command{
 
 		initMsg := getInitMessage(baseBranch)
 
-		title, message, err := editPRTitleAndMessage(DEFAULT_PR_FILE_NAME, initMsg, DEFAULT_CS)
+		var title, body string
+		if argMessage == "" {
+			title, body, err = editPRTitleAndMessage(DEFAULT_PR_FILE_NAME, initMsg, DEFAULT_CS)
+		} else {
+			title, body, err = readTitleAndMessage(strings.NewReader(argMessage), DEFAULT_CS)
+		}
 		etc.PanicIfErrorExist(err)
 		newPR.Title = title
-		newPR.Body = message
+		newPR.Body = body
 
 		pr, err := sw.CreatePullRequest(newPR)
 		etc.PanicIfErrorExist(err)
@@ -163,4 +169,5 @@ func init() {
 	createCmd.AddCommand(createpullrequestCmd)
 	createpullrequestCmd.PersistentFlags().StringVarP(&baseBranch, "base", "b", DEFAULT_BRANCH_NAME, "Base branch(Default is master)")
 	createpullrequestCmd.PersistentFlags().StringVarP(&headBranch, "head", "H", "", "Head branch(Default is current branch)")
+	createpullrequestCmd.PersistentFlags().StringVarP(&argMessage, "message", "m", "", "Pull Request title and body")
 }
