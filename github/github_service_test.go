@@ -34,6 +34,10 @@ func (m *MockRepositoriesService) Create(ctx context.Context, org string, repo *
 	return &github.Repository{HTMLURL: github.String(fmt.Sprintf("%v/%v/%v", DEFAULT_BASE_URL, DEFAULT_OWNER_NAME, repo))}, nil, nil
 }
 
+func (m *MockRepositoriesService) CreateRelease(ctx context.Context, owner, repo string, release *github.RepositoryRelease) (*github.RepositoryRelease, *github.Response, error) {
+	return &github.RepositoryRelease{}, nil, nil
+}
+
 type MockIssuesService struct{}
 
 func (m *MockIssuesService) ListByRepo(ctx context.Context, owner, repo string, opt *github.IssueListByRepoOptions) ([]*github.Issue, *github.Response, error) {

@@ -70,6 +70,10 @@ func (c *ClientWrapper) CreatePullRequest(newPR *service.NewPullRequest) (servic
 	return c.Base.Client.CreatePullRequest(c.Base.Context, c.Base.Remote.RepoName, newPR)
 }
 
+func (c *ClientWrapper) CreateRelease(newRelease *service.NewRelease) (service.Release, error) {
+	return c.Base.Client.CreateRelease(c.Base.Context, c.Base.Remote.Owner, c.Base.Remote.RepoName, newRelease)
+}
+
 func (c *ClientWrapper) CreateToken(ctx context.Context) (string, error) {
 	return c.Base.Client.CreateToken(ctx)
 }
