@@ -99,8 +99,7 @@ var createCmd = &cobra.Command{
 		repo, err := client.CreateRepository(ctx, currentDirName)
 		etc.PanicIfErrorExist(errors.Wrap(err, "Repository creating is failed in create command"))
 
-		// service.repositoryにgitのURLを取得するAPIを追加する
-		_, err = git.SetRemote(".", "origin", repo.GetGitURL())
+		_, err = git.SetRemote(".", "origin", repo.GetCloneURL())
 		etc.PanicIfErrorExist(errors.Wrap(err, "Remote URL setting is failed in create command"))
 		s.Stop()
 	},
