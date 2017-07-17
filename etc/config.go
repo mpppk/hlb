@@ -37,6 +37,7 @@ type ServiceConfig struct {
 	Type     string
 	Token    string `mapstructure:"oauth_token" yaml:"oauth_token"`
 	Protocol string
+	User     string
 }
 
 type Config struct {

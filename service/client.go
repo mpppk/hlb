@@ -28,5 +28,6 @@ type Client interface {
 	GetCommitsURL(owner, repo string) (string, error)
 	CreateRepository(ctx context.Context, repo string) (Repository, error)
 	CreatePullRequest(ctx context.Context, repo string, opt *NewPullRequest) (PullRequest, error)
+	CreateFork(ctx context.Context, owner, repo string) (Repository, error)
 	CreateToken(ctx context.Context) (string, error)
 }
