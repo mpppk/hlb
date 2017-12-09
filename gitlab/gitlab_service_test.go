@@ -70,19 +70,17 @@ func (m *MockIssuesService) ListProjectIssues(pid interface{}, opt *gitlab.ListP
 
 type MockMergeRequestsService struct{}
 
-func (m *MockMergeRequestsService) ListMergeRequests(pid interface{}, opt *gitlab.ListMergeRequestsOptions, options ...gitlab.OptionFunc) ([]*gitlab.MergeRequest, *gitlab.Response, error) {
-	owner, repo, _ := getOwnerAndRepoFromPid(pid)
-
+func (m *MockMergeRequestsService) ListMergeRequests(opt *gitlab.ListMergeRequestsOptions, options ...gitlab.OptionFunc) ([]*gitlab.MergeRequest, *gitlab.Response, error) {
 	return []*gitlab.MergeRequest{
 		{
 			IID:    1,
 			Title:  "Test Pull Request",
-			WebURL: fmt.Sprintf("%v/%v/%v/merge_requests/1", DEFAULT_BASE_URL, owner, repo),
+			WebURL: fmt.Sprintf("%v/%v/%v/merge_requests/1", DEFAULT_BASE_URL, "testowner", "testrepo"),
 		},
 		{
 			IID:    2,
 			Title:  "Other Pull Request",
-			WebURL: fmt.Sprintf("%v/%v/%v/merge_requests/2", DEFAULT_BASE_URL, owner, repo),
+			WebURL: fmt.Sprintf("%v/%v/%v/merge_requests/2", DEFAULT_BASE_URL, "testowner", "testrepo"),
 		},
 	}, nil, nil
 }

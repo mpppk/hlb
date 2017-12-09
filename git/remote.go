@@ -60,7 +60,7 @@ func GetDefaultRemote(path string) (*Remote, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "Error occurred in git.GetDefaultRemote")
 	}
-	return NewRemote(remote.Config().URL)
+	return NewRemote(remote.Config().URLs[0]) // FIXME
 
 }
 
@@ -72,7 +72,7 @@ func SetRemote(path, remoteName, remoteUrl string) (*git.Remote, error) {
 
 	remote, err := r.CreateRemote(&config.RemoteConfig{
 		Name: remoteName,
-		URL:  remoteUrl,
+		URLs:  []string{remoteUrl},
 	})
 
 	if err != nil {

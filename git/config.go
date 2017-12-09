@@ -7,8 +7,8 @@ import (
 	"gopkg.in/src-d/go-git.v4/config"
 )
 
-const EDITOR_KEY = "core.editor"
-const DEFAULT_EDITOR_NAME = "vim"
+const EDITOR_KEY = "core.editor" // FIXME
+const DEFAULT_EDITOR_NAME = "vim" // FIXME
 
 func GetConfig(repoPath string) (*config.Config, error) {
 	errMsg := "Error occurred in git.GetConfig: "
@@ -26,28 +26,16 @@ func GetConfig(repoPath string) (*config.Config, error) {
 }
 
 func GetEditorName() (string, error) {
-	errMsg := "Error occurred in git.GetEditor: "
 	localEditorName, err := gitconfig.Local(EDITOR_KEY)
 
-	_, isErrNotFound := err.(*gitconfig.ErrNotFound)
-
-	if err != nil && !isErrNotFound {
-		return "", errors.Wrap(err, errMsg+"when retrieve local git config")
-	}
-
-	if !isErrNotFound {
+	if err == nil && localEditorName != "" {
 		return localEditorName, nil
 	}
 
 	globalEditorName, err := gitconfig.Global(EDITOR_KEY)
-	_, isErrNotFound = err.(*gitconfig.ErrNotFound)
-	if err != nil && !isErrNotFound {
-		return "", errors.Wrap(err, errMsg+"when retrieve global git config")
-	}
-
-	if !isErrNotFound {
+	if err == nil && globalEditorName != "" {
 		return globalEditorName, nil
 	}
 
-	return DEFAULT_EDITOR_NAME, nil
+	return DEFAULT_EDITOR_NAME, err
 }
