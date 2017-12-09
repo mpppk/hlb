@@ -15,7 +15,7 @@ func GetCurrentBranch(path string) (string, error) {
 
 	head, err := r.Head()
 
-	if !head.IsBranch() {
+	if !head.Name().IsBranch() {
 		return "", errors.New(errMsg + "You are in detached branch")
 	}
 
