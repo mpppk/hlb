@@ -40,7 +40,12 @@ func NewClientViaBasicAuth(ctx context.Context, serviceConfig *etc.ServiceConfig
 }
 
 func newServiceFromClient(serviceConfig *etc.ServiceConfig, client rawClient) (*Client, error) {
-	baseUrl, err := url.Parse(serviceConfig.Protocol + "://api." + serviceConfig.Host)
+	urlStr := serviceConfig.Protocol + "://api." + serviceConfig.Host
+	if !strings.HasSuffix(urlStr, "/") {
+		urlStr += "/"
+	}
+
+	baseUrl, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to parse base URL based on serviceConfig in github.Client.newServiceFromClient")
 	}
