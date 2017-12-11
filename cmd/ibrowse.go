@@ -39,7 +39,7 @@ var ibrowseCmd = &cobra.Command{
 		etc.PanicIfErrorExist(err)
 		sw := hlblib.ClientWrapper{Base: base}
 
-		list := []finder.FilterStringer{}
+		var list []finder.FilterStringer
 
 		//var links []finder.Linker
 		repoUrl, err := sw.GetRepositoryURL()
@@ -110,7 +110,7 @@ var ibrowseCmd = &cobra.Command{
 		case pulls := <-pullsChan:
 			list = append(list, pulls...)
 		default:
-			close(issuesChan)
+			close(pullsChan)
 		}
 
 		stdin.Close()
