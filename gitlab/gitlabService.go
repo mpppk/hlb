@@ -47,8 +47,8 @@ func (c *Client) GetIssues(ctx context.Context, owner, repo string) (serviceIssu
 }
 
 func (c *Client) GetPullRequests(ctx context.Context, owner, repo string) (servicePullRequests []service.PullRequest, err error) {
-	opt := &gitlab.ListMergeRequestsOptions{ListOptions: *c.ListOptions}
-	mergeRequests, _, err := c.RawClient.GetMergeRequests().ListMergeRequests(opt)
+	opt := &gitlab.ListProjectMergeRequestsOptions{ListOptions: *c.ListOptions}
+	mergeRequests, _, err := c.RawClient.GetMergeRequests().ListProjectMergeRequests(owner+"/"+repo, opt)
 
 	for _, mergeRequest := range mergeRequests {
 		servicePullRequests = append(servicePullRequests, &PullRequest{MergeRequest: mergeRequest})
