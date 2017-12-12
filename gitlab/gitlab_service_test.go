@@ -70,7 +70,7 @@ func (m *MockIssuesService) ListProjectIssues(pid interface{}, opt *gitlab.ListP
 
 type MockMergeRequestsService struct{}
 
-func (m *MockMergeRequestsService) ListMergeRequests(opt *gitlab.ListMergeRequestsOptions, options ...gitlab.OptionFunc) ([]*gitlab.MergeRequest, *gitlab.Response, error) {
+func (m *MockMergeRequestsService) ListProjectMergeRequests(pid interface{}, opt *gitlab.ListProjectMergeRequestsOptions, options ...gitlab.OptionFunc) ([]*gitlab.MergeRequest, *gitlab.Response, error) {
 	return []*gitlab.MergeRequest{
 		{
 			IID:    1,
