@@ -1,9 +1,44 @@
 # hlb: git + hub/lab/bucket and more
-hlb is a command line tool that provides a unified interface to multiple git repository hosting services.
+hlb is a command line tool that provides unified & interactive interface to multiple git repository hosting services.
 
 [![CircleCI](https://circleci.com/gh/mpppk/hlb/tree/master.svg?style=svg)](https://circleci.com/gh/mpppk/hlb/tree/master)
 [![Build status](https://ci.appveyor.com/api/projects/status/9jw7n8ruxseys95n/branch/master?svg=true)](https://ci.appveyor.com/project/mpppk/hlb/branch/master)
 [![codebeat badge](https://codebeat.co/badges/544129f2-79a9-4641-8399-f06581cd2c53)](https://codebeat.co/projects/github-com-mpppk-hlb-master)
+
+![hlb_ibrowse.gif](https://raw.githubusercontent.com/wiki/mpppk/hlb/images/hlb_ibrowse.gif)
+
+## Features
+* Cross Platform
+* Support multi git repository hosting services
+* [hub](https://hub.github.com) command compatible 
+* Interactive command
+
+## Commands
+### hlb browse
+* `$ hlb browse`
+    * Open current repository page by default browser
+* `$ hlb browse issues`
+    * Open issues page of current repository by browser
+* `$ hlb browse issues 1` 
+    * Open the page that issue ID is 1
+* `$ hlb browse pull-requests` or `$ hlb browse merge-requests`
+    * Open pull-requests/merge-requests page of current repository by browser
+* `$ hlb browse pull-requests 1`
+    * Open the page that pull-requests/merge-requests ID is 1
+
+### hlb ibrowse (interactive browse)
+![hlb_ibrowse](https://i.gyazo.com/510fe10751129f1716b3a99b1a5014ec.png)
+![hlb_ibrowse.gif](https://raw.githubusercontent.com/wiki/mpppk/hlb/images/hlb_ibrowse.gif)
+
+### hlb create
+![hlb_create](https://i.gyazo.com/56d7fe0535e79819c22ec4248fcfabc4.png)
+![hlb_create_and_browse.gif](https://raw.githubusercontent.com/wiki/mpppk/hlb/images/hlb_create_and_browse.gif)
+
+### hlb init
+Create config file to `~/.config/hlb/.hlb.yaml`.
+
+### hlb add-service
+Get OAuth token from git service and add to config file.
 
 ## Installation
 ### Homebrew
@@ -55,38 +90,13 @@ services:
 ```
 (oauth_token can generate from [GitLab Personal access token page](https://gitlab.com/profile/personal_access_tokens))
 
-## Commands
-### hlb init
-Create config file to `~/.config/hlb/.hlb.yaml`.
-
-### hlb add-service
-Get OAuth token from git service and add to config file.
-
-### hlb browse
-#### Browse page
-* `$ hlb browse`
-    * Open current repository page by default browser
-* `$ hlb browse issues`
-    * Open issues page of current repository by browser
-* `$ hlb browse issues 1` 
-    * Open the page that issue ID is 1
-* `$ hlb browse pull-requests`
-    * Open pull requests page of current repository by browser
-* `$ hlb browse pull-requests 1`
-    * Open the page that pull request ID is 1
-
-### hlb list
-* list issues
-* list pull-requests
-
 ## TODO
-### Implement commands
-- [ ] `hlb pull-request`
+### hub compatibility
+- [x] `hlb pull-request`(experimental)
 - [ ] `hlb fork`
-- [ ] `hlb create`
+- [x] `hlb create`
 - [x] `hlb browse`
 - [ ] `hlb compare`
-- [x] `hlb list`
 - [ ] `hlb ci-status`
 
 ### Support Services
@@ -97,6 +107,3 @@ Get OAuth token from git service and add to config file.
 - [ ] [Gogs](https://gogs.io)
 - [ ] [AWS CodeCommit](https://aws.amazon.com/codecommit/)
 - [ ] [GCP Cloud Source Repositories](https://cloud.google.com/source-repositories/)
-
-### interactive filterの抽象化
-
