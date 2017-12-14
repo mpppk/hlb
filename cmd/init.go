@@ -13,7 +13,7 @@ import (
 // initCmd represents the init command
 var initCmd = &cobra.Command{
 	Use:   "init",
-	Short: "A brief description of your command",
+	Short: "Generate setting file to ~/.config/hlb",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		configFilePath, err := etc.GetConfigFilePath()
