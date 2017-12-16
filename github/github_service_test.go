@@ -109,20 +109,20 @@ type MockRawClient struct {
 	BaseURL        *url.URL
 }
 
-func (m *MockRawClient) GetRepositories() repositoriesService {
+func (m *MockRawClient) GetRepositories() RepositoriesService {
 	return m.Repositories
 }
 
-func (m *MockRawClient) GetIssues() issuesService {
-	return issuesService(m.Issues)
+func (m *MockRawClient) GetIssues() IssuesService {
+	return IssuesService(m.Issues)
 }
 
-func (m *MockRawClient) GetPullRequests() pullRequestsService {
-	return pullRequestsService(m.PullRequests)
+func (m *MockRawClient) GetPullRequests() PullRequestsService {
+	return PullRequestsService(m.PullRequests)
 }
 
-func (m *MockRawClient) GetAuthorizations() authorizationsService {
-	return authorizationsService(m.Authorizations)
+func (m *MockRawClient) GetAuthorizations() AuthorizationsService {
+	return AuthorizationsService(m.Authorizations)
 }
 
 func (m *MockRawClient) SetBaseURL(baseUrl *url.URL) {
@@ -141,21 +141,21 @@ func newMockRawClient() *MockRawClient {
 }
 
 type Client_GetRepositoryURLTest struct {
-	serviceConfig                     *etc.ServiceConfig
-	rawClient                         rawClient
-	willBeError                       bool
-	user                              string
-	repo                              string
-	createRepo                        string
-	issueID                           int
-	pullRequestID                     int
-	expectedRepositoryURL             string
-	expectedIssuesURL                 string
-	expectedIssueURL                  string
-	expectedPullRequestsURL           string
-	expectedPullRequestURL            string
-	expectedCreatedPullRequestURL     string
-	expectedCreatedPullRequestTitle   string
+	serviceConfig                   *etc.ServiceConfig
+	rawClient                       RawClient
+	willBeError                     bool
+	user                            string
+	repo                            string
+	createRepo                      string
+	issueID                         int
+	pullRequestID                   int
+	expectedRepositoryURL           string
+	expectedIssuesURL               string
+	expectedIssueURL                string
+	expectedPullRequestsURL         string
+	expectedPullRequestURL          string
+	expectedCreatedPullRequestURL   string
+	expectedCreatedPullRequestTitle string
 	expectedCreatedPullRequestMessage string
 }
 

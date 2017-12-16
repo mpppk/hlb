@@ -13,7 +13,7 @@ import (
 )
 
 type Client struct {
-	RawClient     rawClient
+	RawClient     RawClient
 	host          string
 	serviceConfig *etc.ServiceConfig
 	ListOptions   *gitlab.ListOptions
@@ -34,13 +34,13 @@ func (cb *ClientBuilder) GetType() string {
 	return "gitlab"
 }
 
-func newGitLabRawClient(serviceConfig *etc.ServiceConfig) *RawClient {
+func newGitLabRawClient(serviceConfig *etc.ServiceConfig) *rawClient {
 	client := gitlab.NewClient(nil, serviceConfig.Token)
 	client.SetBaseURL(serviceConfig.Protocol + "://" + serviceConfig.Host + "/api/v3")
-	return &RawClient{Client: client}
+	return &rawClient{Client: client}
 }
 
-func newClientFromRawClient(serviceConfig *etc.ServiceConfig, rawClient rawClient) service.Client {
+func newClientFromRawClient(serviceConfig *etc.ServiceConfig, rawClient RawClient) service.Client {
 	listOpt := &gitlab.ListOptions{PerPage: 100}
 	return service.Client(&Client{RawClient: rawClient, serviceConfig: serviceConfig, host: serviceConfig.Host, ListOptions: listOpt})
 }
@@ -151,7 +151,7 @@ func (c *Client) CreatePullRequest(ctx context.Context, repo string, newPR *serv
 func (c *Client) CreateRelease(ctx context.Context, owner, repo string, newRelease *service.NewRelease) (service.Release, error) {
 	panic("Not Implemented Yet")
 	//opt := &gitlab.CreateTagOptions{}
-	//tag, _, err := c.RawClient.GetTags().CreateTag(owner+"/"+repo, opt)
+	//tag, _, err := c.rawClient.GetTags().CreateTag(owner+"/"+repo, opt)
 	//return tag, err
 }
 

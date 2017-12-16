@@ -20,7 +20,7 @@ const (
 )
 
 type Client struct {
-	RawClient   rawClient
+	RawClient   RawClient
 	host        string
 	ListOptions *github.ListOptions
 }
@@ -30,7 +30,7 @@ type ClientBuilder struct {}
 func (cb *ClientBuilder) New(ctx context.Context, serviceConfig *etc.ServiceConfig) (service.Client, error) {
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: serviceConfig.Token})
 	tc := oauth2.NewClient(ctx, ts)
-	return newServiceFromClient(serviceConfig, &RawClient{Client: github.NewClient(tc)})
+	return newServiceFromClient(serviceConfig, &rawClient{Client: github.NewClient(tc)})
 }
 
 func (cb *ClientBuilder) NewViaBasicAuth(ctx context.Context, serviceConfig *etc.ServiceConfig, user, pass string) (service.Client, error) {
@@ -38,14 +38,14 @@ func (cb *ClientBuilder) NewViaBasicAuth(ctx context.Context, serviceConfig *etc
 		Username: strings.TrimSpace(user),
 		Password: strings.TrimSpace(pass),
 	}
-	return newServiceFromClient(serviceConfig, &RawClient{Client: github.NewClient(tp.Client())})
+	return newServiceFromClient(serviceConfig, &rawClient{Client: github.NewClient(tp.Client())})
 }
 
 func (cb *ClientBuilder) GetType() string {
 	return "github"
 }
 
-func newServiceFromClient(serviceConfig *etc.ServiceConfig, client rawClient) (service.Client, error) {
+func newServiceFromClient(serviceConfig *etc.ServiceConfig, client RawClient) (service.Client, error) {
 	urlStr := serviceConfig.Protocol + "://api." + serviceConfig.Host
 	if !strings.HasSuffix(urlStr, "/") {
 		urlStr += "/"
@@ -90,7 +90,7 @@ func (c *Client) GetIssues(ctx context.Context, owner, repo string) (serviceIssu
 	return serviceIssues, errors.Wrap(err, "Error occurred in github.Client.GetIssues")
 }
 
-func (c *Client) getGitHubIssues(ctx context.Context, client rawClient, owner, repo string, opt *github.IssueListByRepoOptions) (issues []*github.Issue, err error) {
+func (c *Client) getGitHubIssues(ctx context.Context, client RawClient, owner, repo string, opt *github.IssueListByRepoOptions) (issues []*github.Issue, err error) {
 	issuesAndPRs, _, err := client.GetIssues().ListByRepo(ctx, owner, repo, opt)
 
 	if err != nil {
