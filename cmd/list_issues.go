@@ -12,7 +12,7 @@ import (
 // listissuesCmd represents the listissues command
 var listissuesCmd = &cobra.Command{
 	Use:   "issues",
-	Short: "list issuses",
+	Short: "List issues",
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		base, err := hlblib.NewCmdBase()

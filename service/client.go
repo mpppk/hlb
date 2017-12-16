@@ -1,6 +1,10 @@
 package service
 
-import "context"
+import (
+	"context"
+
+	"github.com/mpppk/hlb/etc"
+)
 
 type NewPullRequest struct {
 	Title      string
@@ -30,4 +34,10 @@ type Client interface {
 	CreatePullRequest(ctx context.Context, repo string, opt *NewPullRequest) (PullRequest, error)
 	CreateRelease(ctx context.Context, owner, repo string, newRelease *NewRelease) (Release, error)
 	CreateToken(ctx context.Context) (string, error)
+}
+
+type ClientGenerator interface {
+	New(ctx context.Context, serviceConfig *etc.ServiceConfig) (Client, error)
+	NewViaBasicAuth(ctx context.Context, serviceConfig *etc.ServiceConfig, username, pass string) (Client, error)
+	GetType() string
 }

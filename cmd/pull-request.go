@@ -7,7 +7,7 @@ import (
 
 var pullrequestCmd = &cobra.Command{
 	Use:   "pull-request",
-	Short: "Create pull-request",
+	Short: "Create pull-request (experimental)",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		cprCmd, _, err := cmd.Root().Find([]string{"create", "pull-request"})

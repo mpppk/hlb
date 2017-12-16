@@ -19,9 +19,19 @@ type Client struct {
 	ListOptions   *gitlab.ListOptions
 }
 
-func NewClient(serviceConfig *etc.ServiceConfig) (service.Client, error) {
+type ClientBuilder struct {}
+
+func (cb *ClientBuilder) New(ctx context.Context, serviceConfig *etc.ServiceConfig) (service.Client, error) {
 	rawClient := newGitLabRawClient(serviceConfig)
 	return newClientFromRawClient(serviceConfig, rawClient), nil
+}
+
+func (cb *ClientBuilder) NewViaBasicAuth(ctx context.Context, serviceConfig *etc.ServiceConfig, user, pass string) (service.Client, error) {
+	panic("gitlab.ClientBuilder.NewViaBasicAuth is not implemented yet")
+}
+
+func (cb *ClientBuilder) GetType() string {
+	return "gitlab"
 }
 
 func newGitLabRawClient(serviceConfig *etc.ServiceConfig) *RawClient {

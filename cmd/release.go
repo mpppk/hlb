@@ -7,7 +7,7 @@ import (
 
 var releaseCmd = &cobra.Command{
 	Use:   "release",
-	Short: "Create release page and upload files",
+	Short: "Create release page and upload files (experimental)",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		crCmd, _, err := cmd.Root().Find([]string{"create", "release"})

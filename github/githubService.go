@@ -25,13 +25,15 @@ type Client struct {
 	ListOptions *github.ListOptions
 }
 
-func NewClient(ctx context.Context, serviceConfig *etc.ServiceConfig) (*Client, error) {
+type ClientBuilder struct {}
+
+func (cb *ClientBuilder) New(ctx context.Context, serviceConfig *etc.ServiceConfig) (service.Client, error) {
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: serviceConfig.Token})
 	tc := oauth2.NewClient(ctx, ts)
 	return newServiceFromClient(serviceConfig, &RawClient{Client: github.NewClient(tc)})
 }
 
-func NewClientViaBasicAuth(ctx context.Context, serviceConfig *etc.ServiceConfig, user, pass string) (*Client, error) {
+func (cb *ClientBuilder) NewViaBasicAuth(ctx context.Context, serviceConfig *etc.ServiceConfig, user, pass string) (service.Client, error) {
 	tp := github.BasicAuthTransport{
 		Username: strings.TrimSpace(user),
 		Password: strings.TrimSpace(pass),
@@ -39,7 +41,11 @@ func NewClientViaBasicAuth(ctx context.Context, serviceConfig *etc.ServiceConfig
 	return newServiceFromClient(serviceConfig, &RawClient{Client: github.NewClient(tp.Client())})
 }
 
-func newServiceFromClient(serviceConfig *etc.ServiceConfig, client rawClient) (*Client, error) {
+func (cb *ClientBuilder) GetType() string {
+	return "github"
+}
+
+func newServiceFromClient(serviceConfig *etc.ServiceConfig, client rawClient) (service.Client, error) {
 	urlStr := serviceConfig.Protocol + "://api." + serviceConfig.Host
 	if !strings.HasSuffix(urlStr, "/") {
 		urlStr += "/"
@@ -51,7 +57,7 @@ func newServiceFromClient(serviceConfig *etc.ServiceConfig, client rawClient) (*
 	}
 	client.SetBaseURL(baseUrl)
 	listOpt := &github.ListOptions{PerPage: 100}
-	return &Client{RawClient: client, host: serviceConfig.Host, ListOptions: listOpt}, nil
+	return service.Client(&Client{RawClient: client, host: serviceConfig.Host, ListOptions: listOpt}), nil
 }
 
 func (c *Client) GetPullRequests(ctx context.Context, owner, repo string) (servicePullRequests []service.PullRequest, err error) {
