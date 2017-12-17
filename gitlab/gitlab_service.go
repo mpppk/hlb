@@ -13,13 +13,41 @@ import (
 )
 
 type Client struct {
-	RawClient     RawClient
+	rawClient     RawClient
 	host          string
 	serviceConfig *etc.ServiceConfig
 	ListOptions   *gitlab.ListOptions
 }
 
 type ClientBuilder struct {}
+
+func (c *Client) GetRepositories() service.RepositoriesService {
+	return service.RepositoriesService(&repositoriesService{
+		raw: c.rawClient.GetProjects(),
+		host: c.host,
+		serviceConfig: c.serviceConfig,
+		})
+}
+
+func (c *Client) GetIssues() service.IssuesService {
+	return service.IssuesService(&issuesService{
+		raw: c.rawClient.GetIssues(),
+		projectsService: c.GetRepositories(),
+		ListOptions: c.ListOptions,
+	})
+}
+
+func (c *Client) GetPullRequests() service.PullRequestsService {
+	return service.PullRequestsService(&pullRequestsService{
+		raw:                 c.rawClient.GetMergeRequests(),
+		repositoriesService: c.GetRepositories(),
+		ListOptions:         c.ListOptions,
+	})
+}
+
+func (c *Client) GetAuthorizations() service.AuthorizationsService {
+	return service.AuthorizationsService(&authorizationsService{})
+}
 
 func (cb *ClientBuilder) New(ctx context.Context, serviceConfig *etc.ServiceConfig) (service.Client, error) {
 	rawClient := newGitLabRawClient(serviceConfig)
@@ -42,67 +70,11 @@ func newGitLabRawClient(serviceConfig *etc.ServiceConfig) *rawClient {
 
 func newClientFromRawClient(serviceConfig *etc.ServiceConfig, rawClient RawClient) service.Client {
 	listOpt := &gitlab.ListOptions{PerPage: 100}
-	return service.Client(&Client{RawClient: rawClient, serviceConfig: serviceConfig, host: serviceConfig.Host, ListOptions: listOpt})
-}
-
-func (c *Client) GetIssues(ctx context.Context, owner, repo string) (serviceIssues []service.Issue, err error) {
-	opt := &gitlab.ListProjectIssuesOptions{ListOptions: *c.ListOptions}
-	issues, _, err := c.RawClient.GetIssues().ListProjectIssues(owner+"/"+repo, opt)
-
-	for _, issue := range issues {
-		serviceIssues = append(serviceIssues, &Issue{Issue: issue})
-	}
-
-	return serviceIssues, errors.Wrap(err, "Failed to get Issues by raw client in gitlab.Client.GetIssues")
-}
-
-func (c *Client) GetPullRequests(ctx context.Context, owner, repo string) (servicePullRequests []service.PullRequest, err error) {
-	opt := &gitlab.ListProjectMergeRequestsOptions{ListOptions: *c.ListOptions}
-	mergeRequests, _, err := c.RawClient.GetMergeRequests().ListProjectMergeRequests(owner+"/"+repo, opt)
-
-	for _, mergeRequest := range mergeRequests {
-		servicePullRequests = append(servicePullRequests, &PullRequest{MergeRequest: mergeRequest})
-	}
-
-	return servicePullRequests, errors.Wrap(err, "Failed to get Pull Requests by raw client in gitlab.Client.GetPullRequests")
-}
-
-func (c *Client) GetRepository(ctx context.Context, owner, repo string) (service.Repository, error) {
-	project, _, err := c.RawClient.GetProjects().GetProject(owner + "/" + repo)
-
-	if err != nil {
-		return nil, errors.Wrap(err, "Failed to get Repository by raw client in gitlab.Client.GetRepository")
-	}
-
-	return &Repository{Project: project}, err
-}
-
-func (c *Client) GetRepositoryURL(owner, repo string) (string, error) {
-	err := checkOwnerAndRepo(owner, repo)
-	return fmt.Sprintf("%s://%s/%s/%s", c.serviceConfig.Protocol, c.host, owner, repo), errors.Wrap(err, "Error occurred in gitlab.Client.GetRepositoryURL")
-}
-
-func (c *Client) GetIssuesURL(owner, repo string) (string, error) {
-	repoUrl, err := c.GetRepositoryURL(owner, repo)
-	return repoUrl + "/issues", errors.Wrap(err, "Error occurred in gitlab.Client.GetIssuesURL")
-}
-
-func (c *Client) GetIssueURL(owner, repo string, id int) (string, error) {
-	url, err := c.GetIssuesURL(owner, repo)
-	return fmt.Sprintf("%s/%d", url, id), errors.Wrap(err, "Error occurred in gitlab.Client.GetIssueURL")
-}
-func (c *Client) GetPullRequestsURL(owner, repo string) (string, error) {
-	repoUrl, err := c.GetRepositoryURL(owner, repo)
-	return repoUrl + "/merge_requests", errors.Wrap(err, "Error occurred in gitlab.Client.GetPullRequestsURL")
-}
-
-func (c *Client) GetPullRequestURL(owner, repo string, id int) (string, error) {
-	url, err := c.GetPullRequestsURL(owner, repo)
-	return fmt.Sprintf("%s/%d", url, id), errors.Wrap(err, "Error occurred in gitlab.Client.GetPUllRequestURL")
+	return &Client{rawClient: rawClient, serviceConfig: serviceConfig, host: serviceConfig.Host, ListOptions: listOpt}
 }
 
 func (c *Client) GetProjectsURL(owner, repo string) (string, error) {
-	repoUrl, err := c.GetRepositoryURL(owner, repo)
+	repoUrl, err := c.GetRepositories().GetURL(owner, repo)
 	return repoUrl + "/boards", errors.Wrap(err, "Error occurred in gitlab.Client.GetProjectsURL")
 }
 
@@ -112,7 +84,7 @@ func (c *Client) GetProjectURL(owner, repo string, id int) (string, error) {
 }
 
 func (c *Client) GetMilestonesURL(owner, repo string) (string, error) {
-	repoUrl, err := c.GetRepositoryURL(owner, repo)
+	repoUrl, err := c.GetRepositories().GetURL(owner, repo)
 	return repoUrl + "/milestones", errors.Wrap(err, "Error occurred in gitlab.Client.GetMilestonesURL")
 }
 
@@ -122,30 +94,13 @@ func (c *Client) GetMilestoneURL(owner, repo string, id int) (string, error) {
 }
 
 func (c *Client) GetWikisURL(owner, repo string) (string, error) {
-	repoUrl, err := c.GetRepositoryURL(owner, repo)
+	repoUrl, err := c.GetRepositories().GetURL(owner, repo)
 	return repoUrl + "/wikis", errors.Wrap(err, "Error occurred in gitlab.Client.GetWikisURL")
 }
 
 func (c *Client) GetCommitsURL(owner, repo string) (string, error) {
-	repoUrl, err := c.GetRepositoryURL(owner, repo)
+	repoUrl, err := c.GetRepositories().GetURL(owner, repo)
 	return repoUrl + "/commits/master", errors.Wrap(err, "Error occurred in gitlab.Client.GetCommitsURL")
-}
-
-func (c *Client) CreateRepository(ctx context.Context, repo string) (service.Repository, error) {
-	opt := &gitlab.CreateProjectOptions{Name: &repo}
-	retRepository, _, err := c.RawClient.GetProjects().CreateProject(opt)
-	return &Repository{retRepository}, err
-}
-
-func (c *Client) CreatePullRequest(ctx context.Context, repo string, newPR *service.NewPullRequest) (service.PullRequest, error) {
-	opt := &gitlab.CreateMergeRequestOptions{
-		Title:        &newPR.Title,
-		Description:  &newPR.Body,
-		SourceBranch: &newPR.HeadBranch,
-		TargetBranch: &newPR.BaseBranch,
-	}
-	newMergeRequest, _, err := c.RawClient.GetMergeRequests().CreateMergeRequest(newPR.BaseOwner+"/"+repo, opt)
-	return &PullRequest{MergeRequest: newMergeRequest}, err
 }
 
 func (c *Client) CreateRelease(ctx context.Context, owner, repo string, newRelease *service.NewRelease) (service.Release, error) {
@@ -153,10 +108,6 @@ func (c *Client) CreateRelease(ctx context.Context, owner, repo string, newRelea
 	//opt := &gitlab.CreateTagOptions{}
 	//tag, _, err := c.rawClient.GetTags().CreateTag(owner+"/"+repo, opt)
 	//return tag, err
-}
-
-func (c *Client) CreateToken(ctx context.Context) (string, error) {
-	return "", errors.New("Not Implemented Yet")
 }
 
 func checkOwnerAndRepo(owner, repo string) error {

@@ -11,31 +11,31 @@ type ClientWrapper struct {
 }
 
 func (c *ClientWrapper) GetRepositoryURL() (string, error) {
-	return c.Base.Client.GetRepositoryURL(c.Base.Remote.Owner, c.Base.Remote.RepoName)
+	return c.Base.Client.GetRepositories().GetURL(c.Base.Remote.Owner, c.Base.Remote.RepoName)
 }
 
 func (c *ClientWrapper) GetIssuesURL() (string, error) {
-	return c.Base.Client.GetIssuesURL(c.Base.Remote.Owner, c.Base.Remote.RepoName)
+	return c.Base.Client.GetIssues().GetIssuesURL(c.Base.Remote.Owner, c.Base.Remote.RepoName)
 }
 
 func (c *ClientWrapper) GetIssueURL(no int) (string, error) {
-	return c.Base.Client.GetIssueURL(c.Base.Remote.Owner, c.Base.Remote.RepoName, no)
+	return c.Base.Client.GetIssues().GetURL(c.Base.Remote.Owner, c.Base.Remote.RepoName, no)
 }
 
 func (c *ClientWrapper) GetIssues() ([]service.Issue, error) {
-	return c.Base.Client.GetIssues(c.Base.Context, c.Base.Remote.Owner, c.Base.Remote.RepoName)
+	return c.Base.Client.GetIssues().ListByRepo(c.Base.Context, c.Base.Remote.Owner, c.Base.Remote.RepoName)
 }
 
 func (c *ClientWrapper) GetPullRequestsURL() (string, error) {
-	return c.Base.Client.GetPullRequestsURL(c.Base.Remote.Owner, c.Base.Remote.RepoName)
+	return c.Base.Client.GetPullRequests().GetPullRequestsURL(c.Base.Remote.Owner, c.Base.Remote.RepoName)
 }
 
 func (c *ClientWrapper) GetPullRequestURL(no int) (string, error) {
-	return c.Base.Client.GetPullRequestURL(c.Base.Remote.Owner, c.Base.Remote.RepoName, no)
+	return c.Base.Client.GetPullRequests().GetURL(c.Base.Remote.Owner, c.Base.Remote.RepoName, no)
 }
 
 func (c *ClientWrapper) GetPullRequests() ([]service.PullRequest, error) {
-	return c.Base.Client.GetPullRequests(c.Base.Context, c.Base.Remote.Owner, c.Base.Remote.RepoName)
+	return c.Base.Client.GetPullRequests().List(c.Base.Context, c.Base.Remote.Owner, c.Base.Remote.RepoName)
 }
 
 func (c *ClientWrapper) GetProjectsURL() (string, error) {
@@ -63,11 +63,11 @@ func (c *ClientWrapper) GetCommitsURL() (string, error) {
 }
 
 func (c *ClientWrapper) CreateRepository(repo string) (service.Repository, error) {
-	return c.Base.Client.CreateRepository(c.Base.Context, repo)
+	return c.Base.Client.GetRepositories().Create(c.Base.Context, repo)
 }
 
 func (c *ClientWrapper) CreatePullRequest(newPR *service.NewPullRequest) (service.PullRequest, error) {
-	return c.Base.Client.CreatePullRequest(c.Base.Context, c.Base.Remote.RepoName, newPR)
+	return c.Base.Client.GetPullRequests().Create(c.Base.Context, c.Base.Remote.RepoName, newPR)
 }
 
 func (c *ClientWrapper) CreateRelease(newRelease *service.NewRelease) (service.Release, error) {
@@ -75,5 +75,5 @@ func (c *ClientWrapper) CreateRelease(newRelease *service.NewRelease) (service.R
 }
 
 func (c *ClientWrapper) CreateToken(ctx context.Context) (string, error) {
-	return c.Base.Client.CreateToken(ctx)
+	return c.Base.Client.GetAuthorizations().CreateToken(ctx)
 }
