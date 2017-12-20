@@ -10,28 +10,6 @@ import (
 
 type HostType int
 
-const (
-	HOST_TYPE_GITHUB HostType = iota + 1
-	HOST_TYPE_GITLAB
-	HOST_TYPE_BITBUCKET
-	HOST_TYPE_GITBUCKET
-)
-
-func (s HostType) String() string {
-	switch s {
-	case HOST_TYPE_GITHUB:
-		return "github"
-	case HOST_TYPE_GITLAB:
-		return "gitlab"
-	case HOST_TYPE_BITBUCKET:
-		return "bitbucket"
-	case HOST_TYPE_GITBUCKET:
-		return "gitbucket"
-	default:
-		return "Unknown"
-	}
-}
-
 type ServiceConfig struct {
 	Host     string
 	Type     string
@@ -56,16 +34,6 @@ func (c *Config) FindServiceConfigs(host string) *Config {
 	var serviceConfigs []*ServiceConfig
 	for _, s := range c.Services {
 		if strings.Contains(s.Host, host) {
-			serviceConfigs = append(serviceConfigs, s)
-		}
-	}
-	return &Config{Services: serviceConfigs}
-}
-
-func (c *Config) FindServiceConfigsByType(serviceType string) *Config {
-	var serviceConfigs []*ServiceConfig
-	for _, s := range c.Services {
-		if s.Type == serviceType {
 			serviceConfigs = append(serviceConfigs, s)
 		}
 	}

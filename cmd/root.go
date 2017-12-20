@@ -6,7 +6,6 @@ import (
 
 	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/git"
-	"github.com/mpppk/hlb/hlblib"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -42,11 +41,6 @@ var RootCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		if serviceConfig.Token == "" {
-			if !hlblib.CanCreateToken(serviceConfig.Type) {
-				fmt.Println("The token of", serviceConfig.Host, "can not create via hlb.")
-				fmt.Println("Please add token to config file(" + configFilePath + ") manually.")
-				os.Exit(1)
-			}
 			serviceUrl := serviceConfig.Protocol + "://" + serviceConfig.Host
 			addServiceCmd.Run(cmd, []string{serviceConfig.Type, serviceUrl})
 		}
