@@ -49,6 +49,12 @@ func (c *Client) GetAuthorizations() service.AuthorizationsService {
 	return service.AuthorizationsService(&authorizationsService{})
 }
 
+func (c *Client) GetProjects() service.ProjectsService {
+	return service.ProjectsService(&projetsService{
+		repositoriesService: c.GetRepositories(),
+	})
+}
+
 func (cb *ClientBuilder) New(ctx context.Context, serviceConfig *etc.ServiceConfig) (service.Client, error) {
 	rawClient := newGitLabRawClient(serviceConfig)
 	return newClientFromRawClient(serviceConfig, rawClient), nil
@@ -71,43 +77,6 @@ func newGitLabRawClient(serviceConfig *etc.ServiceConfig) *rawClient {
 func newClientFromRawClient(serviceConfig *etc.ServiceConfig, rawClient RawClient) service.Client {
 	listOpt := &gitlab.ListOptions{PerPage: 100}
 	return &Client{rawClient: rawClient, serviceConfig: serviceConfig, host: serviceConfig.Host, ListOptions: listOpt}
-}
-
-func (c *Client) GetProjectsURL(owner, repo string) (string, error) {
-	repoUrl, err := c.GetRepositories().GetURL(owner, repo)
-	return repoUrl + "/boards", errors.Wrap(err, "Error occurred in gitlab.Client.GetProjectsURL")
-}
-
-func (c *Client) GetProjectURL(owner, repo string, id int) (string, error) {
-	// GitLab can not have multi boards
-	return c.GetProjectsURL(owner, repo)
-}
-
-func (c *Client) GetMilestonesURL(owner, repo string) (string, error) {
-	repoUrl, err := c.GetRepositories().GetURL(owner, repo)
-	return repoUrl + "/milestones", errors.Wrap(err, "Error occurred in gitlab.Client.GetMilestonesURL")
-}
-
-func (c *Client) GetMilestoneURL(owner, repo string, id int) (string, error) {
-	url, err := c.GetMilestonesURL(owner, repo)
-	return fmt.Sprintf("%s/%d", url, id), errors.Wrap(err, "Error occurred in gitlab.Client.GetMilestoneURL")
-}
-
-func (c *Client) GetWikisURL(owner, repo string) (string, error) {
-	repoUrl, err := c.GetRepositories().GetURL(owner, repo)
-	return repoUrl + "/wikis", errors.Wrap(err, "Error occurred in gitlab.Client.GetWikisURL")
-}
-
-func (c *Client) GetCommitsURL(owner, repo string) (string, error) {
-	repoUrl, err := c.GetRepositories().GetURL(owner, repo)
-	return repoUrl + "/commits/master", errors.Wrap(err, "Error occurred in gitlab.Client.GetCommitsURL")
-}
-
-func (c *Client) CreateRelease(ctx context.Context, owner, repo string, newRelease *service.NewRelease) (service.Release, error) {
-	panic("Not Implemented Yet")
-	//opt := &gitlab.CreateTagOptions{}
-	//tag, _, err := c.rawClient.GetTags().CreateTag(owner+"/"+repo, opt)
-	//return tag, err
 }
 
 func checkOwnerAndRepo(owner, repo string) error {

@@ -18,7 +18,12 @@ type NewPullRequest struct {
 type RepositoriesService interface {
 	Get(ctx context.Context, owner, repo string) (Repository, error)
 	GetURL(owner, repo string) (string, error)
+	GetWikisURL(owner, repo string) (string, error)
+	GetMilestonesURL(owner, repo string) (string, error)
+	GetMilestoneURL(owner, repo string, no int) (string, error)
+	GetCommitsURL(owner, repo string) (string, error)
 	Create(ctx context.Context, repo string) (Repository, error)
+	CreateRelease(ctx context.Context, owner, repo string, newRelease *NewRelease) (Release, error)
 }
 
 type IssuesService interface {
@@ -38,18 +43,17 @@ type AuthorizationsService interface {
 	CreateToken(ctx context.Context) (string, error)
 }
 
+type ProjectsService interface {
+	GetProjectsURL(owner, repo string) (string, error)
+	GetURL(owner, repo string, no int) (string, error)
+}
+
 type Client interface {
 	GetRepositories() RepositoriesService
 	GetPullRequests() PullRequestsService
 	GetIssues() IssuesService
+	GetProjects() ProjectsService
 	GetAuthorizations() AuthorizationsService
-	GetProjectsURL(owner, repo string) (string, error)
-	GetProjectURL(owner, repo string, no int) (string, error)
-	GetMilestonesURL(owner, repo string) (string, error)
-	GetMilestoneURL(owner, repo string, no int) (string, error)
-	GetWikisURL(owner, repo string) (string, error)
-	GetCommitsURL(owner, repo string) (string, error)
-	CreateRelease(ctx context.Context, owner, repo string, newRelease *NewRelease) (Release, error)
 }
 
 type ClientGenerator interface {

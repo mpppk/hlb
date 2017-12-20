@@ -132,7 +132,7 @@ var createpullrequestCmd = &cobra.Command{
 
 		base, err := hlblib.NewCmdBase()
 		etc.PanicIfErrorExist(err)
-		sw := hlblib.ClientWrapper{Base: base}
+		//sw := hlblib.ClientWrapper{Base: base}
 
 		newPR := &service.NewPullRequest{
 			// TODO Set head owner from config file
@@ -159,7 +159,8 @@ var createpullrequestCmd = &cobra.Command{
 		newPR.Title = title
 		newPR.Body = body
 
-		pr, err := sw.CreatePullRequest(newPR)
+		pr, err := base.Client.GetPullRequests().Create(base.Context, base.Remote.RepoName, newPR)
+
 		etc.PanicIfErrorExist(err)
 		fmt.Println(pr.GetHTMLURL())
 	},

@@ -20,9 +20,7 @@ var browsecommitsCmd = &cobra.Command{
 
 		base, err := hlblib.NewCmdBase()
 		etc.PanicIfErrorExist(err)
-		sw := hlblib.ClientWrapper{Base: base}
-
-		url, err := sw.GetCommitsURL()
+		url, err := base.Client.GetRepositories().GetCommitsURL(base.Remote.Owner, base.Remote.RepoName)
 		etc.PanicIfErrorExist(err)
 		open.Run(url)
 	},

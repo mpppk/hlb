@@ -22,10 +22,10 @@ var browsepullrequestsCmd = &cobra.Command{
 
 		base, err := hlblib.NewCmdBase()
 		etc.PanicIfErrorExist(err)
-		sw := hlblib.ClientWrapper{Base: base}
 
 		if len(args) == 0 {
-			url, err := sw.GetPullRequestsURL()
+			url, err := base.Client.GetPullRequests().GetPullRequestsURL(base.Remote.Owner, base.Remote.RepoName)
+
 			etc.PanicIfErrorExist(err)
 			open.Run(url)
 			return
@@ -33,7 +33,7 @@ var browsepullrequestsCmd = &cobra.Command{
 			id, err := strconv.Atoi(args[0])
 			etc.PanicIfErrorExist(err)
 
-			url, err := sw.GetPullRequestURL(id)
+			url, err := base.Client.GetPullRequests().GetURL(base.Remote.Owner, base.Remote.RepoName, id)
 			etc.PanicIfErrorExist(err)
 			open.Run(url)
 			return

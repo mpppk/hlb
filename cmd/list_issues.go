@@ -17,9 +17,7 @@ var listissuesCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		base, err := hlblib.NewCmdBase()
 		etc.PanicIfErrorExist(err)
-		sw := hlblib.ClientWrapper{Base: base}
-
-		issues, err := sw.GetIssues()
+		issues, err := base.Client.GetIssues().ListByRepo(base.Context, base.Remote.Owner, base.Remote.RepoName)
 		etc.PanicIfErrorExist(err)
 
 		for _, issue := range issues {

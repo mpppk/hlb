@@ -21,10 +21,10 @@ var browseissuesCmd = &cobra.Command{
 
 		base, err := hlblib.NewCmdBase()
 		etc.PanicIfErrorExist(err)
-		sw := hlblib.ClientWrapper{Base: base}
 
 		if len(args) == 0 {
-			url, err := sw.GetIssuesURL()
+			url, err := base.Client.GetIssues().GetIssuesURL(base.Remote.Owner, base.Remote.RepoName)
+
 			etc.PanicIfErrorExist(err)
 			open.Run(url)
 			return
@@ -32,7 +32,7 @@ var browseissuesCmd = &cobra.Command{
 			id, err := strconv.Atoi(args[0])
 			etc.PanicIfErrorExist(err)
 
-			url, err := sw.GetIssueURL(id)
+			url, err := base.Client.GetIssues().GetURL(base.Remote.Owner, base.Remote.RepoName, id)
 			etc.PanicIfErrorExist(err)
 			open.Run(url)
 			return

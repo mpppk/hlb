@@ -48,6 +48,12 @@ func (c *Client) GetPullRequests() service.PullRequestsService {
 	})
 }
 
+func (c *Client) GetProjects() service.ProjectsService {
+	return service.ProjectsService(&projectsService{
+		repositoriesService: c.GetRepositories(),
+	})
+}
+
 func (c *Client) GetAuthorizations() service.AuthorizationsService {
 	return service.AuthorizationsService(&authorizationsService{
 		raw: c.rawClient.GetAuthorizations(),
@@ -88,51 +94,6 @@ func newServiceFromClient(serviceConfig *etc.ServiceConfig, client RawClient) (s
 	listOpt := &github.ListOptions{PerPage: 100}
 	return service.Client(&Client{rawClient: client, host: serviceConfig.Host, ListOptions: listOpt}), nil
 }
-
-func (c *Client) GetProjectsURL(owner, repo string) (string, error) {
-	repoUrl, err := c.GetRepositories().GetURL(owner, repo)
-	return repoUrl + "/projects", errors.Wrap(err, "Error occurred in github.Client.GetProjectsURL")
-}
-
-func (c *Client) GetProjectURL(owner, repo string, id int) (string, error) {
-	repoUrl, err := c.GetRepositories().GetURL(owner, repo)
-	return fmt.Sprintf("%s/projects/%d", repoUrl, id), errors.Wrap(err, "Error occurred in github.Client.GetProjectURL")
-}
-
-func (c *Client) GetMilestonesURL(owner, repo string) (string, error) {
-	repoUrl, err := c.GetRepositories().GetURL(owner, repo)
-	return repoUrl + "/milestones", errors.Wrap(err, "Error occurred in github.Client.GetMilestonesURL")
-}
-
-func (c *Client) GetMilestoneURL(owner, repo string, id int) (string, error) {
-	repoUrl, err := c.GetRepositories().GetURL(owner, repo)
-	return fmt.Sprintf("%s/milestone/%d", repoUrl, id), errors.Wrap(err, "Error occurred in github.Client.GetMilestoneURL")
-}
-
-func (c *Client) GetWikisURL(owner, repo string) (string, error) {
-	repoUrl, err := c.GetRepositories().GetURL(owner, repo)
-	return repoUrl + "/wiki", errors.Wrap(err, "Error occurred in github.Client.GetWikisURL")
-}
-
-func (c *Client) GetCommitsURL(owner, repo string) (string, error) {
-	repoUrl, err := c.GetRepositories().GetURL(owner, repo)
-	return repoUrl + "/commits", errors.Wrap(err, "Error occurred in github.Client.GetCommitsURL")
-}
-
-func (c *Client) CreateRelease(ctx context.Context, owner, repo string, newRelease *service.NewRelease) (service.Release, error) {
-	newGHRelease := &github.RepositoryRelease{
-		TagName: github.String(newRelease.GetTagName()),
-		Name:    github.String(newRelease.GetName()),
-		Body:    github.String(newRelease.GetBody()),
-	}
-
-	createdRelease, _, err := c.rawClient.GetRepositories().CreateRelease(ctx, owner, repo, newGHRelease)
-	if err != nil {
-		return nil, errors.Wrap(err, "Failed to get Issues by raw client in github.Client.CreateRelease")
-	}
-	return createdRelease, nil
-}
-
 
 func hasAuthNote(auths []*github.Authorization, note string) bool {
 	for _, a := range auths {
