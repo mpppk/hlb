@@ -20,9 +20,8 @@ var browsewikisCmd = &cobra.Command{
 
 		base, err := hlblib.NewCmdBase()
 		etc.PanicIfErrorExist(err)
-		sw := hlblib.ClientWrapper{Base: base}
+		url, err := base.Client.GetRepositories().GetWikisURL(base.Remote.Owner, base.Remote.RepoName)
 
-		url, err := sw.GetWikisURL()
 		etc.PanicIfErrorExist(err)
 		open.Run(url)
 	},

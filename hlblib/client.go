@@ -23,15 +23,6 @@ func GetClient(ctx context.Context, serviceConfig *etc.ServiceConfig) (service.C
 	return nil, errors.New("unknown serviceConfig type: " + serviceConfig.Type)
 }
 
-func CanCreateToken(serviceType string) bool {
-	switch serviceType {
-	case etc.HOST_TYPE_GITHUB.String():
-		return true
-	default:
-		return false
-	}
-}
-
 func CreateToken(ctx context.Context, serviceConfig *etc.ServiceConfig, username, pass string) (string, error) {
 	for _, clientGenerator := range clientGenerators {
 		if clientGenerator.GetType() == serviceConfig.Type {
@@ -39,7 +30,7 @@ func CreateToken(ctx context.Context, serviceConfig *etc.ServiceConfig, username
 			if err != nil {
 				return "", err
 			}
-			return client.CreateToken(ctx)
+			return client.GetAuthorizations().CreateToken(ctx)
 		}
 	}
 	return "", errors.New("token creating failed because unknown serviceConfig type is provided: " + serviceConfig.Type)

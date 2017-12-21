@@ -22,7 +22,6 @@ var createReleaseCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		base, err := hlblib.NewCmdBase()
 		etc.PanicIfErrorExist(err)
-		sw := hlblib.ClientWrapper{Base: base}
 
 		if len(args) < 1 {
 			fmt.Println("Missed argument TAG")
@@ -37,7 +36,8 @@ var createReleaseCmd = &cobra.Command{
 			Body:    message,
 		}
 
-		release, err := sw.CreateRelease(newRelease)
+		release, err :=  base.Client.GetRepositories().CreateRelease(base.Context, base.Remote.Owner, base.Remote.RepoName, newRelease)
+
 		etc.PanicIfErrorExist(err)
 		fmt.Println(release.GetHTMLURL())
 	},

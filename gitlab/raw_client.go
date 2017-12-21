@@ -2,24 +2,24 @@ package gitlab
 
 import "github.com/xanzy/go-gitlab"
 
-type rawClient interface {
-	GetProjects() projectsService
-	GetMergeRequests() mergeRequestsService
-	GetIssues() issuesService
+type RawClient interface {
+	GetProjects() ProjectsService
+	GetMergeRequests() MergeRequestsService
+	GetIssues() IssuesService
 	//GetTags() tagsService
 	SetBaseURL(baseUrl string) error
 }
 
-type projectsService interface {
+type ProjectsService interface {
 	GetProject(pid interface{}, options ...gitlab.OptionFunc) (*gitlab.Project, *gitlab.Response, error)
 	CreateProject(opt *gitlab.CreateProjectOptions, options ...gitlab.OptionFunc) (*gitlab.Project, *gitlab.Response, error)
 }
 
-type issuesService interface {
+type IssuesService interface {
 	ListProjectIssues(pid interface{}, opt *gitlab.ListProjectIssuesOptions, options ...gitlab.OptionFunc) ([]*gitlab.Issue, *gitlab.Response, error)
 }
 
-type mergeRequestsService interface {
+type MergeRequestsService interface {
 	ListProjectMergeRequests(pid interface{}, opt *gitlab.ListProjectMergeRequestsOptions, options ...gitlab.OptionFunc) ([]*gitlab.MergeRequest, *gitlab.Response, error)
 	CreateMergeRequest(pid interface{}, opt *gitlab.CreateMergeRequestOptions, options ...gitlab.OptionFunc) (*gitlab.MergeRequest, *gitlab.Response, error)
 }
@@ -28,22 +28,22 @@ type mergeRequestsService interface {
 //	CreateTag(pid interface{}, opt *gitlab.CreateTagOptions, options ...gitlab.OptionFunc) (*gitlab.Tag, *gitlab.Response, error)
 //}
 
-type RawClient struct {
+type rawClient struct {
 	*gitlab.Client
 }
 
-func (r *RawClient) GetProjects() projectsService {
-	return projectsService(r.Projects)
+func (r *rawClient) GetProjects() ProjectsService {
+	return ProjectsService(r.Projects)
 }
 
-func (r *RawClient) GetIssues() issuesService {
-	return issuesService(r.Issues)
+func (r *rawClient) GetIssues() IssuesService {
+	return IssuesService(r.Issues)
 }
 
-func (r *RawClient) GetMergeRequests() mergeRequestsService {
-	return mergeRequestsService(r.MergeRequests)
+func (r *rawClient) GetMergeRequests() MergeRequestsService {
+	return MergeRequestsService(r.MergeRequests)
 }
 
-//func (r *RawClient) GetTags() tagsService {
+//func (r *rawClient) GetTags() tagsService {
 //	return tagsService(r.Tags)
 //}

@@ -30,8 +30,8 @@ var browseCmd = &cobra.Command{
 
 		base, err := hlblib.NewCmdBase()
 		etc.PanicIfErrorExist(err)
-		sw := hlblib.ClientWrapper{Base: base}
-		url, err := sw.GetRepositoryURL()
+		url, err := base.Client.GetRepositories().GetURL(base.Remote.Owner, base.Remote.RepoName)
+
 		etc.PanicIfErrorExist(err)
 		open.Run(url)
 	},

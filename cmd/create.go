@@ -96,7 +96,7 @@ var createCmd = &cobra.Command{
 		etc.PanicIfErrorExist(errors.Wrap(err, "Retrieve current directory path is failed in create command"))
 		currentDirName := path.Base(currentDirPath)
 
-		repo, err := client.CreateRepository(ctx, currentDirName)
+		repo, err := client.GetRepositories().Create(ctx, currentDirName)
 		etc.PanicIfErrorExist(errors.Wrap(err, "Repository creating is failed in create command"))
 
 		_, err = git.SetRemote(".", "origin", repo.GetCloneURL())

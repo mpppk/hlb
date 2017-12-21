@@ -109,20 +109,20 @@ type MockRawClient struct {
 	BaseURL        *url.URL
 }
 
-func (m *MockRawClient) GetRepositories() repositoriesService {
+func (m *MockRawClient) GetRepositories() RepositoriesService {
 	return m.Repositories
 }
 
-func (m *MockRawClient) GetIssues() issuesService {
-	return issuesService(m.Issues)
+func (m *MockRawClient) GetIssues() IssuesService {
+	return IssuesService(m.Issues)
 }
 
-func (m *MockRawClient) GetPullRequests() pullRequestsService {
-	return pullRequestsService(m.PullRequests)
+func (m *MockRawClient) GetPullRequests() PullRequestsService {
+	return PullRequestsService(m.PullRequests)
 }
 
-func (m *MockRawClient) GetAuthorizations() authorizationsService {
-	return authorizationsService(m.Authorizations)
+func (m *MockRawClient) GetAuthorizations() AuthorizationsService {
+	return AuthorizationsService(m.Authorizations)
 }
 
 func (m *MockRawClient) SetBaseURL(baseUrl *url.URL) {
@@ -141,21 +141,21 @@ func newMockRawClient() *MockRawClient {
 }
 
 type Client_GetRepositoryURLTest struct {
-	serviceConfig                     *etc.ServiceConfig
-	rawClient                         rawClient
-	willBeError                       bool
-	user                              string
-	repo                              string
-	createRepo                        string
-	issueID                           int
-	pullRequestID                     int
-	expectedRepositoryURL             string
-	expectedIssuesURL                 string
-	expectedIssueURL                  string
-	expectedPullRequestsURL           string
-	expectedPullRequestURL            string
-	expectedCreatedPullRequestURL     string
-	expectedCreatedPullRequestTitle   string
+	serviceConfig                   *etc.ServiceConfig
+	rawClient                       RawClient
+	willBeError                     bool
+	user                            string
+	repo                            string
+	createRepo                      string
+	issueID                         int
+	pullRequestID                   int
+	expectedRepositoryURL           string
+	expectedIssuesURL               string
+	expectedIssueURL                string
+	expectedPullRequestsURL         string
+	expectedPullRequestURL          string
+	expectedCreatedPullRequestURL   string
+	expectedCreatedPullRequestTitle string
 	expectedCreatedPullRequestMessage string
 }
 
@@ -237,35 +237,35 @@ func TestClient_GetRepositoryURL(t *testing.T) {
 		}
 
 		title := "Repository URL"
-		repoURL, err := client.GetRepositoryURL(test.user, test.repo)
+		repoURL, err := client.GetRepositories().GetURL(test.user, test.repo)
 		if ok := util.printErrorIfUnexpected(err, title); ok && err != nil {
 			continue
 		}
 		util.assertString(repoURL, test.expectedRepositoryURL, title)
 
 		title = "Issues URL"
-		issuesURL, err := client.GetIssuesURL(test.user, test.repo)
+		issuesURL, err := client.GetIssues().GetIssuesURL(test.user, test.repo)
 		if ok := util.printErrorIfUnexpected(err, title); ok && err != nil {
 			continue
 		}
 		util.assertString(issuesURL, test.expectedIssuesURL, title)
 
 		title = "Issue URL"
-		issueURL, err := client.GetIssueURL(test.user, test.repo, test.issueID)
+		issueURL, err := client.GetIssues().GetURL(test.user, test.repo, test.issueID)
 		if ok := util.printErrorIfUnexpected(err, title); ok && err != nil {
 			continue
 		}
 		util.assertString(issueURL, test.expectedIssueURL, title)
 
 		title = "PullRequests URL"
-		pullRequestsURL, err := client.GetPullRequestsURL(test.user, test.repo)
+		pullRequestsURL, err := client.GetPullRequests().GetPullRequestsURL(test.user, test.repo)
 		if ok := util.printErrorIfUnexpected(err, title); ok && err != nil {
 			continue
 		}
 		util.assertString(pullRequestsURL, test.expectedPullRequestsURL, title)
 
 		title = "PullRequest URL"
-		pullRequestURL, err := client.GetPullRequestURL(test.user, test.repo, test.pullRequestID)
+		pullRequestURL, err := client.GetPullRequests().GetURL(test.user, test.repo, test.pullRequestID)
 		if ok := util.printErrorIfUnexpected(err, title); ok && err != nil {
 			continue
 		}
@@ -280,7 +280,7 @@ func TestClient_GetRepositoryURL(t *testing.T) {
 			Title:      DEFAULT_CREATED_PR_TITLE,
 			Body:       DEFAULT_CREATED_PR_MESSAGE,
 		}
-		createdPullRequest, err := client.CreatePullRequest(context.Background(), test.createRepo, newPR)
+		createdPullRequest, err := client.GetPullRequests().Create(context.Background(), test.createRepo, newPR)
 		if ok := util.printErrorIfUnexpected(err, title); ok && err != nil {
 			continue
 		}

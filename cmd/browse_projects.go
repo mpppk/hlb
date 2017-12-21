@@ -16,9 +16,8 @@ var browseprojectsCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		base, err := hlblib.NewCmdBase()
 		etc.PanicIfErrorExist(err)
-		sw := hlblib.ClientWrapper{Base: base}
 		if len(args) == 0 {
-			url, err := sw.GetProjectsURL()
+			url, err := base.Client.GetProjects().GetProjectsURL(base.Remote.Owner, base.Remote.RepoName)
 			etc.PanicIfErrorExist(err)
 			open.Run(url)
 			return
@@ -26,7 +25,7 @@ var browseprojectsCmd = &cobra.Command{
 			id, err := strconv.Atoi(args[0])
 			etc.PanicIfErrorExist(err)
 
-			url, err := sw.GetProjectURL(id)
+			url, err :=  base.Client.GetProjects().GetURL(base.Remote.Owner, base.Remote.RepoName, id)
 			etc.PanicIfErrorExist(err)
 			open.Run(url)
 			return

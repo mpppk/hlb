@@ -103,16 +103,16 @@ type MockRawClient struct {
 	BaseURL       string
 }
 
-func (m *MockRawClient) GetProjects() projectsService {
-	return projectsService(m.Projects)
+func (m *MockRawClient) GetProjects() ProjectsService {
+	return ProjectsService(m.Projects)
 }
 
-func (m *MockRawClient) GetIssues() issuesService {
-	return issuesService(m.Issues)
+func (m *MockRawClient) GetIssues() IssuesService {
+	return IssuesService(m.Issues)
 }
 
-func (m *MockRawClient) GetMergeRequests() mergeRequestsService {
-	return mergeRequestsService(m.MergeRequests)
+func (m *MockRawClient) GetMergeRequests() MergeRequestsService {
+	return MergeRequestsService(m.MergeRequests)
 }
 
 func (m *MockRawClient) SetBaseURL(baseUrl string) error {
@@ -130,21 +130,21 @@ func newMockRawClient() *MockRawClient {
 }
 
 type Client_GetRepositoryURLTest struct {
-	serviceConfig                     *etc.ServiceConfig
-	rawClient                         rawClient
-	willBeError                       bool
-	user                              string
-	repo                              string
-	createRepo                        string
-	createPRTitle                     string
-	createPRMessage                   string
-	issueID                           int
-	pullRequestID                     int
-	expectedRepositoryURL             string
-	expectedIssuesURL                 string
-	expectedIssueURL                  string
-	expectedMergeRequestsURL          string
-	expectedPullRequestURL            string
+	serviceConfig            *etc.ServiceConfig
+	rawClient                RawClient
+	willBeError              bool
+	user                     string
+	repo                     string
+	createRepo               string
+	createPRTitle            string
+	createPRMessage          string
+	issueID                  int
+	pullRequestID            int
+	expectedRepositoryURL    string
+	expectedIssuesURL        string
+	expectedIssueURL         string
+	expectedMergeRequestsURL string
+	expectedPullRequestURL   string
 	expectedCreatedPullRequestURL     string
 	expectedCreatedPullRequestTitle   string
 	expectedCreatedPullRequestMessage string
@@ -227,35 +227,35 @@ func TestClient_GetRepositoryURL(t *testing.T) {
 		client := newClientFromRawClient(test.serviceConfig, test.rawClient)
 
 		title := "Repository URL"
-		repoURL, err := client.GetRepositoryURL(test.user, test.repo)
+		repoURL, err := client.GetRepositories().GetURL(test.user, test.repo)
 		if ok := util.printErrorIfUnexpected(err, title); ok && err != nil {
 			continue
 		}
 		util.assertString(repoURL, test.expectedRepositoryURL, title)
 
 		title = "Issues URL"
-		issuesURL, err := client.GetIssuesURL(test.user, test.repo)
+		issuesURL, err := client.GetIssues().GetIssuesURL(test.user, test.repo)
 		if ok := util.printErrorIfUnexpected(err, title); ok && err != nil {
 			continue
 		}
 		util.assertString(issuesURL, test.expectedIssuesURL, title)
 
 		title = "Issue URL"
-		issueURL, err := client.GetIssueURL(test.user, test.repo, test.issueID)
+		issueURL, err := client.GetIssues().GetURL(test.user, test.repo, test.issueID)
 		if ok := util.printErrorIfUnexpected(err, title); ok && err != nil {
 			continue
 		}
 		util.assertString(issueURL, test.expectedIssueURL, title)
 
 		title = "MergeRequests URL"
-		pullRequestsURL, err := client.GetPullRequestsURL(test.user, test.repo)
+		pullRequestsURL, err := client.GetPullRequests().GetPullRequestsURL(test.user, test.repo)
 		if ok := util.printErrorIfUnexpected(err, title); ok && err != nil {
 			continue
 		}
 		util.assertString(pullRequestsURL, test.expectedMergeRequestsURL, title)
 
 		title = "MergeRequest URL"
-		pullRequestURL, err := client.GetPullRequestURL(test.user, test.repo, test.pullRequestID)
+		pullRequestURL, err := client.GetPullRequests().GetURL(test.user, test.repo, test.pullRequestID)
 		if ok := util.printErrorIfUnexpected(err, title); ok && err != nil {
 			continue
 		}
@@ -270,7 +270,7 @@ func TestClient_GetRepositoryURL(t *testing.T) {
 			Title:      DEFAULT_CREATED_PR_TITLE,
 			Body:       DEFAULT_CREATED_PR_MESSAGE,
 		}
-		createdPullRequest, err := client.CreatePullRequest(context.Background(), test.createRepo, newPR)
+		createdPullRequest, err := client.GetPullRequests().Create(context.Background(), test.createRepo, newPR)
 		if ok := util.printErrorIfUnexpected(err, title); ok && err != nil {
 			continue
 		}

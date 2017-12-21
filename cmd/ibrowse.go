@@ -37,24 +37,22 @@ var ibrowseCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		base, err := hlblib.NewCmdBase()
 		etc.PanicIfErrorExist(err)
-		sw := hlblib.ClientWrapper{Base: base}
 
 		var list []finder.FilterStringer
 
-		//var links []finder.Linker
-		repoUrl, err := sw.GetRepositoryURL()
+		repoUrl, err := base.Client.GetRepositories().GetURL(base.Remote.Owner, base.Remote.RepoName)
 		etc.PanicIfErrorExist(err)
-		issuesUrl, err := sw.GetIssuesURL()
+		issuesUrl, err := base.Client.GetIssues().GetIssuesURL(base.Remote.Owner, base.Remote.RepoName)
 		etc.PanicIfErrorExist(err)
-		pullsUrl, err := sw.GetPullRequestsURL()
+		pullsUrl, err := base.Client.GetPullRequests().GetPullRequestsURL(base.Remote.Owner, base.Remote.RepoName)
 		etc.PanicIfErrorExist(err)
-		commitsUrl, err := sw.GetCommitsURL()
+		commitsUrl, err := base.Client.GetRepositories().GetCommitsURL(base.Remote.Owner, base.Remote.RepoName)
 		etc.PanicIfErrorExist(err)
-		projectsUrl, err := sw.GetProjectsURL()
+		projectsUrl, err := base.Client.GetProjects().GetProjectsURL(base.Remote.Owner, base.Remote.RepoName)
 		etc.PanicIfErrorExist(err)
-		milestonesUrl, err := sw.GetMilestonesURL()
+		milestonesUrl, err := base.Client.GetRepositories().GetMilestonesURL(base.Remote.Owner, base.Remote.RepoName)
 		etc.PanicIfErrorExist(err)
-		wikisUrl, err := sw.GetWikisURL()
+		wikisUrl, err := base.Client.GetRepositories().GetWikisURL(base.Remote.Owner, base.Remote.RepoName)
 		etc.PanicIfErrorExist(err)
 
 		list = append(list,
@@ -78,7 +76,7 @@ var ibrowseCmd = &cobra.Command{
 		pullsChan := make(chan []finder.FilterStringer)
 
 		go func() {
-			issues, err := sw.GetIssues()
+			issues, err := base.Client.GetIssues().ListByRepo(base.Context, base.Remote.Owner, base.Remote.RepoName)
 			etc.PanicIfErrorExist(err)
 			fstrs := toFilterStringerFromIssues(issues)
 			for _, fstr := range fstrs {
@@ -88,7 +86,7 @@ var ibrowseCmd = &cobra.Command{
 		}()
 
 		go func() {
-			pulls, err := sw.GetPullRequests()
+			pulls, err := base.Client.GetPullRequests().List(base.Context, base.Remote.Owner, base.Remote.RepoName)
 			etc.PanicIfErrorExist(err)
 			fstrs := toFilterStringerFromPullRequests(pulls)
 			for _, fstr := range fstrs {

@@ -16,10 +16,11 @@ var listpullrequestsCmd = &cobra.Command{
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		base, err := hlblib.NewCmdBase()
-		sw := hlblib.ClientWrapper{Base: base}
 		etc.PanicIfErrorExist(err)
 
-		pulls, err := sw.GetPullRequests()
+		//pulls, err := sw.GetPullRequests()
+		pulls, err := base.Client.GetPullRequests().List(base.Context, base.Remote.Owner, base.Remote.RepoName)
+
 		etc.PanicIfErrorExist(err)
 
 		for _, pull := range pulls {
