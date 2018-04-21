@@ -22,7 +22,12 @@ var browsecommitsCmd = &cobra.Command{
 		etc.PanicIfErrorExist(err)
 		url, err := base.Client.GetRepositories().GetCommitsURL(base.Remote.Owner, base.Remote.RepoName)
 		etc.PanicIfErrorExist(err)
-		open.Run(url)
+
+		if urlFlag {
+			fmt.Println(url)
+		} else {
+			open.Run(url)
+		}
 	},
 }
 

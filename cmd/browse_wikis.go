@@ -23,7 +23,12 @@ var browsewikisCmd = &cobra.Command{
 		url, err := base.Client.GetRepositories().GetWikisURL(base.Remote.Owner, base.Remote.RepoName)
 
 		etc.PanicIfErrorExist(err)
-		open.Run(url)
+
+		if urlFlag {
+			fmt.Println(url)
+		} else {
+			open.Run(url)
+		}
 	},
 }
 
