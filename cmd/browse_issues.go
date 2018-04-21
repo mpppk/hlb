@@ -22,20 +22,24 @@ var browseissuesCmd = &cobra.Command{
 		base, err := hlblib.NewCmdBase()
 		etc.PanicIfErrorExist(err)
 
+		var url string
 		if len(args) == 0 {
-			url, err := base.Client.GetIssues().GetIssuesURL(base.Remote.Owner, base.Remote.RepoName)
-
+			u, err := base.Client.GetIssues().GetIssuesURL(base.Remote.Owner, base.Remote.RepoName)
 			etc.PanicIfErrorExist(err)
-			open.Run(url)
-			return
+			url = u
 		}else {
 			id, err := strconv.Atoi(args[0])
 			etc.PanicIfErrorExist(err)
 
-			url, err := base.Client.GetIssues().GetURL(base.Remote.Owner, base.Remote.RepoName, id)
+			u, err := base.Client.GetIssues().GetURL(base.Remote.Owner, base.Remote.RepoName, id)
 			etc.PanicIfErrorExist(err)
+			url = u
+		}
+
+		if urlFlag {
+			fmt.Println(url)
+		} else {
 			open.Run(url)
-			return
 		}
 	},
 }

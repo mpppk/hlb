@@ -11,6 +11,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var urlFlag bool
+
 // browseCmd represents the browse command
 var browseCmd = &cobra.Command{
 	Use:   "browse",
@@ -33,10 +35,17 @@ var browseCmd = &cobra.Command{
 		url, err := base.Client.GetRepositories().GetURL(base.Remote.Owner, base.Remote.RepoName)
 
 		etc.PanicIfErrorExist(err)
-		open.Run(url)
+
+		if urlFlag {
+			fmt.Println(url)
+		} else {
+			open.Run(url)
+		}
 	},
 }
 
 func init() {
+	browseCmd.PersistentFlags().BoolVarP(&urlFlag, "url", "u", false,
+		"outputs the URL rather than opening the browser")
 	RootCmd.AddCommand(browseCmd)
 }
