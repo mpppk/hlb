@@ -18,6 +18,8 @@ func (a *authorizationsService) CreateToken(ctx context.Context) (string, error)
 		return "", err
 	}
 
+	println(note)
+
 	authReq := &github.AuthorizationRequest{
 		Note:   github.String(note),
 		Scopes: []github.Scope{github.ScopeRepo},
@@ -31,16 +33,15 @@ func (a *authorizationsService) CreateToken(ctx context.Context) (string, error)
 	return *auth.Token, nil
 }
 
-func (a *authorizationsService) getUniqueNote(ctx context.Context, orgNote string) (string, error) {
+func (a *authorizationsService) getAllAuthorizations(ctx context.Context, orgNote string) (allAuths []*github.Authorization, err error) {
 	opt := &github.ListOptions{
-		PerPage: 100,
+		PerPage: 5,
 	}
 
-	var allAuths []*github.Authorization
 	for {
 		auths, resp, err := a.raw.List(ctx, opt)
 		if err != nil {
-			return "", errors.Wrap(err, "Failed to get authorizations by raw client in github.Client.GetPullRequestsURL")
+			return nil, errors.Wrap(err, "Failed to get authorizations by raw client in github.Client.GetPullRequestsURL")
 		}
 
 		allAuths = append(allAuths, auths...)
@@ -49,6 +50,15 @@ func (a *authorizationsService) getUniqueNote(ctx context.Context, orgNote strin
 			break
 		}
 		opt.Page = resp.NextPage
+	}
+	return allAuths, err
+}
+
+
+func (a *authorizationsService) getUniqueNote(ctx context.Context, orgNote string) (string, error) {
+	allAuths, err := a.getAllAuthorizations(ctx, orgNote)
+	if err != nil {
+		return "", err
 	}
 
 	cnt := 1
