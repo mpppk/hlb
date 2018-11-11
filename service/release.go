@@ -1,7 +1,7 @@
 package service
 
 type Release interface {
-	GetID() int64
+	GetID() int
 	GetTagName() string
 	GetName() string
 	GetBody() string
