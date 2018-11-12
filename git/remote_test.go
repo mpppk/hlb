@@ -69,6 +69,13 @@ func TestNewRemote(t *testing.T) {
 			url:         "http://github.com/mpppk",
 			willBeError: true,
 		},
+		{ // https://github.com/mpppk/hlb/issues/40
+			url:                 "ssh://git@my.domain.com:3789/my-group/my-app.git",
+			willBeError:         false,
+			expectedServiceHost: "my.domain.com:3789",
+			expectedOwner:       "my-group",
+			expectedRepoName:    "my-app",
+		},
 	}
 
 	for i, nr := range newRemoteTests {
