@@ -1,0 +1,47 @@
+# Golang CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-go/ for more details
+version: 2
+jobs:
+  test:
+    docker:
+      # specify the version
+      - image: circleci/golang:1.11
+
+    working_directory: /go/src/github.com/mpppk/hlb
+    steps:
+      - checkout
+
+      # specify any bash command here prefixed with `run: `
+      - run: make setup
+      - run: make deps
+      - run: make build
+      - run: make test
+      - run: make codecov
+
+  release:
+    docker:
+      - image: circleci/golang:1.11
+    steps:
+      - checkout
+      - run: curl -sL https://git.io/goreleaser | bash
+
+workflows:
+  version: 2
+  release:
+    jobs:
+      - test
+      - release:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*(-.*)*/
+          requires:
+            - test
+deployment:
+  tag:
+    tag: /v[0-9]+(\.[0-9]+)*(-.*)*/
+    owner: mpppk
+    commands:
+    - curl -sL https://git.io/goreleaser | bash
