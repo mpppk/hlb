@@ -31,7 +31,7 @@ changelog:
 brew:
   github:
     owner: mpppk
-    name: homebrew-hlb
+    name: homebrew-mpppk
   homepage: "https://github.com/mpppk/hlb"
   description: "CLI that provides unified & interactive interface to multiple git repository hosting services"
   dependencies:
