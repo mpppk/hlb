@@ -1,13 +1,15 @@
 package cmd
 
 import (
-	"bufio"
 	"fmt"
+	"github.com/AlecAivazis/survey"
 	"github.com/blang/semver"
+	"github.com/briandowns/spinner"
 	"github.com/mpppk/hlb/hlblib"
 	"github.com/rhysd/go-github-selfupdate/selfupdate"
 	"github.com/spf13/cobra"
 	"os"
+	"time"
 )
 
 var selfupdateCmd = &cobra.Command{
@@ -28,14 +30,20 @@ var selfupdateCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Printf("New hlb version is available. (current: v%s latest: v%s)\n" +
+		msg := fmt.Sprintf("New hlb version is available. (current: v%s latest: v%s)\n" +
 			"Do you want to update to latest version? (y/n)", version, latest.Version)
-		input, err := bufio.NewReader(os.Stdin).ReadString('\n')
-		if err != nil || (input != "y\n" && input != "n\n") {
-			fmt.Println("Invalid input")
+
+		confirm := false
+		prompt := &survey.Confirm{
+			Message: msg,
+		}
+		err = survey.AskOne(prompt, &confirm, nil)
+		if err != nil {
+			fmt.Println("Sorry, internal error is occurred.")
 			return
 		}
-		if input == "n\n" {
+
+		if !confirm {
 			return
 		}
 
@@ -44,11 +52,17 @@ var selfupdateCmd = &cobra.Command{
 			fmt.Println("Could not locate executable path")
 			return
 		}
+
+		s := spinner.New(spinner.CharSets[14], 100*time.Millisecond) // Build our new spinner
+		s.Start()
+
 		if err := selfupdate.UpdateTo(latest.AssetURL, exe); err != nil {
+			s.Stop()
 			fmt.Println("Error occurred while updating binary:", err)
 			return
 		}
-		fmt.Println("Successfully updated to version", latest.Version)
+		s.Stop()
+		fmt.Printf("Successfully updated to v%s\n", latest.Version)
 	},
 }
 
