@@ -10,6 +10,14 @@
   version = "v1.6.4"
 
 [[projects]]
+  digest = "1:686d2b178b394e8470a378ec7991fcb4a78ea29518dd1a4cf65d132a8c287b73"
+  name = "github.com/blang/semver"
+  packages = ["."]
+  pruneopts = ""
+  revision = "2ee87856327ba09384cabd113bc6b5d174e9ec0f"
+  version = "v3.5.1"
+
+[[projects]]
   digest = "1:a438e1e7d52dc834cf8d426c63c3280bbf99e6f8e42ceeed17d654f445b627c5"
   name = "github.com/briandowns/spinner"
   packages = ["."]
@@ -77,6 +85,18 @@
   version = "v1.0.0"
 
 [[projects]]
+  branch = "master"
+  digest = "1:0d37c42156531a07a84812a47c27610947b849710ffab6f62be6e98c5112c140"
+  name = "github.com/inconshreveable/go-update"
+  packages = [
+    ".",
+    "internal/binarydist",
+    "internal/osext",
+  ]
+  pruneopts = ""
+  revision = "8152e7eb6ccf8679a64582a66b78519688d156ad"
+
+[[projects]]
   digest = "1:870d441fe217b8e689d7949fef6e43efbc787e50f200cb1e70dbca9204a1d6be"
   name = "github.com/inconshreveable/mousetrap"
   packages = ["."]
@@ -107,6 +127,14 @@
   pruneopts = ""
   revision = "c2353362d570a7bfa228149c62842019201cfb71"
   version = "v1.8.0"
+
+[[projects]]
+  digest = "1:b856d8248663c39265a764561c1a1a149783f6cc815feb54a1f3a591b91f6eca"
+  name = "github.com/masterminds/semver"
+  packages = ["."]
+  pruneopts = ""
+  revision = "c7af12943936e8c39859482e61f0574c2fd7fc75"
+  version = "v1.4.2"
 
 [[projects]]
   digest = "1:74a81a9187cef23a4dd57d626ce2792c1452974c08cfa1ab84f193c539512950"
@@ -163,6 +191,14 @@
   pruneopts = ""
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
   version = "v0.8.0"
+
+[[projects]]
+  digest = "1:5fd0d8d72587ce81bddb8b7fdab4f4b18b88389163561cef6eb90ad6959a72d5"
+  name = "github.com/rhysd/go-github-selfupdate"
+  packages = ["selfupdate"]
+  pruneopts = ""
+  revision = "472a014a457bf6983bd5b28bdc4e7d14f352f187"
+  version = "v1.1.0"
 
 [[projects]]
   digest = "1:1ebe873a8dc99e3316c30fea2e211038c4d1fcb605eee17e00a5e91b8817925e"
@@ -251,6 +287,19 @@
   pruneopts = ""
   revision = "d154598bacbf4501c095a309753c5d4af66caa81"
   version = "v0.1.2"
+
+[[projects]]
+  digest = "1:ed45c8f71f0756c8319946d21b965c4ab8a060fceb0441685c16ec6fc92e2e5d"
+  name = "github.com/ulikunitz/xz"
+  packages = [
+    ".",
+    "internal/hash",
+    "internal/xlog",
+    "lzma",
+  ]
+  pruneopts = ""
+  revision = "590df8077fbcb06ad62d7714da06c00e5dd2316d"
+  version = "v0.5.5"
 
 [[projects]]
   digest = "1:69db2c3d4b32575fb15921dc4f2121386c9f54d888c2829f0a8352005c384338"
@@ -448,8 +497,10 @@
     "github.com/AlecAivazis/survey",
     "github.com/briandowns/spinner",
     "github.com/google/go-github/github",
+    "github.com/masterminds/semver",
     "github.com/mitchellh/go-homedir",
     "github.com/pkg/errors",
+    "github.com/rhysd/go-github-selfupdate/selfupdate",
     "github.com/skratchdot/open-golang/open",
     "github.com/spf13/cobra",
     "github.com/spf13/viper",
