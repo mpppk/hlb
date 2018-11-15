@@ -28,9 +28,14 @@ jobs:
 
 workflows:
   version: 2
-  release:
+  test_and_release:
     jobs:
-      - test
+      - test:
+          filters:
+            branches:
+              only: /.*/
+            tags:
+              only: /.*/
       - release:
           filters:
             branches:
@@ -39,9 +44,3 @@ workflows:
               only: /v[0-9]+(\.[0-9]+)*(-.*)*/
           requires:
             - test
-deployment:
-  tag:
-    tag: /v[0-9]+(\.[0-9]+)*(-.*)*/
-    owner: mpppk
-    commands:
-    - curl -sL https://git.io/goreleaser | bash
