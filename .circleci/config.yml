@@ -30,17 +30,17 @@ workflows:
   version: 2
   test_and_release:
     jobs:
-      - test:
-        filters:
-          branches:
-            only: /.*/
-          tags:
-            only: /.*/
-      - release:
-        filters:
-          branches:
-            ignore: /.*/
-          tags:
-            only: /v[0-9]+(\.[0-9]+)*(-.*)*/
-        requires:
-          - test
+      - test
+#        filters:
+#          branches:
+#            only: /.*/
+#          tags:
+#            only: /.*/
+#      - release:
+#        filters:
+#          branches:
+#            ignore: /.*/
+#          tags:
+#            only: /v[0-9]+(\.[0-9]+)*(-.*)*/
+#        requires:
+#          - test
