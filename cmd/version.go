@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/mpppk/hlb/hlblib"
 	"github.com/spf13/cobra"
 )
 
@@ -11,7 +12,7 @@ var versionCmd = &cobra.Command{
 	Short: "Show hlb version",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("v0.0.2")
+		fmt.Println("v"+hlblib.Version)
 	},
 }
 

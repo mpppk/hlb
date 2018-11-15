@@ -76,3 +76,7 @@
 [[constraint]]
   branch = "v2"
   name = "gopkg.in/yaml.v2"
+
+[[constraint]]
+  name = "github.com/rhysd/go-github-selfupdate"
+  version = "1.1.0"
