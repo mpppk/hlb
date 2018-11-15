@@ -28,7 +28,7 @@ jobs:
 
 workflows:
   version: 2
-  release:
+  test_and_release:
     jobs:
       - test:
         filters:
