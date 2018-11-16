@@ -9,18 +9,24 @@ jobs:
     <<: *defaults
     steps:
       - checkout
+      - restore_cache:
+          key: vendor-{{ checksum "Gopkg.lock" }}
 
       # specify any bash command here prefixed with `run: `
       - run: make setup
-      - run: make deps
       - run: make build
       - run: make test
       - run: make codecov
-
+      - save_cache:
+          key: vendor-{{ checksum "Gopkg.lock" }}
+          paths:
+          - vendor
   release:
     <<: *defaults
     steps:
       - checkout
+      - restore_cache:
+          key: vendor-{{ checksum "Gopkg.lock" }}
       - run: curl -sL https://git.io/goreleaser | bash
 
 workflows:
