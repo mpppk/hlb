@@ -4,6 +4,10 @@ SHELL = /bin/bash
 deps:
 	dep ensure -v
 
+.PHONY: deps-ci
+deps-ci:
+	dep ensure -v -vendor-only=true
+
 .PHONY: setup
 setup:
 	go get github.com/golang/dep/cmd/dep
