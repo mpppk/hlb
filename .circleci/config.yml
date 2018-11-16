@@ -14,7 +14,6 @@ jobs:
 
       # specify any bash command here prefixed with `run: `
       - run: make setup
-      - run: make deps-ci
       - run: make build
       - run: make test
       - run: make codecov

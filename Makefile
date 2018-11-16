@@ -13,31 +13,31 @@ setup:
 	go get github.com/golang/dep/cmd/dep
 
 .PHONY: lint
-lint: deps
+lint: deps-ci
 	gometalinter
 
 .PHONY: test
-test: deps
+test: deps-ci
 	go test ./...
 
 .PHONY: coverage
-coverage: deps
+coverage: deps-ci
 	go test -race -coverprofile=coverage.txt -covermode=atomic ./...
 
 .PHONY: codecov
-codecov: deps coverage
+codecov: deps-ci coverage
 	bash <(curl -s https://codecov.io/bash)
 
 .PHONY: build
-build: deps
+build: deps-ci
 	go build
 
 .PHONY: cross-build-snapshot
-cross-build: deps
+cross-build: deps-ci
 	goreleaser --rm-dist --snapshot
 
 .PHONY: install
-install: deps
+install: deps-ci
 	go install
 
 .PHONY: circleci
