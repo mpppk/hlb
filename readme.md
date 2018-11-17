@@ -55,6 +55,11 @@ Download from [release page](https://github.com/mpppk/hlb/releases) and put it a
 $ go get github.com/mpppk/hlb
 ```
 
+## Update
+v0.0.3 or greater has `selfupdate` command for easy updating.
+
+![hlb_selfupdate](https://raw.githubusercontent.com/wiki/mpppk/hlb/images/hlb_selfupdate.gif)
+
 ## Authentication
 authenticate infomation of hlb is stored in `~/.config/hlb/.hlb.yaml`.
 
