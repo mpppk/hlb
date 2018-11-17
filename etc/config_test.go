@@ -21,6 +21,18 @@ func TestFindHost(t *testing.T) {
 			Protocol: "protocolA",
 		},
 		{
+			Host:     "nameA:81",
+			Type:     "typeA",
+			Token:    "OAuthTokenA",
+			Protocol: "protocolA",
+		},
+		{
+			Host:     "nameB:81",
+			Type:     "typeB",
+			Token:    "OAuthTokenB",
+			Protocol: "protocolB",
+		},
+		{
 			Host:     "nameB",
 			Type:     "typeB",
 			Token:    "OAuthTokenB",
@@ -37,9 +49,21 @@ func TestFindHost(t *testing.T) {
 		},
 		{
 			services:          services,
-			targetServiceName: "nameB",
+			targetServiceName: "nameA:81",
 			expectedStatus:    true,
 			expectedService:   services[1],
+		},
+		{
+			services:          services,
+			targetServiceName: "nameB:81",
+			expectedStatus:    true,
+			expectedService:   services[2],
+		},
+		{
+			services:          services,
+			targetServiceName: "nameB",
+			expectedStatus:    true,
+			expectedService:   services[3],
 		},
 		{
 			services:          services,
