@@ -50,12 +50,12 @@
   version = "v1.2.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:9547658985777034a408e42fc69cbac2f8d3556e2e08fb9848f285767ea2e25e"
+  digest = "1:da48a0d8983531875679a5e5e972d01e0c89be9cead711642bea836fa64eeed3"
   name = "github.com/google/go-github"
   packages = ["github"]
   pruneopts = ""
-  revision = "99760a16213d6fdde13f4e477438f876b6c9c6eb"
+  revision = "f55b50f38167644bb7e4be03d9a2bde71d435239"
+  version = "v18.2.0"
 
 [[projects]]
   digest = "1:cea4aa2038169ee558bf507d5ea02c94ca85bcca28a4c7bb99fd59b31e43a686"
@@ -153,12 +153,12 @@
   revision = "9520e82c474b0a04dd04f8a40959027271bab992"
 
 [[projects]]
-  branch = "master"
   digest = "1:096a8a9182648da3d00ff243b88407838902b6703fc12657f76890e08d1899bf"
   name = "github.com/mitchellh/go-homedir"
   packages = ["."]
   pruneopts = ""
   revision = "ae18d6b8b3205b561c79e8e5f69bff09736185f4"
+  version = "v1.0.0"
 
 [[projects]]
   digest = "1:bcc46a0fbd9e933087bef394871256b5c60269575bb661935874729c65bbbf60"
@@ -167,6 +167,18 @@
   pruneopts = ""
   revision = "3536a929edddb9a5b34bd6861dc4a9647cb459fe"
   version = "v1.1.2"
+
+[[projects]]
+  digest = "1:64e40f92f5d7a3f480e8636a016c66aaeaff431d1935c2a08aadfab38bf88232"
+  name = "github.com/mpppk/gitany"
+  packages = [
+    ".",
+    "github",
+    "gitlab",
+  ]
+  pruneopts = ""
+  revision = "c75d4b3ce4846e98f04e539e546f6d577f3580a6"
+  version = "v0.0.3"
 
 [[projects]]
   digest = "1:7c4a3dfaf6a6a70d05954f9eab61be866456a9056e8eba065b7e3a4907203a92"
@@ -294,12 +306,12 @@
   version = "v0.5.5"
 
 [[projects]]
-  digest = "1:69db2c3d4b32575fb15921dc4f2121386c9f54d888c2829f0a8352005c384338"
+  digest = "1:37934f4a0ac2c2efa8773024395b2d1b1d63c5125845be5e6b761ed771380454"
   name = "github.com/xanzy/go-gitlab"
   packages = ["."]
   pruneopts = ""
-  revision = "7bcfc0373b18ff9f02c7485a15a29053d85e8e56"
-  version = "v0.7.5"
+  revision = "954568c5d9242be1fb907039d769952fa4f6bc70"
+  version = "v0.11.7"
 
 [[projects]]
   digest = "1:afc0b8068986a01e2d8f449917829753a54f6bd4d1265c2b4ad9cba75560020f"
@@ -489,17 +501,16 @@
     "github.com/AlecAivazis/survey",
     "github.com/blang/semver",
     "github.com/briandowns/spinner",
-    "github.com/google/go-github/github",
     "github.com/mitchellh/go-homedir",
+    "github.com/mpppk/gitany",
+    "github.com/mpppk/gitany/github",
+    "github.com/mpppk/gitany/gitlab",
     "github.com/pkg/errors",
     "github.com/rhysd/go-github-selfupdate/selfupdate",
     "github.com/skratchdot/open-golang/open",
     "github.com/spf13/cobra",
     "github.com/spf13/viper",
     "github.com/tcnksm/go-gitconfig",
-    "github.com/xanzy/go-gitlab",
-    "golang.org/x/crypto/ssh/terminal",
-    "golang.org/x/oauth2",
     "gopkg.in/src-d/go-git.v4",
     "gopkg.in/src-d/go-git.v4/config",
     "gopkg.in/src-d/go-git.v4/plumbing",

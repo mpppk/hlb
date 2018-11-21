@@ -1,19 +1,20 @@
-package etc
+package hlblib
 
 import (
+	"github.com/mpppk/gitany"
 	"reflect"
 	"testing"
 )
 
 type findHostTest struct {
-	services          []*ServiceConfig
+	services          []*gitany.ServiceConfig
 	targetServiceName string
 	expectedStatus    bool
-	expectedService   *ServiceConfig
+	expectedService   *gitany.ServiceConfig
 }
 
 func TestFindHost(t *testing.T) {
-	services := []*ServiceConfig{
+	services := []*gitany.ServiceConfig{
 		{
 			Host:     "nameA",
 			Type:     "typeA",

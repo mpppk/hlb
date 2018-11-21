@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/hlblib"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/cobra"
@@ -20,20 +19,20 @@ var browsemilestonesCmd = &cobra.Command{
 		}
 
 		base, err := hlblib.NewCmdBase()
-		etc.PanicIfErrorExist(err)
+		hlblib.PanicIfErrorExist(err)
 
 		var url string
 		if len(args) == 0 {
 			u, err :=  base.Client.GetRepositories().GetMilestonesURL(base.Remote.Owner, base.Remote.RepoName)
-			etc.PanicIfErrorExist(err)
+			hlblib.PanicIfErrorExist(err)
 			url = u
 
 		} else {
 			id, err := strconv.Atoi(args[0])
-			etc.PanicIfErrorExist(err)
+			hlblib.PanicIfErrorExist(err)
 
 			u, err :=  base.Client.GetRepositories().GetMilestoneURL(base.Remote.Owner, base.Remote.RepoName, id)
-			etc.PanicIfErrorExist(err)
+			hlblib.PanicIfErrorExist(err)
 			url = u
 		}
 

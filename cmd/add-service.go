@@ -3,6 +3,8 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"github.com/mpppk/gitany"
+	"github.com/mpppk/hlb/hlblib"
 	"io/ioutil"
 	"net/url"
 	"os"
@@ -11,9 +13,6 @@ import (
 
 	"github.com/AlecAivazis/survey"
 	"github.com/briandowns/spinner"
-	"github.com/mpppk/hlb/etc"
-	"github.com/mpppk/hlb/hlblib"
-	"github.com/mpppk/hlb/service"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
@@ -27,9 +26,9 @@ var addServiceCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 
-		var config etc.Config
+		var config hlblib.Config
 		err := viper.Unmarshal(&config)
-		etc.PanicIfErrorExist(err)
+		hlblib.PanicIfErrorExist(err)
 
 		if len(args) < 2 {
 			panic("invalid args")
@@ -39,7 +38,7 @@ var addServiceCmd = &cobra.Command{
 		serviceUrl := args[1]
 
 		parsedUrl, err := url.Parse(serviceUrl)
-		etc.PanicIfErrorExist(err)
+		hlblib.PanicIfErrorExist(err)
 
 		serviceConfig, ok := config.FindServiceConfig(parsedUrl.Host)
 		if ok {
@@ -59,7 +58,7 @@ var addServiceCmd = &cobra.Command{
 
 			}
 		} else {
-			serviceConfig = &etc.ServiceConfig{
+			serviceConfig = &gitany.ServiceConfig{
 				Host:     parsedUrl.Host,
 				Type:     serviceType,
 				Token:    "",
@@ -67,12 +66,12 @@ var addServiceCmd = &cobra.Command{
 			}
 		}
 
-		username, password := service.PromptUserAndPassword(serviceType)
+		username, password := gitany.PromptUserAndPassword(serviceType)
 
 		s := spinner.New(spinner.CharSets[14], 100*time.Millisecond) // Build our new spinner
 		s.Start()                                                    // Start the spinner
-		token, err := hlblib.CreateToken(ctx, serviceConfig, username, password)
-		etc.PanicIfErrorExist(err)
+		token, err := gitany.CreateToken(ctx, serviceConfig, username, password)
+		hlblib.PanicIfErrorExist(err)
 		serviceConfig.Token = token
 		s.Stop()
 		if !ok {
@@ -83,8 +82,8 @@ var addServiceCmd = &cobra.Command{
 		}
 
 		f, err := yaml.Marshal(config)
-		configFilePath, err := etc.GetConfigFilePath()
-		etc.PanicIfErrorExist(err)
+		configFilePath, err := hlblib.GetConfigFilePath()
+		hlblib.PanicIfErrorExist(err)
 		ioutil.WriteFile(configFilePath, f, 0666)
 	},
 }

@@ -5,13 +5,14 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/mpppk/gitany"
+
 	"path"
 
 	"time"
 
 	"github.com/AlecAivazis/survey"
 	"github.com/briandowns/spinner"
-	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/git"
 	"github.com/mpppk/hlb/hlblib"
 	"github.com/pkg/errors"
@@ -19,7 +20,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func chooseService(host string, config *etc.Config) (*etc.ServiceConfig, error) {
+func chooseService(host string, config *hlblib.Config) (*gitany.ServiceConfig, error) {
 	subConfig := config
 	if host != "" {
 		subConfig = config.FindServiceConfigs(host)
@@ -61,9 +62,9 @@ var createCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		var config etc.Config
+		var config hlblib.Config
 		err := viper.Unmarshal(&config)
-		etc.PanicIfErrorExist(errors.Wrap(err, "Error occurred when unmarshal viper config"))
+		hlblib.PanicIfErrorExist(errors.Wrap(err, "Error occurred when unmarshal viper config"))
 
 		host := ""
 		if len(args) > 0 {
@@ -76,10 +77,10 @@ var createCmd = &cobra.Command{
 			interactiveFlag = false
 		}
 
-		var serviceConfig *etc.ServiceConfig
+		var serviceConfig *gitany.ServiceConfig
 		if interactiveFlag {
 			serviceConfig, err = chooseService(host, &config)
-			etc.PanicIfErrorExist(errors.Wrap(err, "Error occurred while selecting the git service in create command"))
+			hlblib.PanicIfErrorExist(errors.Wrap(err, "Error occurred while selecting the git service in create command"))
 		} else {
 			serviceConfig = subConfig.Services[0]
 		}
@@ -89,18 +90,19 @@ var createCmd = &cobra.Command{
 			s.Start()
 		}
 
-		client, err := hlblib.GetClient(ctx, serviceConfig)
-		etc.PanicIfErrorExist(errors.Wrap(err, "Error occurred when client creating in create command"))
+		client, err := gitany.NewClient(ctx, serviceConfig)
+		hlblib.PanicIfErrorExist(errors.Wrap(err, "Error occurred when client creating in create command"))
 
 		currentDirPath, err := filepath.Abs(filepath.Dir(os.Args[0]))
-		etc.PanicIfErrorExist(errors.Wrap(err, "Retrieve current directory path is failed in create command"))
+		hlblib.PanicIfErrorExist(errors.Wrap(err, "Retrieve current directory path is failed in create command"))
 		currentDirName := path.Base(currentDirPath)
 
-		repo, err := client.GetRepositories().Create(ctx, currentDirName)
-		etc.PanicIfErrorExist(errors.Wrap(err, "Repository creating is failed in create command"))
+		newRepo := gitany.NewRepository(currentDirName)
+		repo, _, err := client.GetRepositories().Create(ctx, "", newRepo)
+		hlblib.PanicIfErrorExist(errors.Wrap(err, "Repository creating is failed in create command"))
 
 		_, err = git.SetRemote(".", "origin", repo.GetCloneURL())
-		etc.PanicIfErrorExist(errors.Wrap(err, "Remote URL setting is failed in create command"))
+		hlblib.PanicIfErrorExist(errors.Wrap(err, "Remote URL setting is failed in create command"))
 		s.Stop()
 	},
 }

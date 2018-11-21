@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/mpppk/hlb/etc"
+	"github.com/mpppk/hlb/hlblib"
 	"github.com/spf13/cobra"
 )
 
@@ -11,7 +11,7 @@ var browsemergerequestsCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		prCmd, _, err := cmd.Root().Find([]string{"browse", "pull-requests"})
-		etc.PanicIfErrorExist(err)
+		hlblib.PanicIfErrorExist(err)
 		prCmd.Run(prCmd, args)
 	},
 }
