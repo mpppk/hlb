@@ -2,12 +2,12 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/mpppk/gitany"
 
 	"os"
 
 	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/hlblib"
-	"github.com/mpppk/hlb/service"
 	"github.com/spf13/cobra"
 )
 
@@ -30,13 +30,13 @@ var createReleaseCmd = &cobra.Command{
 
 		title, message, err := editTitleAndMessage(DEFAULT_RELEASE_FILE_NAME, "", DEFAULT_CS)
 
-		newRelease := &service.NewRelease{
+		newRelease := &gitany.NewRelease{
 			TagName: args[0],
 			Name:    title,
 			Body:    message,
 		}
 
-		release, err :=  base.Client.GetRepositories().CreateRelease(base.Context, base.Remote.Owner, base.Remote.RepoName, newRelease)
+		release, _, err :=  base.Client.GetRepositories().CreateRelease(base.Context, base.Remote.Owner, base.Remote.RepoName, newRelease)
 
 		etc.PanicIfErrorExist(err)
 		fmt.Println(release.GetHTMLURL())

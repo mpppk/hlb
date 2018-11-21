@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"github.com/mpppk/gitany"
 	"os"
 	"path/filepath"
 
@@ -13,13 +14,12 @@ import (
 	"github.com/briandowns/spinner"
 	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/git"
-	"github.com/mpppk/hlb/hlblib"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-func chooseService(host string, config *etc.Config) (*etc.ServiceConfig, error) {
+func chooseService(host string, config *etc.Config) (*gitany.ServiceConfig, error) {
 	subConfig := config
 	if host != "" {
 		subConfig = config.FindServiceConfigs(host)
@@ -76,7 +76,7 @@ var createCmd = &cobra.Command{
 			interactiveFlag = false
 		}
 
-		var serviceConfig *etc.ServiceConfig
+		var serviceConfig *gitany.ServiceConfig
 		if interactiveFlag {
 			serviceConfig, err = chooseService(host, &config)
 			etc.PanicIfErrorExist(errors.Wrap(err, "Error occurred while selecting the git service in create command"))
@@ -89,14 +89,15 @@ var createCmd = &cobra.Command{
 			s.Start()
 		}
 
-		client, err := hlblib.GetClient(ctx, serviceConfig)
+		client, err := gitany.NewClient(ctx, serviceConfig)
 		etc.PanicIfErrorExist(errors.Wrap(err, "Error occurred when client creating in create command"))
 
 		currentDirPath, err := filepath.Abs(filepath.Dir(os.Args[0]))
 		etc.PanicIfErrorExist(errors.Wrap(err, "Retrieve current directory path is failed in create command"))
 		currentDirName := path.Base(currentDirPath)
 
-		repo, err := client.GetRepositories().Create(ctx, currentDirName)
+		newRepo := gitany.NewRepository(currentDirName)
+		repo, _, err := client.GetRepositories().Create(ctx, "", newRepo)
 		etc.PanicIfErrorExist(errors.Wrap(err, "Repository creating is failed in create command"))
 
 		_, err = git.SetRemote(".", "origin", repo.GetCloneURL())

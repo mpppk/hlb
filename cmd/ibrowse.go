@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/mpppk/gitany"
 	"io"
 	"os/exec"
 
@@ -11,19 +12,18 @@ import (
 	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/finder"
 	"github.com/mpppk/hlb/hlblib"
-	"github.com/mpppk/hlb/service"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/cobra"
 )
 
-func toFilterStringerFromIssues(issues []service.Issue) (fss []finder.FilterStringer) {
+func toFilterStringerFromIssues(issues []gitany.Issue) (fss []finder.FilterStringer) {
 	for _, fi := range finder.ToFilterableIssues(issues) {
 		fss = append(fss, finder.FilterStringer(fi))
 	}
 	return fss
 }
 
-func toFilterStringerFromPullRequests(pulls []service.PullRequest) (fss []finder.FilterStringer) {
+func toFilterStringerFromPullRequests(pulls []gitany.PullRequest) (fss []finder.FilterStringer) {
 	for _, fp := range finder.ToFilterablePullRequests(pulls) {
 		fss = append(fss, finder.FilterStringer(fp))
 	}
@@ -76,7 +76,12 @@ var ibrowseCmd = &cobra.Command{
 		pullsChan := make(chan []finder.FilterStringer)
 
 		go func() {
-			issues, err := base.Client.GetIssues().ListByRepo(base.Context, base.Remote.Owner, base.Remote.RepoName)
+			issues, _, err := base.Client.GetIssues().ListByRepo(
+				base.Context,
+				base.Remote.Owner,
+				base.Remote.RepoName,
+				nil,
+				)
 			etc.PanicIfErrorExist(err)
 			fstrs := toFilterStringerFromIssues(issues)
 			for _, fstr := range fstrs {

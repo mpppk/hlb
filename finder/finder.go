@@ -1,11 +1,11 @@
 package finder
 
 import (
-	"os/exec"
+	"github.com/mpppk/gitany"
 	"io"
-	"strings"
-	"github.com/mpppk/hlb/service"
+	"os/exec"
 	"strconv"
+	"strings"
 )
 
 type FilterStringer interface {
@@ -30,7 +30,7 @@ func (f *FilterableURL) FilterString() string{
 }
 
 type FilterableIssue struct {
-	service.Issue
+	gitany.Issue
 }
 
 func (f *FilterableIssue) GetURL() string{
@@ -41,7 +41,7 @@ func (f *FilterableIssue) FilterString() string{
 	return "#" + strconv.Itoa(f.GetNumber()) + " " + f.GetTitle()
 }
 
-func ToFilterableIssues(issues []service.Issue) (fis []*FilterableIssue) {
+func ToFilterableIssues(issues []gitany.Issue) (fis []*FilterableIssue) {
 	for _, issue := range issues {
 		fi := &FilterableIssue{Issue: issue}
 		fis = append(fis, fi)
@@ -50,7 +50,7 @@ func ToFilterableIssues(issues []service.Issue) (fis []*FilterableIssue) {
 }
 
 type FilterablePullRequest struct {
-	service.PullRequest
+	gitany.PullRequest
 }
 
 func (f *FilterablePullRequest) GetURL() string{
@@ -61,7 +61,7 @@ func (f *FilterablePullRequest) FilterString() string{
 	return "!" + strconv.Itoa(f.GetNumber()) + " " + f.GetTitle()
 }
 
-func ToFilterablePullRequests(pulls []service.PullRequest) (fis []*FilterablePullRequest) {
+func ToFilterablePullRequests(pulls []gitany.PullRequest) (fis []*FilterablePullRequest) {
 	for _, pull := range pulls {
 		fp := &FilterablePullRequest{PullRequest: pull}
 		fis = append(fis, fp)

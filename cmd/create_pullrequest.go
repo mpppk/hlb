@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/mpppk/gitany"
 	"os"
 	"os/exec"
 
@@ -14,11 +15,10 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/mpppk/gitany/github"
 	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/git"
-	"github.com/mpppk/hlb/github"
 	"github.com/mpppk/hlb/hlblib"
-	"github.com/mpppk/hlb/service"
 	"github.com/spf13/cobra"
 	gogit "gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
@@ -134,7 +134,7 @@ var createpullrequestCmd = &cobra.Command{
 		etc.PanicIfErrorExist(err)
 		//sw := hlblib.ClientWrapper{Base: base}
 
-		newPR := &service.NewPullRequest{
+		newPR := &gitany.NewPullRequest{
 			// TODO Set head owner from config file
 			HeadOwner:  base.Remote.Owner,
 			BaseBranch: baseBranch,

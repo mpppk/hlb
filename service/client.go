@@ -2,8 +2,7 @@ package service
 
 import (
 	"context"
-
-	"github.com/mpppk/hlb/etc"
+	"github.com/mpppk/gitany"
 )
 
 type NewPullRequest struct {
@@ -57,7 +56,7 @@ type Client interface {
 }
 
 type ClientGenerator interface {
-	New(ctx context.Context, serviceConfig *etc.ServiceConfig) (Client, error)
-	NewViaBasicAuth(ctx context.Context, serviceConfig *etc.ServiceConfig, username, pass string) (Client, error)
+	New(ctx context.Context, serviceConfig *gitany.ServiceConfig) (Client, error)
+	NewViaBasicAuth(ctx context.Context, serviceConfig *gitany.ServiceConfig, username, pass string) (Client, error)
 	GetType() string
 }

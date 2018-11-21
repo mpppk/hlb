@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/mpppk/gitany"
 	"io/ioutil"
 	"os"
 
@@ -19,7 +20,7 @@ var initCmd = &cobra.Command{
 		configFilePath, err := etc.GetConfigFilePath()
 		etc.PanicIfErrorExist(err)
 		if _, err := os.Stat(configFilePath); err != nil {
-			hosts := []*etc.ServiceConfig{
+			hosts := []*gitany.ServiceConfig{
 				{
 					Host:     "github.com",
 					Type:     "github",

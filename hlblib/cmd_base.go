@@ -3,19 +3,19 @@ package hlblib
 import (
 	"context"
 	"errors"
+	"github.com/mpppk/gitany"
 
 	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/git"
-	"github.com/mpppk/hlb/service"
 	"github.com/spf13/viper"
 )
 
 type CmdBase struct {
-	Context context.Context
-	Config  *etc.Config
-	Remote  *git.Remote
-	Host    *etc.ServiceConfig
-	Client  service.Client
+	Context       context.Context
+	Config        *etc.Config
+	Remote        *git.Remote
+	ServiceConfig *gitany.ServiceConfig
+	Client        gitany.Client
 }
 
 func NewCmdBase() (*CmdBase, error) {
@@ -32,21 +32,21 @@ func NewCmdBase() (*CmdBase, error) {
 		return nil, err
 	}
 
-	host, ok := config.FindServiceConfig(remote.ServiceHost)
+	serviceConfig, ok := config.FindServiceConfig(remote.ServiceHost)
 	if !ok {
-		errors.New("host not found" + remote.ServiceHost)
+		return nil, errors.New("serviceConfig not found" + remote.ServiceHost)
 	}
 
-	client, err := GetClient(ctx, host)
+	client, err := gitany.NewClient(ctx, serviceConfig)
 	if err != nil {
 		return nil, err
 	}
 
 	return &CmdBase{
-		Context: ctx,
-		Config:  &config,
-		Remote:  remote,
-		Host:    host,
-		Client:  client,
+		Context:       ctx,
+		Config:        &config,
+		Remote:        remote,
+		ServiceConfig: serviceConfig,
+		Client:        client,
 	}, nil
 }

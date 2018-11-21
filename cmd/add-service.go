@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"github.com/mpppk/gitany"
 	"io/ioutil"
 	"net/url"
 	"os"
@@ -12,7 +13,6 @@ import (
 	"github.com/AlecAivazis/survey"
 	"github.com/briandowns/spinner"
 	"github.com/mpppk/hlb/etc"
-	"github.com/mpppk/hlb/hlblib"
 	"github.com/mpppk/hlb/service"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -59,7 +59,7 @@ var addServiceCmd = &cobra.Command{
 
 			}
 		} else {
-			serviceConfig = &etc.ServiceConfig{
+			serviceConfig = &gitany.ServiceConfig{
 				Host:     parsedUrl.Host,
 				Type:     serviceType,
 				Token:    "",
@@ -71,7 +71,7 @@ var addServiceCmd = &cobra.Command{
 
 		s := spinner.New(spinner.CharSets[14], 100*time.Millisecond) // Build our new spinner
 		s.Start()                                                    // Start the spinner
-		token, err := hlblib.CreateToken(ctx, serviceConfig, username, password)
+		token, err := gitany.CreateToken(ctx, serviceConfig, username, password)
 		etc.PanicIfErrorExist(err)
 		serviceConfig.Token = token
 		s.Stop()

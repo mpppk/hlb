@@ -1,6 +1,7 @@
 package etc
 
 import (
+	"github.com/mpppk/gitany"
 	"path"
 	"strings"
 
@@ -10,19 +11,12 @@ import (
 
 type HostType int
 
-type ServiceConfig struct {
-	Host     string
-	Type     string
-	Token    string `mapstructure:"oauth_token" yaml:"oauth_token"`
-	Protocol string
-}
-
 type Config struct {
-	Services []*ServiceConfig
+	Services []*gitany.ServiceConfig
 }
 
-func (c *Config) FindServiceConfig(host string) (*ServiceConfig, bool) {
-	var matchedHosts []*ServiceConfig
+func (c *Config) FindServiceConfig(host string) (*gitany.ServiceConfig, bool) {
+	var matchedHosts []*gitany.ServiceConfig
 	for _, h := range c.Services {
 		if strings.Contains(host, h.Host) {
 			matchedHosts = append(matchedHosts, h)
@@ -60,7 +54,7 @@ func (c *Config) FindServiceConfig(host string) (*ServiceConfig, bool) {
 }
 
 func (c *Config) FindServiceConfigs(host string) *Config {
-	var serviceConfigs []*ServiceConfig
+	var serviceConfigs []*gitany.ServiceConfig
 	for _, s := range c.Services {
 		if strings.Contains(s.Host, host) {
 			serviceConfigs = append(serviceConfigs, s)
