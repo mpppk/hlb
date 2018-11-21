@@ -3,8 +3,6 @@ package cmd
 import (
 	"fmt"
 
-	"os"
-
 	"github.com/mpppk/hlb/hlblib"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/cobra"
@@ -18,17 +16,6 @@ var browseCmd = &cobra.Command{
 	Short: "browse repo",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) > 0 {
-			fmt.Printf(`Unknown subcommand "%v" for "browse"`, args[0])
-			fmt.Println("\nDid you mean this?")
-
-			suggestedCmdNames := cmd.SuggestionsFor(args[0])
-			for _, s := range suggestedCmdNames {
-				fmt.Println("\t", s)
-			}
-			os.Exit(1)
-		}
-
 		base, err := hlblib.NewCmdBase()
 		hlblib.PanicIfErrorExist(err)
 		url, err := base.Client.GetRepositories().GetURL(base.Remote.Owner, base.Remote.RepoName)
