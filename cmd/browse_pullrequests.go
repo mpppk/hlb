@@ -11,9 +11,10 @@ import (
 )
 
 var browsepullrequestsCmd = &cobra.Command{
-	Use:   "pull-requests",
-	Short: "browse pull-requests",
-	Long:  ``,
+	Aliases: []string{"merge-requests"},
+	Use:     "pull-requests",
+	Short:   "browse pull-requests",
+	Long:    ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) > 1 {
 			fmt.Println("Too many issue IDs")
