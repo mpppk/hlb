@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/mpppk/gitany"
 
 	"os"
 
-	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/hlblib"
 	"github.com/spf13/cobra"
 )
@@ -21,7 +21,7 @@ var createReleaseCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		base, err := hlblib.NewCmdBase()
-		etc.PanicIfErrorExist(err)
+		hlblib.PanicIfErrorExist(err)
 
 		if len(args) < 1 {
 			fmt.Println("Missed argument TAG")
@@ -36,9 +36,9 @@ var createReleaseCmd = &cobra.Command{
 			Body:    message,
 		}
 
-		release, _, err :=  base.Client.GetRepositories().CreateRelease(base.Context, base.Remote.Owner, base.Remote.RepoName, newRelease)
+		release, _, err := base.Client.GetRepositories().CreateRelease(base.Context, base.Remote.Owner, base.Remote.RepoName, newRelease)
 
-		etc.PanicIfErrorExist(err)
+		hlblib.PanicIfErrorExist(err)
 		fmt.Println(release.GetHTMLURL())
 	},
 }

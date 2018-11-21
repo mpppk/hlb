@@ -1,15 +1,15 @@
 package cmd
 
 import (
-	"github.com/mpppk/gitany"
 	"io"
 	"os/exec"
+
+	"github.com/mpppk/gitany"
 
 	"os"
 
 	"strings"
 
-	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/finder"
 	"github.com/mpppk/hlb/hlblib"
 	"github.com/skratchdot/open-golang/open"
@@ -36,24 +36,24 @@ var ibrowseCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		base, err := hlblib.NewCmdBase()
-		etc.PanicIfErrorExist(err)
+		hlblib.PanicIfErrorExist(err)
 
 		var list []finder.FilterStringer
 
 		repoUrl, err := base.Client.GetRepositories().GetURL(base.Remote.Owner, base.Remote.RepoName)
-		etc.PanicIfErrorExist(err)
+		hlblib.PanicIfErrorExist(err)
 		issuesUrl, err := base.Client.GetIssues().GetIssuesURL(base.Remote.Owner, base.Remote.RepoName)
-		etc.PanicIfErrorExist(err)
+		hlblib.PanicIfErrorExist(err)
 		pullsUrl, err := base.Client.GetPullRequests().GetPullRequestsURL(base.Remote.Owner, base.Remote.RepoName)
-		etc.PanicIfErrorExist(err)
+		hlblib.PanicIfErrorExist(err)
 		commitsUrl, err := base.Client.GetRepositories().GetCommitsURL(base.Remote.Owner, base.Remote.RepoName)
-		etc.PanicIfErrorExist(err)
+		hlblib.PanicIfErrorExist(err)
 		projectsUrl, err := base.Client.GetProjects().GetProjectsURL(base.Remote.Owner, base.Remote.RepoName)
-		etc.PanicIfErrorExist(err)
+		hlblib.PanicIfErrorExist(err)
 		milestonesUrl, err := base.Client.GetRepositories().GetMilestonesURL(base.Remote.Owner, base.Remote.RepoName)
-		etc.PanicIfErrorExist(err)
+		hlblib.PanicIfErrorExist(err)
 		wikisUrl, err := base.Client.GetRepositories().GetWikisURL(base.Remote.Owner, base.Remote.RepoName)
-		etc.PanicIfErrorExist(err)
+		hlblib.PanicIfErrorExist(err)
 
 		list = append(list,
 			&finder.FilterableURL{URL: repoUrl, String: "*repo"},
@@ -81,8 +81,8 @@ var ibrowseCmd = &cobra.Command{
 				base.Remote.Owner,
 				base.Remote.RepoName,
 				nil,
-				)
-			etc.PanicIfErrorExist(err)
+			)
+			hlblib.PanicIfErrorExist(err)
 			fstrs := toFilterStringerFromIssues(issues)
 			for _, fstr := range fstrs {
 				io.WriteString(stdin, fstr.FilterString()+"\n")
@@ -92,7 +92,7 @@ var ibrowseCmd = &cobra.Command{
 
 		go func() {
 			pulls, err := base.Client.GetPullRequests().List(base.Context, base.Remote.Owner, base.Remote.RepoName)
-			etc.PanicIfErrorExist(err)
+			hlblib.PanicIfErrorExist(err)
 			fstrs := toFilterStringerFromPullRequests(pulls)
 			for _, fstr := range fstrs {
 				io.WriteString(stdin, fstr.FilterString()+"\n")
@@ -117,7 +117,7 @@ var ibrowseCmd = &cobra.Command{
 		}
 
 		stdin.Close()
-		etc.PanicIfErrorExist(err)
+		hlblib.PanicIfErrorExist(err)
 
 		selectedStr := strings.TrimSpace(string(out))
 		selectedStr = strings.Trim(selectedStr, "\n")

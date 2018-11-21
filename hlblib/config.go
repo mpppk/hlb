@@ -1,4 +1,4 @@
-package etc
+package hlblib
 
 import (
 	"github.com/mpppk/gitany"
@@ -80,10 +80,10 @@ func GetConfigFileName() string {
 
 func GetConfigDirPath() (string, error) {
 	dir, err := homedir.Dir()
-	return path.Join(dir, GetConfigDirName()), errors.Wrap(err, "Error occurred in etc.GetConfigDirPath")
+	return path.Join(dir, GetConfigDirName()), errors.Wrap(err, "Error occurred in hlblib.GetConfigDirPath")
 }
 
 func GetConfigFilePath() (string, error) {
 	configDirPath, err := GetConfigDirPath()
-	return path.Join(configDirPath, GetConfigFileName()), errors.Wrap(err, "Error occurred in etc.GetConfigFilePath")
+	return path.Join(configDirPath, GetConfigFileName()), errors.Wrap(err, "Error occurred in hlblib.GetConfigFilePath")
 }

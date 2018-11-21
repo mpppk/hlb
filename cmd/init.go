@@ -2,11 +2,12 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/mpppk/gitany"
 	"io/ioutil"
 	"os"
 
-	"github.com/mpppk/hlb/etc"
+	"github.com/mpppk/gitany"
+	"github.com/mpppk/hlb/hlblib"
+
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 )
@@ -17,8 +18,8 @@ var initCmd = &cobra.Command{
 	Short: "Generate setting file to ~/.config/hlb",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		configFilePath, err := etc.GetConfigFilePath()
-		etc.PanicIfErrorExist(err)
+		configFilePath, err := hlblib.GetConfigFilePath()
+		hlblib.PanicIfErrorExist(err)
 		if _, err := os.Stat(configFilePath); err != nil {
 			hosts := []*gitany.ServiceConfig{
 				{
@@ -35,14 +36,14 @@ var initCmd = &cobra.Command{
 				},
 			}
 
-			config := etc.Config{Services: hosts}
+			config := hlblib.Config{Services: hosts}
 			f, err := yaml.Marshal(config)
-			etc.PanicIfErrorExist(err)
-			configFileDirPath, err := etc.GetConfigDirPath()
+			hlblib.PanicIfErrorExist(err)
+			configFileDirPath, err := hlblib.GetConfigDirPath()
 			err = os.MkdirAll(configFileDirPath, 0777)
-			etc.PanicIfErrorExist(err)
+			hlblib.PanicIfErrorExist(err)
 			err = ioutil.WriteFile(configFilePath, f, 0666)
-			etc.PanicIfErrorExist(err)
+			hlblib.PanicIfErrorExist(err)
 		} else {
 			fmt.Println("config file already exist:", configFilePath)
 		}

@@ -5,7 +5,6 @@ import (
 
 	"os"
 
-	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/hlblib"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/cobra"
@@ -31,10 +30,10 @@ var browseCmd = &cobra.Command{
 		}
 
 		base, err := hlblib.NewCmdBase()
-		etc.PanicIfErrorExist(err)
+		hlblib.PanicIfErrorExist(err)
 		url, err := base.Client.GetRepositories().GetURL(base.Remote.Owner, base.Remote.RepoName)
 
-		etc.PanicIfErrorExist(err)
+		hlblib.PanicIfErrorExist(err)
 
 		if urlFlag {
 			fmt.Println(url)

@@ -3,25 +3,25 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/spf13/cobra"
-	"github.com/mpppk/hlb/hlblib"
 	"strconv"
-	"github.com/mpppk/hlb/etc"
+
+	"github.com/mpppk/hlb/hlblib"
+	"github.com/spf13/cobra"
 )
 
 // listpullrequestsCmd represents the listpullrequests command
 var listpullrequestsCmd = &cobra.Command{
 	Use:   "pull-requests",
 	Short: "list pull-requests",
-	Long: ``,
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		base, err := hlblib.NewCmdBase()
-		etc.PanicIfErrorExist(err)
+		hlblib.PanicIfErrorExist(err)
 
 		//pulls, err := sw.GetPullRequests()
 		pulls, err := base.Client.GetPullRequests().List(base.Context, base.Remote.Owner, base.Remote.RepoName)
 
-		etc.PanicIfErrorExist(err)
+		hlblib.PanicIfErrorExist(err)
 
 		for _, pull := range pulls {
 			info := "#" + strconv.Itoa(pull.GetNumber()) + " " + pull.GetTitle()

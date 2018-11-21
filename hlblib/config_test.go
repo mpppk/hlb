@@ -1,4 +1,4 @@
-package etc
+package hlblib
 
 import (
 	"github.com/mpppk/gitany"

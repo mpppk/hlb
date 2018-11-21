@@ -1,9 +1,10 @@
 package cmd
 
 import (
-	"github.com/mpppk/gitany"
 	"os"
 	"os/exec"
+
+	"github.com/mpppk/gitany"
 
 	"io/ioutil"
 
@@ -16,7 +17,6 @@ import (
 	"strings"
 
 	"github.com/mpppk/gitany/github"
-	"github.com/mpppk/hlb/etc"
 	"github.com/mpppk/hlb/git"
 	"github.com/mpppk/hlb/hlblib"
 	"github.com/spf13/cobra"
@@ -69,10 +69,10 @@ func getInitMessage(baseBranch string) string {
 
 	r, err := gogit.PlainOpen(".")
 	logs, err := r.Log(&gogit.LogOptions{})
-	etc.PanicIfErrorExist(err)
+	hlblib.PanicIfErrorExist(err)
 
 	branches, err := r.Branches()
-	etc.PanicIfErrorExist(err)
+	hlblib.PanicIfErrorExist(err)
 	var baseBranchHash plumbing.Hash
 	branches.ForEach(func(ref *plumbing.Reference) error {
 		if ref.Name().Short() == baseBranch {
@@ -96,12 +96,12 @@ func getInitMessage(baseBranch string) string {
 func editTitleAndMessage(pullreqFileName, initMsg, cs string) (title, body string, err error) {
 	// TODO Add commit logs
 	comments, err := github.RenderPullRequestTpl(initMsg, cs, baseBranch, headBranch, "")
-	etc.PanicIfErrorExist(err)
+	hlblib.PanicIfErrorExist(err)
 
 	ioutil.WriteFile(pullreqFileName, []byte(comments), 0777)
 
 	editorName, err := git.GetEditorName()
-	etc.PanicIfErrorExist(err)
+	hlblib.PanicIfErrorExist(err)
 
 	c := exec.Command(editorName, pullreqFileName)
 	vimr := regexp.MustCompile("[mg]?vi[m]$")
@@ -116,10 +116,10 @@ func editTitleAndMessage(pullreqFileName, initMsg, cs string) (title, body strin
 	c.Run()
 
 	contents, err := ioutil.ReadFile(pullreqFileName)
-	etc.PanicIfErrorExist(err)
+	hlblib.PanicIfErrorExist(err)
 
 	err = os.Remove(pullreqFileName)
-	etc.PanicIfErrorExist(err)
+	hlblib.PanicIfErrorExist(err)
 
 	return readTitleAndMessage(bytes.NewReader(contents), cs)
 }
@@ -131,7 +131,7 @@ var createpullrequestCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		base, err := hlblib.NewCmdBase()
-		etc.PanicIfErrorExist(err)
+		hlblib.PanicIfErrorExist(err)
 		//sw := hlblib.ClientWrapper{Base: base}
 
 		newPR := &gitany.NewPullRequest{
@@ -143,7 +143,7 @@ var createpullrequestCmd = &cobra.Command{
 
 		if headBranch == "" {
 			headBranch, err = git.GetCurrentBranch(".")
-			etc.PanicIfErrorExist(err)
+			hlblib.PanicIfErrorExist(err)
 		}
 		newPR.HeadBranch = headBranch
 
@@ -155,13 +155,13 @@ var createpullrequestCmd = &cobra.Command{
 		} else {
 			title, body, err = readTitleAndMessage(strings.NewReader(argMessage), DEFAULT_CS)
 		}
-		etc.PanicIfErrorExist(err)
+		hlblib.PanicIfErrorExist(err)
 		newPR.Title = title
 		newPR.Body = body
 
 		pr, err := base.Client.GetPullRequests().Create(base.Context, base.Remote.RepoName, newPR)
 
-		etc.PanicIfErrorExist(err)
+		hlblib.PanicIfErrorExist(err)
 		fmt.Println(pr.GetHTMLURL())
 	},
 }

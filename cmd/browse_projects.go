@@ -3,11 +3,11 @@ package cmd
 import (
 	"strconv"
 
-	"github.com/mpppk/hlb/etc"
+	"fmt"
+
 	"github.com/mpppk/hlb/hlblib"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/cobra"
-	"fmt"
 )
 
 var browseprojectsCmd = &cobra.Command{
@@ -16,19 +16,19 @@ var browseprojectsCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		base, err := hlblib.NewCmdBase()
-		etc.PanicIfErrorExist(err)
+		hlblib.PanicIfErrorExist(err)
 
 		var url string
 		if len(args) == 0 {
 			u, err := base.Client.GetProjects().GetProjectsURL(base.Remote.Owner, base.Remote.RepoName)
-			etc.PanicIfErrorExist(err)
+			hlblib.PanicIfErrorExist(err)
 			url = u
 		} else {
 			id, err := strconv.Atoi(args[0])
-			etc.PanicIfErrorExist(err)
+			hlblib.PanicIfErrorExist(err)
 
-			u, err :=  base.Client.GetProjects().GetURL(base.Remote.Owner, base.Remote.RepoName, id)
-			etc.PanicIfErrorExist(err)
+			u, err := base.Client.GetProjects().GetURL(base.Remote.Owner, base.Remote.RepoName, id)
+			hlblib.PanicIfErrorExist(err)
 			url = u
 		}
 
