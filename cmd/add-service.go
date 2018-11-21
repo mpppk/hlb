@@ -13,7 +13,6 @@ import (
 	"github.com/AlecAivazis/survey"
 	"github.com/briandowns/spinner"
 	"github.com/mpppk/hlb/etc"
-	"github.com/mpppk/hlb/service"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
@@ -67,7 +66,7 @@ var addServiceCmd = &cobra.Command{
 			}
 		}
 
-		username, password := service.PromptUserAndPassword(serviceType)
+		username, password := gitany.PromptUserAndPassword(serviceType)
 
 		s := spinner.New(spinner.CharSets[14], 100*time.Millisecond) // Build our new spinner
 		s.Start()                                                    // Start the spinner

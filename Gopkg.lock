@@ -511,7 +511,6 @@
     "github.com/spf13/cobra",
     "github.com/spf13/viper",
     "github.com/tcnksm/go-gitconfig",
-    "golang.org/x/crypto/ssh/terminal",
     "gopkg.in/src-d/go-git.v4",
     "gopkg.in/src-d/go-git.v4/config",
     "gopkg.in/src-d/go-git.v4/plumbing",
