@@ -25,7 +25,9 @@ var browseCmd = &cobra.Command{
 		if urlFlag {
 			fmt.Println(url)
 		} else {
-			open.Run(url)
+			if err := open.Run(url); err != nil {
+				hlblib.PanicIfErrorExist(err)
+			}
 		}
 	},
 }
