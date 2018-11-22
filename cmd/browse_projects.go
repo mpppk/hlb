@@ -11,9 +11,10 @@ import (
 )
 
 var browseprojectsCmd = &cobra.Command{
-	Use:   "projects",
-	Short: "browse projects",
-	Long:  ``,
+	Aliases: []string{"boards"},
+	Use:     "projects",
+	Short:   "browse projects",
+	Long:    ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		base, err := hlblib.NewCmdBase()
 		hlblib.PanicIfErrorExist(err)
