@@ -169,7 +169,7 @@
   version = "v1.1.2"
 
 [[projects]]
-  digest = "1:64e40f92f5d7a3f480e8636a016c66aaeaff431d1935c2a08aadfab38bf88232"
+  digest = "1:b2a15525faf5cce4d016b3b3adb7a56b58bb7bfeee9810a7bd83379b0052178b"
   name = "github.com/mpppk/gitany"
   packages = [
     ".",
@@ -177,8 +177,8 @@
     "gitlab",
   ]
   pruneopts = ""
-  revision = "c75d4b3ce4846e98f04e539e546f6d577f3580a6"
-  version = "v0.0.3"
+  revision = "76ee0a0de56238d94eeca64651573a7a31238161"
+  version = "v0.0.4"
 
 [[projects]]
   digest = "1:7c4a3dfaf6a6a70d05954f9eab61be866456a9056e8eba065b7e3a4907203a92"
