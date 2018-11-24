@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"io"
 	"os/exec"
 
@@ -35,7 +36,7 @@ var ibrowseCmd = &cobra.Command{
 	Short: "Browse interactive",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		base, err := hlblib.NewCmdBase()
+		base, err := hlblib.NewCmdContext()
 		hlblib.PanicIfErrorExist(err)
 
 		var list []finder.FilterStringer
@@ -75,9 +76,10 @@ var ibrowseCmd = &cobra.Command{
 		issuesChan := make(chan []finder.FilterStringer)
 		pullsChan := make(chan []finder.FilterStringer)
 
+		ctx := context.Background()
 		go func() {
 			issues, _, err := base.Client.GetIssues().ListByRepo(
-				base.Context,
+				ctx,
 				base.Remote.Owner,
 				base.Remote.RepoName,
 				nil,
@@ -91,7 +93,7 @@ var ibrowseCmd = &cobra.Command{
 		}()
 
 		go func() {
-			pulls, err := base.Client.GetPullRequests().List(base.Context, base.Remote.Owner, base.Remote.RepoName)
+			pulls, err := base.Client.GetPullRequests().List(ctx, base.Remote.Owner, base.Remote.RepoName)
 			hlblib.PanicIfErrorExist(err)
 			fstrs := toFilterStringerFromPullRequests(pulls)
 			for _, fstr := range fstrs {

@@ -16,7 +16,7 @@ var browseprojectsCmd = &cobra.Command{
 	Short:   "browse projects",
 	Long:    ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		base, err := hlblib.NewCmdBase()
+		base, err := hlblib.NewCmdContext()
 		hlblib.PanicIfErrorExist(err)
 
 		var url string

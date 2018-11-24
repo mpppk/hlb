@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"os"
 	"os/exec"
 
@@ -130,7 +131,7 @@ var createpullrequestCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		base, err := hlblib.NewCmdBase()
+		base, err := hlblib.NewCmdContext()
 		hlblib.PanicIfErrorExist(err)
 		//sw := hlblib.ClientWrapper{Base: base}
 
@@ -159,7 +160,8 @@ var createpullrequestCmd = &cobra.Command{
 		newPR.Title = title
 		newPR.Body = body
 
-		pr, err := base.Client.GetPullRequests().Create(base.Context, base.Remote.RepoName, newPR)
+		ctx := context.Background()
+		pr, err := base.Client.GetPullRequests().Create(ctx, base.Remote.RepoName, newPR)
 
 		hlblib.PanicIfErrorExist(err)
 		fmt.Println(pr.GetHTMLURL())

@@ -1,24 +1,25 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-	"github.com/mpppk/hlb/hlblib"
-	"github.com/skratchdot/open-golang/open"
 	"fmt"
 	"strconv"
+
+	"github.com/mpppk/hlb/hlblib"
+	"github.com/skratchdot/open-golang/open"
+	"github.com/spf13/cobra"
 )
 
 // browseissuesCmd represents the browseissues command
 var browseissuesCmd = &cobra.Command{
 	Use:   "issues",
 	Short: "browse issues",
-	Long: `browse issues`,
+	Long:  `browse issues`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) > 1 {
 			fmt.Println("Too many issue IDs")
 		}
 
-		base, err := hlblib.NewCmdBase()
+		base, err := hlblib.NewCmdContext()
 		hlblib.PanicIfErrorExist(err)
 
 		var url string
@@ -26,7 +27,7 @@ var browseissuesCmd = &cobra.Command{
 			u, err := base.Client.GetIssues().GetIssuesURL(base.Remote.Owner, base.Remote.RepoName)
 			hlblib.PanicIfErrorExist(err)
 			url = u
-		}else {
+		} else {
 			id, err := strconv.Atoi(args[0])
 			hlblib.PanicIfErrorExist(err)
 

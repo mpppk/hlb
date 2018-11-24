@@ -17,7 +17,7 @@ var browsecommitsCmd = &cobra.Command{
 			fmt.Println("warning: `browse commits` does not accept any args. They are ignored.")
 		}
 
-		base, err := hlblib.NewCmdBase()
+		base, err := hlblib.NewCmdContext()
 		hlblib.PanicIfErrorExist(err)
 		url, err := base.Client.GetRepositories().GetCommitsURL(base.Remote.Owner, base.Remote.RepoName)
 		hlblib.PanicIfErrorExist(err)

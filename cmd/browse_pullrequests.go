@@ -20,7 +20,7 @@ var browsepullrequestsCmd = &cobra.Command{
 			fmt.Println("Too many issue IDs")
 		}
 
-		base, err := hlblib.NewCmdBase()
+		base, err := hlblib.NewCmdContext()
 		hlblib.PanicIfErrorExist(err)
 
 		var url string

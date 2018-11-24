@@ -18,12 +18,12 @@ var browsemilestonesCmd = &cobra.Command{
 			fmt.Println("Too many milestone IDs")
 		}
 
-		base, err := hlblib.NewCmdBase()
+		base, err := hlblib.NewCmdContext()
 		hlblib.PanicIfErrorExist(err)
 
 		var url string
 		if len(args) == 0 {
-			u, err :=  base.Client.GetRepositories().GetMilestonesURL(base.Remote.Owner, base.Remote.RepoName)
+			u, err := base.Client.GetRepositories().GetMilestonesURL(base.Remote.Owner, base.Remote.RepoName)
 			hlblib.PanicIfErrorExist(err)
 			url = u
 
@@ -31,7 +31,7 @@ var browsemilestonesCmd = &cobra.Command{
 			id, err := strconv.Atoi(args[0])
 			hlblib.PanicIfErrorExist(err)
 
-			u, err :=  base.Client.GetRepositories().GetMilestoneURL(base.Remote.Owner, base.Remote.RepoName, id)
+			u, err := base.Client.GetRepositories().GetMilestoneURL(base.Remote.Owner, base.Remote.RepoName, id)
 			hlblib.PanicIfErrorExist(err)
 			url = u
 		}

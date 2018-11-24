@@ -10,15 +10,13 @@ import (
 	"github.com/spf13/viper"
 )
 
-type CmdBase struct {
-	Context       context.Context
-	Config        *Config
+type CmdContext struct {
 	Remote        *git.Remote
 	ServiceConfig *gitany.ServiceConfig
 	Client        gitany.Client
 }
 
-func NewCmdBase() (*CmdBase, error) {
+func NewCmdContext() (*CmdContext, error) {
 	ctx := context.Background()
 
 	var config Config
@@ -42,9 +40,7 @@ func NewCmdBase() (*CmdBase, error) {
 		return nil, err
 	}
 
-	return &CmdBase{
-		Context:       ctx,
-		Config:        &config,
+	return &CmdContext{
 		Remote:        remote,
 		ServiceConfig: serviceConfig,
 		Client:        client,

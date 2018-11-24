@@ -17,7 +17,7 @@ var browsewikisCmd = &cobra.Command{
 			fmt.Println("warning: `browse wikis` does not accept any args. They are ignored.")
 		}
 
-		base, err := hlblib.NewCmdBase()
+		base, err := hlblib.NewCmdContext()
 		hlblib.PanicIfErrorExist(err)
 		url, err := base.Client.GetRepositories().GetWikisURL(base.Remote.Owner, base.Remote.RepoName)
 

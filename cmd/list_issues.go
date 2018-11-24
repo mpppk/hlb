@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 
 	"strconv"
@@ -15,9 +16,11 @@ var listissuesCmd = &cobra.Command{
 	Short: "List issues",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		base, err := hlblib.NewCmdBase()
+		base, err := hlblib.NewCmdContext()
 		hlblib.PanicIfErrorExist(err)
-		issues, _, err := base.Client.GetIssues().ListByRepo(base.Context, base.Remote.Owner, base.Remote.RepoName, nil)
+
+		ctx := context.Background()
+		issues, _, err := base.Client.GetIssues().ListByRepo(ctx, base.Remote.Owner, base.Remote.RepoName, nil)
 		hlblib.PanicIfErrorExist(err)
 
 		for _, issue := range issues {

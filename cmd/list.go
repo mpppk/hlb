@@ -17,7 +17,7 @@ var listCmd = &cobra.Command{
 		fmt.Println("list called")
 	},
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		base, _ := hlblib.NewCmdBase()
+		base, _ := hlblib.NewCmdContext()
 		if base.ServiceConfig.Token == "" && base.ServiceConfig.Type == "github" {
 			addServiceCmd.Run(nil, nil)
 		}
