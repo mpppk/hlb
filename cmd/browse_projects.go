@@ -3,44 +3,32 @@ package cmd
 import (
 	"strconv"
 
-	"fmt"
+	"github.com/pkg/errors"
 
 	"github.com/mpppk/hlb/hlblib"
-	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/cobra"
 )
 
-var browseprojectsCmd = &cobra.Command{
-	Aliases: []string{"boards"},
-	Use:     "projects",
-	Short:   "browse projects",
-	Long:    ``,
-	Run: func(cmd *cobra.Command, args []string) {
-		base, err := hlblib.NewCmdContext()
-		hlblib.PanicIfErrorExist(err)
-
-		var url string
-		if len(args) == 0 {
-			u, err := base.Client.GetProjects().GetProjectsURL(base.Remote.Owner, base.Remote.RepoName)
-			hlblib.PanicIfErrorExist(err)
-			url = u
-		} else {
-			id, err := strconv.Atoi(args[0])
-			hlblib.PanicIfErrorExist(err)
-
-			u, err := base.Client.GetProjects().GetURL(base.Remote.Owner, base.Remote.RepoName, id)
-			hlblib.PanicIfErrorExist(err)
-			url = u
-		}
-
-		if urlFlag {
-			fmt.Println(url)
-		} else {
-			open.Run(url)
-		}
-	},
+func NewCmdBrowseProjects(cmdContextFunc func() (*hlblib.CmdContext, error)) *cobra.Command {
+	cmd := &cobra.Command{
+		Args:  MaximumNumArgs(1),
+		Use:   "projects",
+		Short: "browse projects",
+		Long:  ``,
+		RunE: NewBrowseCmdFunc(cmdContextFunc, func(cmdContext *hlblib.CmdContext, args []string) (string, error) {
+			if len(args) == 0 {
+				u, err := cmdContext.Client.GetProjects().GetProjectsURL(cmdContext.Remote.Owner, cmdContext.Remote.RepoName)
+				return u, errors.Wrap(err, "failed to fetch projects URL for browse")
+			} else {
+				id, _ := strconv.Atoi(args[0])
+				u, err := cmdContext.Client.GetProjects().GetURL(cmdContext.Remote.Owner, cmdContext.Remote.RepoName, id)
+				return u, errors.Wrap(err, "failed to fetch project URL for browse")
+			}
+		}),
+	}
+	return cmd
 }
 
 func init() {
-	browseCmd.AddCommand(browseprojectsCmd)
+	browseCmd.AddCommand(NewCmdBrowseProjects(hlblib.NewCmdContext))
 }

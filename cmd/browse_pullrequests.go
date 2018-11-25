@@ -1,50 +1,34 @@
 package cmd
 
 import (
-	"fmt"
-
 	"strconv"
 
+	"github.com/pkg/errors"
+
 	"github.com/mpppk/hlb/hlblib"
-	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/cobra"
 )
 
-var browsepullrequestsCmd = &cobra.Command{
-	Aliases: []string{"merge-requests"},
-	Use:     "pull-requests",
-	Short:   "browse pull-requests",
-	Long:    ``,
-	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) > 1 {
-			fmt.Println("Too many issue IDs")
-		}
-
-		base, err := hlblib.NewCmdContext()
-		hlblib.PanicIfErrorExist(err)
-
-		var url string
-		if len(args) == 0 {
-			u, err := base.Client.GetPullRequests().GetPullRequestsURL(base.Remote.Owner, base.Remote.RepoName)
-			hlblib.PanicIfErrorExist(err)
-			url = u
-		} else {
-			id, err := strconv.Atoi(args[0])
-			hlblib.PanicIfErrorExist(err)
-
-			u, err := base.Client.GetPullRequests().GetURL(base.Remote.Owner, base.Remote.RepoName, id)
-			hlblib.PanicIfErrorExist(err)
-			url = u
-		}
-
-		if urlFlag {
-			fmt.Println(url)
-		} else {
-			open.Run(url)
-		}
-	},
+func NewCmdBrowsePullRequests(cmdContextFunc func() (*hlblib.CmdContext, error)) *cobra.Command {
+	cmd := &cobra.Command{
+		Args:  MaximumNumArgs(1),
+		Use:   "pull-requests",
+		Short: "browse pull-requests",
+		Long:  ``,
+		RunE: NewBrowseCmdFunc(cmdContextFunc, func(cmdContext *hlblib.CmdContext, args []string) (string, error) {
+			if len(args) == 0 {
+				u, err := cmdContext.Client.GetPullRequests().GetPullRequestsURL(cmdContext.Remote.Owner, cmdContext.Remote.RepoName)
+				return u, errors.Wrap(err, "failed to fetch pull requests URL for browse")
+			} else {
+				id, _ := strconv.Atoi(args[0])
+				u, err := cmdContext.Client.GetPullRequests().GetURL(cmdContext.Remote.Owner, cmdContext.Remote.RepoName, id)
+				return u, errors.Wrap(err, "failed to fetch pull request URL for browse")
+			}
+		}),
+	}
+	return cmd
 }
 
 func init() {
-	browseCmd.AddCommand(browsepullrequestsCmd)
+	browseCmd.AddCommand(NewCmdBrowsePullRequests(hlblib.NewCmdContext))
 }
