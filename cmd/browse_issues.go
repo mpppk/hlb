@@ -1,48 +1,34 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-	"github.com/mpppk/hlb/hlblib"
-	"github.com/skratchdot/open-golang/open"
-	"fmt"
 	"strconv"
+
+	"github.com/mpppk/hlb/hlblib"
+	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
 )
 
-// browseissuesCmd represents the browseissues command
-var browseissuesCmd = &cobra.Command{
-	Use:   "issues",
-	Short: "browse issues",
-	Long: `browse issues`,
-	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) > 1 {
-			fmt.Println("Too many issue IDs")
-		}
-
-		base, err := hlblib.NewCmdBase()
-		hlblib.PanicIfErrorExist(err)
-
-		var url string
-		if len(args) == 0 {
-			u, err := base.Client.GetIssues().GetIssuesURL(base.Remote.Owner, base.Remote.RepoName)
-			hlblib.PanicIfErrorExist(err)
-			url = u
-		}else {
-			id, err := strconv.Atoi(args[0])
-			hlblib.PanicIfErrorExist(err)
-
-			u, err := base.Client.GetIssues().GetURL(base.Remote.Owner, base.Remote.RepoName, id)
-			hlblib.PanicIfErrorExist(err)
-			url = u
-		}
-
-		if urlFlag {
-			fmt.Println(url)
-		} else {
-			open.Run(url)
-		}
-	},
+func NewCmdBrowseIssues(cmdContextFunc func() (*hlblib.CmdContext, error)) *cobra.Command {
+	cmd := &cobra.Command{
+		Args:  MaximumNumArgs(1),
+		Use:   "issues",
+		Short: "browse issues",
+		Long:  ``,
+		RunE: NewBrowseCmdFunc(cmdContextFunc, func(cmdContext *hlblib.CmdContext, args []string) (string, error) {
+			var url string
+			if len(args) == 0 {
+				u, err := cmdContext.Client.GetIssues().GetIssuesURL(cmdContext.Remote.Owner, cmdContext.Remote.RepoName)
+				return u, errors.Wrap(err, "failed to get issues URL for browse from: "+url)
+			} else {
+				id, _ := strconv.Atoi(args[0]) // never return err because it already checked by args validator
+				u, err := cmdContext.Client.GetIssues().GetURL(cmdContext.Remote.Owner, cmdContext.Remote.RepoName, id)
+				return u, errors.Wrap(err, "failed to get issue URL for browse from: "+url)
+			}
+		}),
+	}
+	return cmd
 }
 
 func init() {
-	browseCmd.AddCommand(browseissuesCmd)
+	browseCmd.AddCommand(NewCmdBrowseIssues(hlblib.NewCmdContext))
 }

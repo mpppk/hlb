@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 
 	"strconv"
@@ -15,11 +16,12 @@ var listpullrequestsCmd = &cobra.Command{
 	Short: "list pull-requests",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		base, err := hlblib.NewCmdBase()
+		base, err := hlblib.NewCmdContext()
 		hlblib.PanicIfErrorExist(err)
 
 		//pulls, err := sw.GetPullRequests()
-		pulls, err := base.Client.GetPullRequests().List(base.Context, base.Remote.Owner, base.Remote.RepoName)
+		ctx := context.Background()
+		pulls, err := base.Client.GetPullRequests().List(ctx, base.Remote.Owner, base.Remote.RepoName)
 
 		hlblib.PanicIfErrorExist(err)
 

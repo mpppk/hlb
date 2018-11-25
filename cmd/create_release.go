@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/mpppk/gitany"
@@ -20,7 +21,7 @@ var createReleaseCmd = &cobra.Command{
 	Short: "Create release page and upload files",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		base, err := hlblib.NewCmdBase()
+		base, err := hlblib.NewCmdContext()
 		hlblib.PanicIfErrorExist(err)
 
 		if len(args) < 1 {
@@ -36,7 +37,8 @@ var createReleaseCmd = &cobra.Command{
 			Body:    message,
 		}
 
-		release, _, err := base.Client.GetRepositories().CreateRelease(base.Context, base.Remote.Owner, base.Remote.RepoName, newRelease)
+		ctx := context.Background()
+		release, _, err := base.Client.GetRepositories().CreateRelease(ctx, base.Remote.Owner, base.Remote.RepoName, newRelease)
 
 		hlblib.PanicIfErrorExist(err)
 		fmt.Println(release.GetHTMLURL())

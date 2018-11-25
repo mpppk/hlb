@@ -1,39 +1,31 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/mpppk/hlb/hlblib"
-	"github.com/skratchdot/open-golang/open"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
 var urlFlag bool
+var browseCmd = NewCmdBrowse(hlblib.NewCmdContext)
 
-// browseCmd represents the browse command
-var browseCmd = &cobra.Command{
-	Use:   "browse",
-	Short: "browse repo",
-	Long:  ``,
-	Run: func(cmd *cobra.Command, args []string) {
-		base, err := hlblib.NewCmdBase()
-		hlblib.PanicIfErrorExist(err)
-		url, err := base.Client.GetRepositories().GetURL(base.Remote.Owner, base.Remote.RepoName)
+func NewCmdBrowse(cmdContextFunc func() (*hlblib.CmdContext, error)) *cobra.Command {
+	cmd := &cobra.Command{
+		Args:  cobra.NoArgs,
+		Use:   "browse",
+		Short: "browse repo",
+		Long:  ``,
+		RunE: NewBrowseCmdFunc(cmdContextFunc, func(cmdContext *hlblib.CmdContext, args []string) (string, error) {
+			url, err := cmdContext.Client.GetRepositories().GetURL(cmdContext.Remote.Owner, cmdContext.Remote.RepoName)
+			return url, errors.Wrap(err, "failed to get repository commits URL for browse from: "+url)
+		}),
+	}
 
-		hlblib.PanicIfErrorExist(err)
-
-		if urlFlag {
-			fmt.Println(url)
-		} else {
-			if err := open.Run(url); err != nil {
-				hlblib.PanicIfErrorExist(err)
-			}
-		}
-	},
+	cmd.PersistentFlags().BoolVarP(&urlFlag, "url", "u", false,
+		"outputs the URL rather than opening the browser")
+	return cmd
 }
 
 func init() {
-	browseCmd.PersistentFlags().BoolVarP(&urlFlag, "url", "u", false,
-		"outputs the URL rather than opening the browser")
 	RootCmd.AddCommand(browseCmd)
 }

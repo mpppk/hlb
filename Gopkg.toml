@@ -44,4 +44,4 @@
 
 [[constraint]]
   name = "github.com/mpppk/gitany"
-  version = "0.0.3"
+  version = "0.0.4"
