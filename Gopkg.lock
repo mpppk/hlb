@@ -175,6 +175,7 @@
     ".",
     "github",
     "gitlab",
+    "mock",
   ]
   pruneopts = ""
   revision = "76ee0a0de56238d94eeca64651573a7a31238161"
@@ -505,6 +506,7 @@
     "github.com/mpppk/gitany",
     "github.com/mpppk/gitany/github",
     "github.com/mpppk/gitany/gitlab",
+    "github.com/mpppk/gitany/mock",
     "github.com/pkg/errors",
     "github.com/rhysd/go-github-selfupdate/selfupdate",
     "github.com/skratchdot/open-golang/open",

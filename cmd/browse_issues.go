@@ -1,49 +1,56 @@
 package cmd
 
 import (
-	"fmt"
 	"strconv"
+
+	"github.com/pkg/errors"
 
 	"github.com/mpppk/hlb/hlblib"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/cobra"
 )
 
-// browseissuesCmd represents the browseissues command
-var browseissuesCmd = &cobra.Command{
-	Use:   "issues",
-	Short: "browse issues",
-	Long:  `browse issues`,
-	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) > 1 {
-			fmt.Println("Too many issue IDs")
-		}
+func NewCmdBrowseIssues(cmdContextFunc func() (*hlblib.CmdContext, error)) *cobra.Command {
+	cmd := &cobra.Command{
+		Args:  MaximumNumArgs(1),
+		Use:   "issues",
+		Short: "browse issues",
+		Long:  ``,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cmdContext, err := cmdContextFunc()
+			if err != nil {
+				return errors.Wrap(err, "failed to get command context")
+			}
+			var url string
+			if len(args) == 0 {
+				u, err := cmdContext.Client.GetIssues().GetIssuesURL(cmdContext.Remote.Owner, cmdContext.Remote.RepoName)
+				if err != nil {
+					return errors.Wrap(err, "failed to get issues URL for browse from: "+url)
+				}
+				url = u
+			} else {
+				id, _ := strconv.Atoi(args[0]) // never return err because it already checked by args validator
 
-		base, err := hlblib.NewCmdContext()
-		hlblib.PanicIfErrorExist(err)
+				u, err := cmdContext.Client.GetIssues().GetURL(cmdContext.Remote.Owner, cmdContext.Remote.RepoName, id)
+				if err != nil {
+					return errors.Wrap(err, "failed to get issue URL for browse from: "+url)
+				}
+				url = u
+			}
 
-		var url string
-		if len(args) == 0 {
-			u, err := base.Client.GetIssues().GetIssuesURL(base.Remote.Owner, base.Remote.RepoName)
-			hlblib.PanicIfErrorExist(err)
-			url = u
-		} else {
-			id, err := strconv.Atoi(args[0])
-			hlblib.PanicIfErrorExist(err)
-
-			u, err := base.Client.GetIssues().GetURL(base.Remote.Owner, base.Remote.RepoName, id)
-			hlblib.PanicIfErrorExist(err)
-			url = u
-		}
-
-		if urlFlag {
-			fmt.Println(url)
-		} else {
-			open.Run(url)
-		}
-	},
+			if urlFlag {
+				cmd.Println(url)
+			} else {
+				if err := open.Run(url); err != nil {
+					return errors.Wrap(err, "failed to open repository URL: "+url)
+				}
+			}
+			return nil
+		},
+	}
+	return cmd
 }
 
 func init() {
-	browseCmd.AddCommand(browseissuesCmd)
+	browseCmd.AddCommand(NewCmdBrowseIssues(hlblib.NewCmdContext))
 }

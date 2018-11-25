@@ -1,35 +1,42 @@
 package cmd
 
 import (
-	"fmt"
+	"github.com/pkg/errors"
 
 	"github.com/mpppk/hlb/hlblib"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/cobra"
 )
 
-var browsecommitsCmd = &cobra.Command{
-	Use:   "commits",
-	Short: "browse commits",
-	Long:  ``,
-	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) > 0 {
-			fmt.Println("warning: `browse commits` does not accept any args. They are ignored.")
-		}
+func NewCmdBrowseCommits(cmdContextFunc func() (*hlblib.CmdContext, error)) *cobra.Command {
+	cmd := &cobra.Command{
+		Args:  cobra.NoArgs,
+		Use:   "commits",
+		Short: "browse commits",
+		Long:  ``,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cmdContext, err := cmdContextFunc()
+			if err != nil {
+				return errors.Wrap(err, "failed to get command context")
+			}
+			url, err := cmdContext.Client.GetRepositories().GetCommitsURL(cmdContext.Remote.Owner, cmdContext.Remote.RepoName)
+			if err != nil {
+				return errors.Wrap(err, "failed to get repository commits URL for browse from: "+url)
+			}
 
-		base, err := hlblib.NewCmdContext()
-		hlblib.PanicIfErrorExist(err)
-		url, err := base.Client.GetRepositories().GetCommitsURL(base.Remote.Owner, base.Remote.RepoName)
-		hlblib.PanicIfErrorExist(err)
-
-		if urlFlag {
-			fmt.Println(url)
-		} else {
-			open.Run(url)
-		}
-	},
+			if urlFlag {
+				cmd.Println(url)
+			} else {
+				if err := open.Run(url); err != nil {
+					return errors.Wrap(err, "failed to open repository URL: "+url)
+				}
+			}
+			return nil
+		},
+	}
+	return cmd
 }
 
 func init() {
-	browseCmd.AddCommand(browsecommitsCmd)
+	browseCmd.AddCommand(NewCmdBrowseCommits(hlblib.NewCmdContext))
 }
