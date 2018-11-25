@@ -1,10 +1,8 @@
 package cmd
 
 import (
-	"github.com/pkg/errors"
-
 	"github.com/mpppk/hlb/hlblib"
-	"github.com/skratchdot/open-golang/open"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -17,26 +15,10 @@ func NewCmdBrowse(cmdContextFunc func() (*hlblib.CmdContext, error)) *cobra.Comm
 		Use:   "browse",
 		Short: "browse repo",
 		Long:  ``,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cmdContext, err := cmdContextFunc()
-			if err != nil {
-				return errors.Wrap(err, "failed to get command context")
-			}
-
+		RunE: NewBrowseCmdFunc(cmdContextFunc, func(cmdContext *hlblib.CmdContext, args []string) (string, error) {
 			url, err := cmdContext.Client.GetRepositories().GetURL(cmdContext.Remote.Owner, cmdContext.Remote.RepoName)
-			if err != nil {
-				return errors.Wrap(err, "failed to get repository for browse from: "+url)
-			}
-
-			if urlFlag {
-				cmd.Println(url)
-			} else {
-				if err := open.Run(url); err != nil {
-					return errors.Wrap(err, "failed to open repository URL: "+url)
-				}
-			}
-			return nil
-		},
+			return url, errors.Wrap(err, "failed to get repository commits URL for browse from: "+url)
+		}),
 	}
 
 	cmd.PersistentFlags().BoolVarP(&urlFlag, "url", "u", false,

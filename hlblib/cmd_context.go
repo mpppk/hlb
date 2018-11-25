@@ -16,6 +16,8 @@ type CmdContext struct {
 	Client        gitany.Client
 }
 
+type CmdContextFunc func() (*CmdContext, error)
+
 func NewCmdContext() (*CmdContext, error) {
 	ctx := context.Background()
 
